@@ -1,0 +1,76 @@
+.card {
+    max-width: 550px;
+    margin: 35px auto;
+    padding: 32px;
+    border-radius: 16px;
+    background-color: #fff;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+    transition: box-shadow 0.3s ease;
+}
+
+.card:hover {
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
+}
+
+.profileHeader {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+}
+
+.icon {
+    font-size: 100px;
+    color: #4796e0;
+}
+
+.fullName {
+    font-size: 24px;
+    color: #222;
+    margin: 0;
+}
+
+.infoGrid {
+    width: 60%;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+}
+
+.infoBox {
+    flex: 1 1 220px;
+    padding: 16px;
+    background-color: #f7faff;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.04);
+}
+
+.infoHeader {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.infoIcon {
+    font-size: 18px;
+    color: #4796e0;
+}
+
+.label {
+    font-size: 18px;
+    color: #666;
+    margin: 0;
+}
+
+.value {
+    font-size: 16px;
+    color: #333;
+    margin: 0;
+}

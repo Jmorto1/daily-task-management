@@ -1,0 +1,282 @@
+/*admin page*/
+.dashboardPage{
+    background-color:#fff ;
+    width: 100vw;
+    height:100vh;
+    display:flex;
+    color: black;
+    justify-content: space-between;
+    overflow: hidden
+}
+/* admin menu */
+.menu{
+    width: 270px;
+    background-color: #4796E0;
+    display: flex;
+    border-radius: 0 0 5px 0;
+    flex-direction: column;
+    align-items: center;
+    color: white;
+}
+/* menuHeader */
+.menuHeader{
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    justify-content: space-around;
+    padding: 10px;
+}
+.logoImage{
+    height:60px;
+    width: 100px;
+    border-radius:5px;
+    background-image: url("../assets/images/addisAbabLogo.jpg");
+    background-repeat: no-repeat;
+    background-color: rgba(248, 245, 245, 0.926);
+    background-size: cover;
+    background-position: center;
+
+}
+.name{
+    font-size:22px;
+}
+.menuListNav{
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    margin: 40px auto;
+}
+.menuListNav ul{
+    display: flex;
+    flex-direction: column;
+    gap:10px;
+    justify-content: center;
+    width: fit-content;
+    margin: 0 auto;
+    padding:0;
+
+}
+.menuList li{
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    border-width: 0px 0.2px 2px 1px;
+    border-style: solid;
+    border-color: rgba(0, 0, 0, 0.3);
+    border-left-color: rgba(0, 0, 0, 0.1);
+    border-right-color: rgba(186, 81, 81, 0.1);
+    margin-bottom: 10px;
+    border-radius: 3px;
+    text-align: start;
+    cursor: pointer;
+    color: white;
+    padding:7px 15px 7px 30px;
+    transition: background ease 0.3s;
+}
+.menuList li:hover{
+    background:#357dc0;
+}
+.icons{
+    font-size:20px;
+}
+/*content area*/
+.contentArea{
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+.Header{
+     display: flex;
+    flex-direction: row;
+    align-items:center;
+    justify-content:flex-end;
+    margin: 0;
+    padding: 10px 20px 10px 20px;
+    gap: 40px;
+    background-color: rgba(244, 239, 239, 0.962);
+    min-height: 70px;
+    border-right: 1px solid rgba(0, 0, 0, 0.1) ;
+    border-left: 1px solid rgba(0, 0, 0, 0.1);
+    border-bottom: 2px solid rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 6px rgba(89, 74, 200, 0.2);
+}
+.HeaderTitle{
+    color: #357dc0;
+    font-size: 20px;
+    font-weight: 500;
+}
+.avatorContainer{
+    position: relative;
+    margin: 0;
+    padding: 0;
+}
+.avatorWrapper{
+    width: 50px;
+    height: 50px;
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background ease 0.3s;
+}
+.avatorWrapper:hover {
+    background-color: rgb(214, 209, 206);
+}
+.avator{
+    width: 35px;
+    height: 35px;
+    aspect-ratio: 1/1;
+    font-size: 23px;
+    border-radius: 50%;
+    background-color:rgb(96, 125, 132);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: box-shadow ease 0.3s;
+}
+
+.profileDropdown {
+    position: absolute;
+    top: 60px;
+    right: 0px;
+    color: rgba(255, 255, 255, 0.692);
+    background-color: rgb(67, 66, 62);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    padding: 10px 0;
+    min-width: 250px;
+    min-height: 350px;
+    z-index: 100;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+.profileDropdown .avator{
+    width: 100px;
+    height: 100px;
+    font-size: 40px;
+    cursor:default;
+}
+.profileDropdown .role{
+    color: rgb(96, 125, 132);
+    font-size: 20px;
+    
+}
+.profileDropdown ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.profileDropdown li {
+    padding: 10px 16px 10px 40px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    text-align: center;
+    border-radius: 10px;
+}
+
+.profileDropdown li:hover {
+    background-color: #2f2b2b;
+}
+.profileDropdown .icons{
+    color:rgb(7, 28, 11);
+}
+.profileDropdown a {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+.menuList li.activebtn {
+    background-color: white;
+    color: #357dc0;
+}
+
+.menuList li.activebtn:hover {
+    background-color: white;
+    color: #357dc0;
+}
+.displayArea{
+    display: flex;
+    flex-wrap: wrap;
+    overflow-y: auto;
+    overflow-x: auto;
+    box-sizing: border-box;
+}
+@media(min-width:1200px){
+    .Header{
+        padding: 10px 50px 10px 20px;
+    }
+    .HeaderTitle{
+        margin-right: 100px;
+        font-size: 25px;
+    }
+}
+/*mobile version*/
+@media (max-width: 768px) {
+    .dashboardPage {
+        flex-direction: column;
+    }
+    .displayArea {
+        flex: 1;
+        overflow-y: auto;
+        overflow-x: auto;
+    }
+
+    .menu {
+        flex-direction: row-reverse;
+        width: 100%;
+        height: 70px;
+        position: relative;
+        margin: 0;
+        z-index: 10;
+    }
+    .menuToggle{
+        position: absolute;
+        bottom:0px;
+        left: 15px;
+        border: none;
+        border-radius: 5px;
+        height: 60px;
+        width: 60px;
+        transition: all ease 0.2s;
+        color: white;
+    }
+    .menuToggle svg,.menuToggle button{
+        background-color: #4796E0;
+        border: none;
+        border-radius: 5px;
+        width: 100%;
+        height:100%;
+        cursor: pointer;
+    }
+    .menuList {
+        margin: 0;
+        position: absolute;
+        top: 100%;
+        left: 0px;
+        z-index: 1000;
+        width: 250px;
+        border-radius: 0 0 10px 10px;
+        background-color:#4796E0;
+    }
+    .Header{
+        align-items:center;
+        justify-content:space-around;
+        margin: 0;
+        padding: 5px 15px;
+        gap: 20px;
+    }
+    .HeaderTitle{
+        font-size: 16px;
+    }
+}
