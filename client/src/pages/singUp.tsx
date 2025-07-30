@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { FaUser, FaPhone, FaLock, FaEye, FaEyeSlash } from "react-icons/fa";
+import Language from "../components/languages";
 import styles from "../styles/SignupPage.module.css";
 
 export default function SignupPage() {
@@ -31,6 +32,9 @@ export default function SignupPage() {
     setShowConfirmPassword(!showConfirmPassword);
   return (
     <div className={styles.signupContainer}>
+      <div className={styles.language}>
+        <Language />
+      </div>
       <div className={styles.signupForm}>
         <h2>Create an Account</h2>
         <form onSubmit={handleSubmit}>

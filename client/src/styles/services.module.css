@@ -1,0 +1,196 @@
+.container{
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    overflow: none;
+}
+/*header*/
+.header{
+    display: flex;
+    align-items: center;
+    justify-content:space-around;
+    padding:20px 10px 10px;
+}
+.btn{
+    padding: 7px 28px;
+    font-size: 1rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.12s ease;
+    color: #fff;
+    letter-spacing: 0.5px;
+    box-shadow: 2px 3px 10px rgba(0, 0, 0, 0.15);
+    background: linear-gradient(135deg, #28a745, #218838);
+}
+.btn:hover {
+    background: linear-gradient(135deg, #388e3c, #4caf50);
+    box-shadow:2px 3px 10px #388e3cbb;
+}
+/* display area*/
+.displayArea {
+    width: 90%;
+    padding: 12px;
+    margin: 10px auto;
+}
+
+/* Main Service */
+.mainService {
+    background-color: #e3f2fd;
+    border: 1.8px solid #90caf9;
+    border-radius: 10px;
+    margin-bottom: 5px;
+    padding: 7px;
+    box-shadow: inset 0 2px 5px rgba(144, 202, 249, 0.4);
+    transition: background-color 0.3s ease;
+}
+
+.mainService:hover {
+    background-color: #bbdefb;
+    border-color: #64b5f6;
+    box-shadow: inset 0 2px 8px rgba(100, 181, 246, 0.6);
+}
+
+/* Main Service button */
+.mainButton {
+    cursor: pointer;
+    background: none;
+    border: none;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 0;
+    font-weight: 700;
+    font-size: 18px;
+    color: #0d47a1;
+    text-align: left;
+    user-select: none;
+    outline-offset: 3px;
+}
+
+.mainButton:hover {
+    color: #1565c0;
+}
+
+/* Text spacing */
+.mainText {
+    margin-left: 14px;
+}
+
+/* Sub Services Container */
+.subServicesContainer {
+    padding-left: 15px;
+    border-left: 3px solid #bbdefb;
+    margin-top: 10px;
+}
+.subServiceTitle {
+    background-color: rgb(154, 198, 154);
+    border: 1.4px solid #bbdefb;
+    text-align: center;
+    font-size:18px;
+    border-radius: 8px;
+    margin-bottom: 0px;
+    padding: 8px 14px;
+}
+/* Sub Service */
+.subService {
+    background-color: #f3f6fb;
+    border: 1.4px solid #bbdefb;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    padding: 8px;
+    box-shadow: inset 0 1px 4px rgba(187, 222, 251, 0.5);
+    transition: background-color 0.3s ease;
+}
+.subService:hover {
+    background-color: #dceefb;
+    border-color: #90caf9;
+    box-shadow: inset 0 2px 6px rgba(144, 202, 249, 0.7);
+}
+
+/* Sub Service button */
+.subButton {
+    cursor: pointer;
+    background: none;
+    border: none;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 0;
+    font-weight: 600;
+    font-size: 15px;
+    color: #1565c0;
+    text-align: left;
+    user-select: none;
+    outline-offset: 3px;
+}
+
+.subButton:hover {
+    color: #1976d2;
+}
+
+/* Sub service text spacing */
+.subText {
+    margin-left: 14px;
+}
+
+/* Activities List */
+.activitiesList {
+    padding-left: 28px;
+    font-size: 14px;
+    margin-top: 6px;
+    list-style-type: disc;
+    color: #394242;
+}
+
+/* Individual Activity Item */
+.activityItem {
+    background-color: #ffffff;
+    border: 1.2px solid #cfd8dc;
+    border-radius: 6px;
+    margin: 4px 0;
+    padding: 6px 14px;
+    box-shadow: 0 1px 3px rgba(207, 216, 220, 0.6);
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+    cursor: default;
+    user-select: text;
+}
+
+.activityItem:hover {
+    background-color: #e3f2fd;
+    border-color: #90caf9;
+}
+
+/* Arrow circular wrapper */
+.circleClosed,
+.circleOpen {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background-color: #f1f3f4;
+    color: #5f6368;
+    transition: background-color 0.3s ease;
+    flex-shrink: 0;
+    user-select: none;
+}
+
+.circleClosed:hover,
+.circleOpen:hover {
+    background-color: #e8eaed;
+}
+
+/* Arrow Down */
+.arrowDown {
+    transform: rotate(0deg);
+    transition: transform 0.3s ease;
+}
+
+/* Arrow Up */
+.arrowUp {
+    transform: rotate(180deg);
+    transition: transform 0.3s ease;
+}
