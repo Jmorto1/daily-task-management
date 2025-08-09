@@ -1,4 +1,4 @@
-import { MdMiscellaneousServices } from "react-icons/md";
+import { MdMiscellaneousServices, MdYard } from "react-icons/md";
 import {
   FaTasks,
   FaUserTie,
@@ -19,7 +19,10 @@ import { useLang } from "../hooks/useLang";
 import EditInfo from "../components/editInfo";
 import About from "../components/about";
 import Services from "../components/services";
+import Employee from "../components/employee.";
+import MyTasks from "../components/myTask";
 import ChangePassword from "../components/changePassword";
+import Report from "../components/report";
 import { useIsMoblie } from "../hooks/useIsMobile";
 import { useIsOpen } from "../hooks/useIsOpen";
 export default function Dashboard() {
@@ -30,7 +33,7 @@ export default function Dashboard() {
   const prevView = useRef(activeView);
   const excludeFromHistory = ["changePassword", "editInfo"];
   const isMobile = useIsMoblie();
-  const navlistRef = useRef<HTMLDivElement>(null);
+  const navlistRef = useRef<HTMLDivElement | null>(null);
   const { isOpen, setIsOpen } = useIsOpen(navlistRef);
   const { lang, setLang } = useLang();
   const translate = {
@@ -135,19 +138,34 @@ export default function Dashboard() {
                   <MdMiscellaneousServices className={styles.icons} />
                   {text.service}
                 </li>
-                <li>
+                <li
+                  onClick={() => {
+                    setActiveView("myTasks");
+                  }}
+                  className={activeView === "myTasks" ? styles.activebtn : ""}
+                >
                   <FaTasks className={styles.icons} />
-                  {text.myjob}
+                  {text.myTask}
                 </li>
                 <li>
                   <FaUsers className={styles.icons} />
                   {text.allGroups}
                 </li>
-                <li>
+                <li
+                  onClick={() => {
+                    setActiveView("report");
+                  }}
+                  className={activeView === "report" ? styles.activebtn : ""}
+                >
                   <FaFileAlt className={styles.icons} />
                   {text.reports}
                 </li>
-                <li>
+                <li
+                  onClick={() => {
+                    setActiveView("employee");
+                  }}
+                  className={activeView === "employee" ? styles.activebtn : ""}
+                >
                   <FaUserTie className={styles.icons} /> {text.employees}
                 </li>
                 <li
@@ -224,6 +242,9 @@ export default function Dashboard() {
             />
           )}
           {activeView === "services" && <Services />}
+          {activeView === "myTasks" && <MyTasks />}
+          {activeView === "report" && <Report />}
+          {activeView === "employee" && <Employee />}
           {activeView === "about" && <About />}
         </div>
       </div>

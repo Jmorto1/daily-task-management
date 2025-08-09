@@ -1,4 +1,5 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { AppDataProvider } from "./context/appDataContext";
 import { LangProvider } from "./context/languageContext";
 import SignupPage from "./pages/singUp";
 import LoginPage from "./pages/Login";
@@ -19,9 +20,11 @@ const router = createBrowserRouter([
 ]);
 function App() {
   return (
-    <LangProvider>
-      <RouterProvider router={router} />
-    </LangProvider>
+    <AppDataProvider>
+      <LangProvider>
+        <RouterProvider router={router} />
+      </LangProvider>
+    </AppDataProvider>
   );
 }
 

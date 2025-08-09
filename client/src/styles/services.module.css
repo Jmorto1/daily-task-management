@@ -1,5 +1,6 @@
 .container{
     display: flex;
+    position: relative;
     flex-direction: column;
     width: 100%;
     overflow: none;
@@ -10,9 +11,18 @@
     align-items: center;
     justify-content:space-around;
     padding:20px 10px 10px;
+    margin-bottom:0;
 }
-.btn{
+.buttonGroup {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    justify-content: center;
+}
+.allButton,.moreButton,.mineButton,.addButton{
     padding: 7px 28px;
+    width: 135px;
     font-size: 1rem;
     font-weight: 600;
     border: none;
@@ -21,20 +31,51 @@
     transition: all 0.12s ease;
     color: #fff;
     letter-spacing: 0.5px;
+    
+}
+.allButton,.mineButton{
+    box-shadow: 2px 3px 10px rgba(0, 0, 0, 0.15);
+    background: linear-gradient(135deg, #1976d2, #1565c0);
+}
+.allButton:hover,.mineButton:hover {
+    background: linear-gradient(135deg, #1e40af, #2563eb);
+    box-shadow:2px 3px 10px #1e40afbb;
+}   
+.moreButton,.addButton {
     box-shadow: 2px 3px 10px rgba(0, 0, 0, 0.15);
     background: linear-gradient(135deg, #28a745, #218838);
 }
-.btn:hover {
+.moreButton:hover,.addButton:hover {
     background: linear-gradient(135deg, #388e3c, #4caf50);
     box-shadow:2px 3px 10px #388e3cbb;
 }
 /* display area*/
+/*noServiceMessage*/
+.noServiceMessage {
+    color: #721c24;
+    font-size: 20px;
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin-top: 16px;
+    text-align: center;
+    font-weight: 500;
+}
 .displayArea {
     width: 90%;
-    padding: 12px;
+    padding:0 12px 12px 12px;
     margin: 10px auto;
 }
-
+/*services header*/
+.serviceHeader {
+    margin: 0;
+    margin-bottom: 6px;
+    padding-bottom: 8px;
+    text-align: center;
+    color: #2c3e50;
+    font-size: 24px;
+    font-weight: 600;
+    
+}
 /* Main Service */
 .mainService {
     background-color: #e3f2fd;
@@ -134,17 +175,84 @@
 .subText {
     margin-left: 14px;
 }
-
 /* Activities List */
 .activitiesList {
-    padding-left: 28px;
-    font-size: 14px;
-    margin-top: 6px;
-    list-style-type: disc;
-    color: #394242;
+    padding-left: 0;
+    margin: 0;
+    list-style: none;
 }
 
+.activityHeader,
+.activityRow {
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr 1fr 1fr 2fr;
+    gap: 12px;
+    align-items: center;
+    padding: 12px 16px;
+    box-sizing: border-box;
+    font-weight: 500;
+    font-size: 14px;
+    color: #333;
+}
+
+.activityHeader {
+    background-color: #e3f2fd;
+    border-radius: 6px;
+    margin-bottom: 8px;
+}
+
+.activityItem {
+    
+    background-color: #ffffff;
+    border: 1.2px solid #cfd8dc;
+    border-radius: 6px;
+    margin: 4px 0;
+    box-shadow: 0 1px 3px rgba(207, 216, 220, 0.6);
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+.activityItem:hover {
+    background-color: #f1f8ff;
+}
+
+.submitButton button:hover {
+    background-color: #1565c0;
+}
+/* mobileActivityBox*/
+.mobileActivityBox{
+    display: flex;
+    flex-direction: column;
+}
+.row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    color: #333;
+    text-align: start;
+}
+.row *{
+    width: 50%;
+    word-break: break-word;
+}
+.row span:nth-child(1) {
+    font-weight: 600;
+    color: #666;
+}
+.row span:nth-child(2){
+    padding-left: 20px;
+}
 /* Individual Activity Item */
+.submitButton {
+    padding: 6px 10px;
+    background-color: #1976d2;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin: 0 auto;
+}
 .activityItem {
     background-color: #ffffff;
     border: 1.2px solid #cfd8dc;
@@ -193,4 +301,384 @@
 .arrowUp {
     transform: rotate(180deg);
     transition: transform 0.3s ease;
+}
+/* Overlay */
+.overlay {
+    position: fixed;
+    inset: 0;
+    background: transparent;
+    z-index: 999;
+    pointer-events: auto;
+}
+/*actionsPanel*/
+.actionsPanel {
+    position: fixed;
+    pointer-events: auto;
+    left: 60%;
+    bottom: 40px;
+    transform: translateX(-60%);
+    background: linear-gradient(135deg, #f8fafc 0%, #e3e8ee 100%);
+    border: 1.5px solid #90caf9;
+    border-radius: 8px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.16);
+    padding: 15px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    z-index: 1000;
+    min-width: 310px;
+    max-width: 100%;
+    transition: all 0.3s cubic-bezier(.4, 0, .2, 1);
+} 
+.actionsPanelCentered ,.addNew,.more{
+position: fixed;
+top: 50%;
+left: 50%;
+transform: translate(-50%, -50%);
+background: linear-gradient(135deg, #f8fafc 0%, #e3e8ee 100%);
+border: 1.5px solid #90caf9;
+border-radius: 8px;
+box-shadow: 0 12px 40px rgba(0, 0, 0, 0.18);
+padding: 16px 10px 16px 10px;
+display: flex;
+flex-direction: column;
+align-items: center;
+gap: 18px;
+z-index: 1000;
+min-width: 310px;
+max-width: 480px;
+max-height: 80vh;
+overflow-y: auto;
+transition: all 0.3s cubic-bezier(.4, 0, .2, 1);
+}
+.activityPanelHeader {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: #1976d2;
+    margin-bottom: 18px;
+    text-align: center;
+    letter-spacing: 0.02em;
+}
+.closeIconButton{
+position: absolute;
+display: flex;
+right: 0;
+top: 0;
+width: 30px;
+height: 30px;
+background-color: inherit;
+border: none;
+align-items: center;
+justify-content: center;
+border-radius: 3px;
+transition: background ease 0.3s;
+z-index: 10;
+}
+.closeIconButton:hover{
+    background-color: red;
+}
+.headerTitile {
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: #1976d2;
+    font-size: 1.12rem;
+    text-align: center;
+    letter-spacing: 0.01em;
+}
+.formActions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+}
+.formActions button {
+    flex: 1;
+    padding: 7px 10px ;
+    font-size: 1.05rem;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    color: #fff;
+    border: none;
+    max-width: 100px;
+    transition: background 0.3s ease, box-shadow 0.3s ease;
+}
+.cancelButton {
+    background: linear-gradient(90deg, #f44336 0%, #e57373 100%);
+    box-shadow: 0 2px 8px rgba(244, 67, 54, 0.08);
+}
+.saveButton {
+    background: linear-gradient(90deg, #4caf50 0%, #81c784 100%);
+    box-shadow: 0 2px 8px rgba(76, 175, 80, 0.08);
+}
+.cancelButton:hover {
+    background: linear-gradient(90deg, #d32f2f 0%, #f44336 100%);
+    box-shadow: 0 4px 16px rgba(244, 67, 54, 0.12);
+}
+.saveButton:hover {
+    background: linear-gradient(90deg, #388e3c 0%, #4caf50 100%);
+    box-shadow: 0 4px 16px rgba(76, 175, 80, 0.12);
+}
+.form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: 96%;
+    gap: 12px;
+    background: #f1f5f9;
+    border-radius: 12px;
+    padding: 24px 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+.formGroup{
+    display: grid;
+    grid-template-columns: 2fr 3fr;
+    justify-content: center;
+    gap: 10px;
+    align-items: center;
+    
+}
+
+.input {
+    font-size: 1.08rem;
+    padding: 8px 10px;
+    border-radius: 9px;
+    border: 1.5px solid #90caf9;
+    margin-right: 0;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    background: #fff;
+    box-shadow: 0 1px 4px rgba(144, 202, 249, 0.08);
+    max-width: 100%;
+    justify-self: center;
+    box-sizing: border-box;
+    appearance: none;
+}
+
+input[type="time"].input {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
+    appearance: none;
+}
+
+.input:focus {
+    border-color: #1976d2;
+    box-shadow: 0 0 0 2px #90caf9;
+}
+.label {
+    font-size: 1.05rem;
+    font-weight: 500;
+    color: #2d3748;
+    min-width: 130px;
+    justify-self: center;
+}
+/*viewActions*/
+.viewActions{
+    display: flex;
+    align-items: center;
+    width: 100%;
+    justify-content: space-around;
+}
+.viewActions button{
+    display: flex;
+    gap: 4px;
+    align-items: center;
+    justify-content: center;
+}
+.editButton {
+    background: linear-gradient(90deg, #2563eb 0%, #3182ce 100%);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 24px;
+    font-size: 1.05rem;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(49, 130, 206, 0.08);
+    transition: background 0.2s, box-shadow 0.2s;
+}
+
+/* Add New Service Modal Custom Styles */
+.subServiceSection {
+    width: 100%;
+    margin-top: 18px;
+    background: #f8fafc;
+    border-radius: 8px;
+    padding: 12px 0 0 0;
+}
+.subServiceHeader {
+    font-size: 1.12rem;
+    font-weight: 600;
+    color: #1976d2;
+    margin-bottom: 10px;
+    text-align: left;
+}
+.subServiceForm {
+    background: #e3f2fd;
+    border: 1.2px solid #90caf9;
+    border-radius: 8px;
+    margin-bottom: 14px;
+    padding: 14px 10px 10px 10px;
+}
+.activitySection {
+    margin-top: 10px;
+    background: #f1f5f9;
+    border-radius: 8px;
+    padding: 10px 0 0 0;
+}
+.activityHeader {
+    font-size: 1.05rem;
+    font-weight: 500;
+    color: #2563eb;
+    margin-bottom: 8px;
+    text-align: left;
+}
+.activityForm {
+background: #fff;
+border: 1px solid #cfd8dc;
+border-radius: 7px;
+margin-bottom: 14px;
+padding: 14px 8px 14px 8px;
+display: flex;
+flex-direction: column;
+gap: 0;
+}
+.activityForm .formGroup {
+margin-bottom: 12px;
+}
+.addSubServiceButton {
+    margin-top: 10px;
+    background: linear-gradient(90deg, #1976d2 0%, #3182ce 100%);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 18px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(49, 130, 206, 0.08);
+    transition: background 0.2s, box-shadow 0.2s;
+}
+.addSubServiceButton:hover {
+    background: linear-gradient(90deg, #1e40af 0%, #2563eb 100%);
+    box-shadow: 0 4px 16px rgba(49, 130, 206, 0.12);
+}
+.addActivityButton {
+    margin-top: 8px;
+    background: linear-gradient(90deg, #4caf50 0%, #81c784 100%);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 7px 14px;
+    font-size: 0.98rem;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(76, 175, 80, 0.08);
+    transition: background 0.2s, box-shadow 0.2s;
+}
+.addActivityButton:hover {
+    background: linear-gradient(90deg, #388e3c 0%, #4caf50 100%);
+    box-shadow: 0 4px 16px rgba(76, 175, 80, 0.12);
+}
+
+.editButton:hover {
+    background: linear-gradient(90deg, #1e40af 0%, #2563eb 100%);
+    box-shadow: 0 4px 16px rgba(49, 130, 206, 0.12);
+}
+
+.deleteButton {
+    background: linear-gradient(90deg, #e53e3e 0%, #f56565 100%);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 24px;
+    font-size: 1.05rem;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(229, 62, 62, 0.08);
+    transition: background 0.2s, box-shadow 0.2s;
+}
+
+.deleteButton:hover {
+    background: linear-gradient(90deg, #c53030 0%, #e53e3e 100%);
+    box-shadow: 0 4px 16px rgba(229, 62, 62, 0.12);
+}
+
+.editActions {
+    display: flex;
+    flex-direction: row;
+    gap: 18px;
+    margin-top: 18px;
+    justify-content: center;
+}
+
+
+
+.headerTitile {
+    font-weight: 600;
+    margin-right: 12px;
+    color: #1976d2;
+    font-size: 1.08rem;
+}
+
+.editInput {
+    font-size: 1rem;
+    padding: 7px 16px;
+    border-radius: 7px;
+    border: 1.5px solid #90caf9;
+    margin-right: 10px;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.editInput:focus {
+    border-color: #1976d2;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    overflow: none;
+}
+@media (max-width: 600px) {
+
+    .actionsPanel,
+    .actionsPanelCentered,
+    .addNew,.more {
+        padding: 12px 2vw;
+        max-width: 90%;
+    }
+    .form{
+        max-width: 96%;
+    }
+    .input {
+        font-size: 1.08rem;
+        padding: 10px 18px;
+        border-radius: 9px;
+        border: 1.5px solid #90caf9;
+        margin-right: 0;
+        outline: none;
+        transition: border-color 0.2s, box-shadow 0.2s;
+        background: #fff;
+        box-shadow: 0 1px 4px rgba(144, 202, 249, 0.08);
+        width: 100% !important;
+        justify-self: center;
+        box-sizing: border-box;
+    }
+
+    .input:focus {
+        border-color: #1976d2;
+        box-shadow: 0 0 0 2px #90caf9;
+    }
+
+    .activityPanelHeader {
+        font-size: 1.08rem;
+        margin-bottom: 10px;
+    }
 }

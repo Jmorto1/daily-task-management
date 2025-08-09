@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 
-export function useIsOpen(navlistRef: React.RefObject<HTMLDivElement>) {
+export function useIsOpen(navlistRef: React.RefObject<HTMLDivElement|null>) {
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {

@@ -1,7 +1,7 @@
 {
     "city":"Addis Ababa",
     "service":"services",
-    "myjob":"My Tasks",
+    "myTask":"My Tasks",
     "employees": "All Employees",
     "allGroups": "All Groups",
     "reports": "Reports",

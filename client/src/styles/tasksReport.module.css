@@ -1,0 +1,405 @@
+.activityTableCard {
+    display: none;
+}
+
+.container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 0 auto 30px;
+    padding: 24px 28px;
+    background: linear-gradient(135deg, #fdfdff);
+    border-radius: 14px;
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease-in-out;
+    height: fit-content;
+}
+
+.header {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 18px;
+    margin-bottom: 32px;
+    background: #f5faff;
+    padding: 18px 0 10px 0;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(26, 115, 232, 0.07);
+    font-size: 1.08rem;
+}
+
+.header label {
+    color: #1a73e8;
+    font-weight: 700;
+    font-size: 1.05rem;
+    margin-right: 6px;
+    letter-spacing: 0.5px;
+}
+
+.header span {
+    color: #22304a;
+    font-weight: 600;
+    font-size: 1.05rem;
+    margin: 0 8px;
+}
+
+.datePicker {
+    padding: 10px 16px;
+    border-radius: 8px;
+    border: 1.8px solid #b0b7c3;
+    font-size: 1.05rem;
+    background-color: #fff;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.07);
+    transition: border-color 0.3s ease;
+    min-width: 140px;
+    text-align: center;
+    margin: 0 2px;
+    outline: none;
+}
+
+.datePicker:focus {
+    border-color: #1a73e8;
+    outline: none;
+    box-shadow: 0 0 8px rgba(26, 115, 232, 0.5);
+}
+
+.datePicker {
+    padding: 10px 16px;
+    border-radius: 8px;
+    border: 1.8px solid #b0b7c3;
+    font-size: 1.05rem;
+    background-color: #fff;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.07);
+    transition: border-color 0.3s ease;
+    min-width: 160px;
+    text-align: center;
+}
+
+.datePicker:focus {
+    border-color: #1a73e8;
+    outline: none;
+    box-shadow: 0 0 8px rgba(26, 115, 232, 0.5);
+}
+
+/*additional Services*/
+.standardService,
+.additionalService {
+    background: linear-gradient(90deg, #f5f7fa 0%, #c3cfe2 100%);
+    padding: 18px 24px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(26, 115, 232, 0.09);
+    margin-bottom: 18px;
+    font-size: 1.08rem;
+    color: #22304a;
+    font-weight: 500;
+    border-left: 5px solid #1a73e8;
+    transition: background 0.3s, box-shadow 0.3s;
+}
+
+.standardService:hover,
+.additionalService:hover {
+    background: linear-gradient(90deg, #e3f0fd 0%, #b6d0f7 100%);
+    box-shadow: 0 4px 18px rgba(26, 115, 232, 0.14);
+    outline: none;
+}
+
+.button {
+    font-weight: 700;
+    border: none;
+    padding: 12px 22px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    font-size: 1rem;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    min-height: 44px;
+}
+
+.datePicker {
+    padding: 10px 16px;
+    border-radius: 8px;
+    border: 1.8px solid #b0b7c3;
+    font-size: 1.05rem;
+    background-color: #fff;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.07);
+    transition: border-color 0.3s ease;
+}
+
+.datePicker:focus {
+    border-color: #1a73e8;
+    outline: none;
+    box-shadow: 0 0 8px rgba(26, 115, 232, 0.5);
+}
+
+.button {
+    font-weight: 700;
+    border: none;
+    padding: 12px 22px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    font-size: 1rem;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+
+.button:active {
+    transform: scale(0.96);
+}
+
+.primary {
+    background: linear-gradient(90deg, #1a73e8, #0c56b3);
+    color: #fff;
+    box-shadow: 0 6px 12px rgba(26, 115, 232, 0.6);
+}
+
+.primary:hover {
+    background: linear-gradient(90deg, #155ab6, #0a3e7b);
+    box-shadow: 0 8px 16px rgba(21, 90, 182, 0.75);
+}
+
+.secondary {
+    background: linear-gradient(90deg, #28a745, #1e7e34);
+    color: #fff;
+    box-shadow: 0 6px 12px rgba(40, 167, 69, 0.3);
+}
+
+.secondary:hover {
+    background: linear-gradient(90deg, #218838, #155d27);
+    box-shadow: 0 8px 16px rgba(33, 136, 56, 0.75);
+}
+
+.noTaskMessage {
+    text-align: center;
+    font-size: 1.15rem;
+    color: #d32f2f;
+    margin: 32px auto 24px auto;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+.section {
+    margin-bottom: 48px;
+}
+
+.sectionHeader {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    border-bottom: 3px solid #d0d8e2;
+    padding-bottom: 6px;
+}
+
+.downloadButtons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 18px;
+    margin-top: 20px;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 14px 18px;
+    border-radius: 10px;
+    transition: background 0.3s;
+}
+
+.downloadButtons button {
+    background: linear-gradient(90deg, #3a7bd5, #00d2ff);
+    color: #fff;
+    font-weight: 700;
+    border: none;
+    padding: 8px 13px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1.05rem;
+    box-shadow: 0 4px 12px rgba(58, 123, 213, 0.18);
+    transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+    outline: none;
+    margin: 0 2px;
+    letter-spacing: 0.5px;
+}
+
+.downloadButtons button:hover,
+.downloadButtons button:focus {
+    background: linear-gradient(90deg, #2b5876, #4e4376);
+    box-shadow: 0 6px 18px rgba(58, 123, 213, 0.25);
+    transform: translateY(-2px) scale(1.04);
+}
+
+.downloadButtons button:active {
+    background: linear-gradient(90deg, #3a7bd5, #00d2ff);
+    transform: scale(0.97);
+}
+
+.serviceBlock {
+    margin-bottom: 10px;
+    border-radius: 10px;
+    background-color: #22304a;
+}
+
+.subServiceBlock {
+    margin-bottom: 10px;
+    margin-left: 5%;
+    width: 95%;
+}
+
+.serviceTitle,
+.subServiceTitle {
+    font-weight: 700;
+    background-color: #e3f2fd;
+    padding: 14px 20px;
+    border-radius: 10px;
+    box-shadow: 0 3px 8px rgba(26, 115, 232, 0.15);
+    margin: 10px 0;
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 0.25s ease;
+}
+
+.serviceTitle {
+    margin-bottom: 0;
+}
+.subServiceTitle{
+    display: flex;
+    justify-content: space-between;
+}
+.serviceTitle:hover,
+.subServiceTitle:hover,
+.serviceTitle:focus,
+.subServiceTitle:focus {
+    background-color: #bbdefb;
+    outline: none;
+}
+.serviceTitleContent{
+    display:inline-flex;
+    width: 90%;
+    justify-content: space-between;
+}
+.table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin-top: 12px;
+    border-radius: 12px;
+    overflow: hidden;
+    background-color: #fff;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.07);
+    font-size: 1rem;
+}
+
+.table thead {
+    background-color: #1a73e8;
+    color: white;
+    font-weight: 700;
+}
+
+.table th,
+.table td {
+    padding: 14px 16px;
+    text-align: left;
+    border-bottom: 1px solid #dde6f1;
+    vertical-align: middle;
+}
+
+.table tbody tr:nth-child(even) {
+    background-color: #f9fbff;
+}
+
+.table tbody tr:hover {
+    background-color: #e3f2fd;
+}
+
+/* Media Queries */
+@media (max-width: 900px) {
+    .container {
+        max-width: 720px;
+        padding: 20px 22px;
+    }
+
+    .sectionHeader {
+        gap: 10px;
+    }
+
+    .button {
+        padding: 10px 18px;
+        font-size: 0.95rem;
+    }
+
+    .datePicker {
+        padding: 8px 12px;
+        font-size: 0.95rem;
+    }
+}
+
+@media (max-width: 645px),
+(min-width:768px) and (max-width:920px) {
+    .table {
+        display: none !important;
+    }
+
+    .activityTableCard {
+        display: block;
+        width: 100%;
+    }
+
+    .activityCard {
+        background: #fff;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(26, 115, 232, 0.08);
+        margin-bottom: 16px;
+        padding: 12px 14px;
+        font-size: 0.98rem;
+        border-left: 4px solid #1a73e8;
+    }
+
+    .activityCardRow {
+        display: flex;
+        justify-content: space-between;
+        padding: 4px 0;
+        border-bottom: 1px solid #e3eaf2;
+    }
+
+    .activityCardRow:last-child {
+        border-bottom: none;
+    }
+
+    .activityCardLabel {
+        font-weight: 600;
+        color: #1a73e8;
+        min-width: 110px;
+        margin-right: 10px;
+    }
+
+    .activityCardValue {
+        color: #22304a;
+        text-align: right;
+        flex: 1;
+    }
+}
+
+
+
+@media (max-width: 360px) {
+
+    .table th,
+    .table td {
+        padding: 10px 12px;
+        font-size: 0.85rem;
+    }
+
+    .serviceTitle,
+    .subServiceTitle {
+        font-size: 1rem;
+        padding: 12px 16px;
+    }
+
+    .button {
+        font-size: 0.9rem;
+        padding: 10px 14px;
+    }
+}

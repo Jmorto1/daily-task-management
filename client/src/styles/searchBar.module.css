@@ -34,3 +34,11 @@
 
     box-shadow: 0 0 0 2px rgba(71, 150, 224, 0.3);
 }
+@media(max-width:400px){
+    .searchContainer{
+        width: 160px;
+    }
+    .searchInput{
+        width: 65%;
+    }
+}

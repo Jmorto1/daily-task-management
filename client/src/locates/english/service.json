@@ -1,4 +1,9 @@
 {
     "add":"Add New",
-    "subservice":"Sub Services"
+    "more":"+ More",
+    "all":"All",
+    "mine":"Mine",
+    "title":"Available Services",
+    "subservice":"Sub Services",
+    "noFound":"No services found"
 }

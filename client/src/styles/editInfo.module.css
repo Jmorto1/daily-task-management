@@ -1,6 +1,7 @@
 .container {
   max-width: 600px;
-  margin: 50px auto 50px;
+  height: min-content;
+  margin: 30px auto;
   background: #f9f9f9;
   padding: 25px 30px;
   border-radius: 10px;
@@ -36,7 +37,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
 }
 
 .label {
@@ -56,14 +57,14 @@
 }
 
 .input {
-  padding: 10px 12px;
+  padding: 8px 12px;
   width: 90%;
   border: 1px solid #ccc;
   border-radius: 6px;
   outline: none;
   transition: border-color 0.2s;
 }
-.input.phoneNo{
+.input.phoneNo,.input.office{
   max-width: 300px;
 }
 .input:focus {

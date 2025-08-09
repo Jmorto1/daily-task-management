@@ -1,0 +1,70 @@
+
+.container {
+  background: linear-gradient(135deg, #fdfdff);
+  margin: 0;
+  padding: 0;
+  width: 100%;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  width: 90%;
+  gap: 24px;
+  margin: 15px auto;
+  background: #e3f0fd;
+  border-radius: 12px;
+  padding: 18px 24px;
+  box-shadow: 0 2px 8px rgba(26, 115, 232, 0.07);
+}
+.titlewrapper{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.icon {
+  color: #1a73e8;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #22304a;
+  margin: 0;
+}
+
+.teamSelectWrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.label {
+  font-size: 1.08rem;
+  font-weight: 600;
+  color: #1a73e8;
+}
+
+.select {
+  padding: 8px 16px;
+  text-align: center;
+  border-radius: 8px;
+  border: 1.5px solid #b0b7c3;
+  font-size: 1.05rem;
+  background: #fff;
+  color: #22304a;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.07);
+  transition: border-color 0.3s;
+}
+
+.select:focus {
+  border-color: #1a73e8;
+  outline: none;
+  box-shadow: 0 0 8px rgba(26, 115, 232, 0.15);
+}
+
+.reportContent {
+  width: 100%;
+}

@@ -54,6 +54,19 @@ export default function EditInfo({ prevView, setActiveView }: propsType) {
             </div>
           </div>
         </div>
+        <div className={styles.fieldGroup}>
+          <label className={styles.label}>{text.office}</label>
+          <div className={styles.inputs}>
+            <div>
+              <label className={styles.subLabel}>በአማርኛ</label>
+              <input className={styles.input} type="text" required />
+            </div>
+            <div>
+              <label className={styles.subLabel}>In English</label>
+              <input className={styles.input} type="text" required />
+            </div>
+          </div>
+        </div>
 
         <div className={styles.fieldGroup}>
           <label className={styles.label}>{text.phoneNo}</label>

@@ -1,0 +1,441 @@
+/* Container */
+.container {
+    margin: 20px auto;
+    padding: 12px 16px;
+}
+
+/* Title */
+.title {
+    text-align: center;
+    font-size: 28px;
+    margin-bottom: 24px;
+    color: #222;
+    font-weight: 700;
+}
+
+/* Pending Button */
+.pendingBtn {
+    background-color: #1d72b8;
+    color: white;
+    border: none;
+    border-radius: 25px;
+    padding: 10px 22px;
+    font-size: 16px;
+    cursor: pointer;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 12px rgb(29 114 184 / 0.4);
+    transition: background-color 0.3s ease;
+}
+
+.pendingBtn:hover {
+    background-color: #155d8b;
+}
+
+/* Badge for pending count */
+.badge {
+    background-color: #e94560;
+    color: white;
+    font-size: 14px;
+    font-weight: 700;
+    border-radius: 9999px;
+    padding: 4px 10px;
+    min-width: 24px;
+    text-align: center;
+    user-select: none;
+}
+/*pending container*/
+.pendingContainer{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.column{
+    flex: 1;
+    display: flex;
+    flex-direction:column;
+    align-items: center;
+    justify-content: center;
+    flex:1;
+    color: black;
+
+}
+.column .header{
+    font-size: 18px;
+    color:#155d8b;
+}
+/* Pending List */
+.pendingList {
+    background-color: #f1f5f9;
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 30px;
+    box-shadow: inset 0 0 8px rgb(0 0 0 / 0.05);
+}
+/* Each pending employee item */
+.pendingItem {
+    background-color: white;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    flex-wrap: wrap;
+}
+
+/* Pending employee simple text fields */
+.pendingItem>div {
+    flex: 1 1 140px;
+    font-size: 15px;
+    color: #1f2937;
+    font-weight: 600;
+}
+
+/* Pending action buttons container */
+.pendingActions {
+    margin-left: auto;
+    display: flex;
+    gap: 12px;
+    flex-shrink: 0;
+}
+
+/* Buttons */
+.approveBtn,
+.deleteBtn,
+.editBtn,
+.saveBtn,
+.cancelBtn {
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    border: none;
+    user-select: none;
+    transition: background-color 0.25s ease;
+    flex-shrink: 0;
+}
+
+/* Approve button */
+.approveBtn {
+    background-color: hsl(134, 61%, 41%);
+    color: white;
+    max-width: 150px;
+    min-width: 100px;
+}
+
+.approveBtn:hover {
+    background-color: #1e7e34;
+}
+
+/* Delete button */
+.deleteBtn {
+    background-color: #dc3545;
+    color: white;
+    max-width: 150px;
+    min-width: 100px;
+}
+
+.deleteBtn:hover {
+    background-color: #a71d2a;
+}
+
+/* Edit button */
+.editBtn {
+    background-color: #3b82f6;
+    color: white;
+}
+
+.editBtn:hover {
+    background-color: #1e40af;
+}
+
+/* Save button */
+.saveBtn {
+    background-color: #10b981;
+    color: white;
+}
+
+.saveBtn:hover {
+    background-color: #065f46;
+}
+
+/* Cancel button */
+.cancelBtn {
+    background-color: #6b7280;
+    color: white;
+}
+
+.cancelBtn:hover {
+    background-color: #374151;
+}
+
+/* Approve Form */
+.approveForm {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 12px;
+    border: 1px solid #bbb;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    width: 100%;
+}
+
+.approveForm>div {
+    flex: 1 1 150px;
+    display: flex;
+    flex-direction: column;
+}
+
+.approveForm label {
+    font-weight: 600;
+    margin-bottom: 4px;
+    color: #374151;
+    font-size: 14px;
+}
+
+.approveForm input[type="text"],
+.approveForm select {
+    padding: 6px 8px;
+    border: 1.5px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+    color: #111827;
+}
+
+.approveForm input[readonly] {
+    background-color: #e9ecef;
+    cursor: not-allowed;
+    color: #495057;
+}
+
+/* Approve form actions */
+.approveFormActions {
+    display: flex;
+    gap: 10px;
+    align-items: flex-end;
+    flex: 1 1 100%;
+    margin-top: 8px;
+}
+.approveBtn
+/* Employee Table */
+.employeeTable {
+    border-collapse: collapse;
+    width: 100%;
+    box-shadow: 0 6px 18px rgb(0 0 0 / 0.05);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+/* Table Header and Rows */
+.tableHeader,
+.tableRow {
+    display: grid;
+    grid-template-columns: 2.5fr 1.5fr 1fr 1.5fr 1.5fr 1fr;
+    align-items: center;
+    padding: 10px 20px;
+}
+
+.tableHeader {
+    background-color: #3b82f6;
+    color: white;
+    font-weight: 700;
+    font-size: 15px;
+}
+
+.tableRow {
+    background-color: #ffffff;
+    border-bottom: 1px solid #e5e7eb;
+    font-size: 14px;
+    color: #374151;
+}
+
+.tableRow:nth-child(even) {
+    background-color: #f9fafb;
+}
+
+/* Individual cells */
+.tableRow>div,
+.tableHeader>div {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+/* Select dropdown */
+.select {
+    padding: 6px 8px;
+    font-size: 14px;
+    border-radius: 6px;
+    border: 1.5px solid #ccc;
+    color: #111827;
+    cursor: pointer;
+    width: 100%;
+    max-width: 160px;
+}
+
+/* Actions cell */
+.actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    justify-content: flex-end;
+    width: 100px;
+}
+/* Responsive: stack table rows vertically on small screens */
+@media (max-width: 640px) {
+
+    .tableRow {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 16px 20px;
+        border: 1px solid #ddd;
+        margin-bottom: 20px;
+        border-radius: 14px;
+        background: linear-gradient(145deg, #f0f4ff, #d9e2ff);
+        box-shadow:
+            4px 4px 8px rgba(0, 0, 0, 0.1),
+            -4px -4px 8px rgba(255, 255, 255, 0.7);
+        transition: transform 0.3s ease;
+    }
+
+    .tableRow:hover {
+        transform: translateY(-4px);
+        box-shadow:
+            8px 8px 16px rgba(0, 0, 0, 0.15),
+            -8px -8px 16px rgba(255, 255, 255, 0.85);
+    }
+
+    .tableRow>div {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        align-items: center;
+        justify-content: center;
+        width: 80%;
+        margin: 0 auto;
+        padding: 8px 0;
+        white-space: normal;
+        font-size: 15px;
+        color: #1e293b;
+        border-bottom: 1px solid #cbd5e1;
+    }
+
+    .tableRow>div:last-child {
+        border-bottom: none;
+        align-self: center;
+        width:fit-content
+    }
+
+    .tableRow>div:first-child {
+        font-weight: 700;
+        font-size: 18px;
+        color: #2563eb;
+        margin-bottom: 8px;
+    }
+    .tableRow>div :nth-child(1){
+        font-size: 18px;
+    }
+    .actions {
+        justify-content: flex-start;
+        margin-top: 12px;
+    }
+}
+
+/* Pending List and Items on smaller screens */
+@media (max-width: 640px) {
+    .pendingList {
+        padding: 14px;
+        box-shadow:
+            0 4px 15px rgba(38, 132, 255, 0.2);
+        border-radius: 14px;
+        background: linear-gradient(160deg, #eff6ff, #dbeafe);
+    }
+
+    .pendingItem {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 14px 16px;
+        gap: 10px;
+        box-shadow:
+            2px 2px 8px rgba(38, 132, 255, 0.1),
+            inset 0 0 10px #e0e7ff;
+        border-radius: 12px;
+    }
+
+    .pendingItem>div {
+        width: 100%;
+        font-size: 15px;
+        color: #1e40af;
+    }
+
+    .pendingActions {
+        width: 100%;
+        justify-content: flex-start;
+        gap: 14px;
+    }
+    .pendingContainer{
+        flex-direction: column;
+        align-items: start;
+        justify-content: center
+    }
+    .column{
+        flex-direction: row;
+        width: 90%;
+        margin: 0 0 0 auto;
+
+    }
+    .column *{
+        flex:1;
+    }
+}
+
+/* Buttons adjustments on mobile */
+@media (max-width: 480px) {
+    .pendingBtn {
+        font-size: 14px;
+        padding: 8px 18px;
+    }
+
+    .badge {
+        padding: 4px 8px;
+        min-width: 20px;
+        font-size: 13px;
+    }
+
+    .approveBtn,
+    .deleteBtn,
+    .editBtn,
+    .saveBtn,
+    .cancelBtn {
+        padding: 6px 10px;
+        font-size: 13px;
+    }
+/* Form fields on small devices */
+    .approveForm>div {
+        flex: 1 1 100%;
+    }
+
+    .approveForm {
+        padding: 10px;
+    }
+
+    .approveForm input[type="text"],
+    .approveForm select {
+        font-size: 14px;
+    }
+}
+
+/* Container padding smaller on very small screens */
+@media (max-width: 360px) {
+    .container {
+        margin: 15px 12px;
+        padding: 10px 12px;
+    }
+}

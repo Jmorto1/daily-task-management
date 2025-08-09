@@ -206,6 +206,7 @@
     color: #357dc0;
 }
 .displayArea{
+    display: flex;
     overflow-y: auto;
     overflow-x: auto;
     box-sizing: border-box;
