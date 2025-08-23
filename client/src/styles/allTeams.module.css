@@ -1,0 +1,419 @@
+.container {
+  border-radius: 16px;
+    padding: 2rem;
+    margin: 32px auto;
+    width: 100%;
+}
+.header {
+  display: flex;
+  flex-direction: column;
+  justify-content:center;
+  align-items: center;
+  margin-bottom: 15px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.headerBtn{
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content:space-around;
+}
+.adminContainer{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap:7px;
+  background: #f1f5f9;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  padding: 10px;
+
+}
+.title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #185a9d;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+.adminHeader{
+  font-size: 1.2rem;
+    font-weight: 700;
+    color: #1e558c;
+    text-align: center;
+}
+.createBtn,
+.adminAssignBtn,.adminSeeBtn {
+  border: none;
+  border-radius: 8px;
+  padding: 0.5rem 1.2rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: white;
+  cursor: pointer;
+  transition: transform 0.1s ease, background 0.2s ease;
+  background: linear-gradient(90deg, #43cea2, #185a9d);
+}
+.adminAssignBtn,
+.adminSeeBtn{
+  padding: 0.3rem 0.5rem;
+  font-size: 0.9rem;
+  width: 130px;
+}
+
+.createBtn:hover,
+.adminAssignBtn:hover ,.adminSeeBtn:hover{
+  transform: scale(1.05);
+
+}
+.noFoundMessage {
+  text-align: center;
+  font-size: 20px;
+  margin-bottom: 30px;
+  color: rgb(199, 10, 10);
+}
+.table {
+  width: 100%;
+  min-width: 320;
+  padding-bottom: 240px;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.tableHeader {
+  background: #eaf6fb;
+  font-weight: 700;
+  color: #185a9d;
+
+}
+
+.tableBody {
+  max-height: 300px;
+  flex-direction: column;
+  overflow-y: auto;
+  background: #f8fafc;
+}
+
+.tableRow {
+  padding: 0.8rem;
+  height: 20px;
+  border-bottom: 1px solid #e3e8ee;
+  transition: background 0.2s;
+  overflow-y: scroll;
+}
+
+.tableRow:hover {
+  background: #c9e1ed;
+}
+
+.tableRow:focus {
+  background: #b2d8e6;
+}
+.iconButton {
+  border: none;
+  padding: 0;
+  width: 30px;
+  aspect-ratio: 1;
+  background-color: inherit;
+  border-radius: 50%;
+  cursor: pointer;
+
+}
+.dropdown {
+  position: relative;
+}
+
+.dropdownMenu {
+  position: absolute;
+  top: 40px;
+  right: -13px;
+  padding: 20px;
+  width: 150px;
+  height: 200px;
+  min-height: 180px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background-color: rgb(191, 202, 222);
+  z-index: 100000000;
+  border-radius: 10px;
+}
+
+.dropdownMenu button {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background-color: #f5f5f5;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  color: #333;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.dropdownMenu button:hover {
+  background-color: #e0e0e0;
+  color: #000;
+}
+
+.addTeam ,.assignService,.assignService,.deleteService,.changeLeader{
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: linear-gradient(135deg, #f8fafc 0%, #e3e8ee 100%);
+  border: 1.5px solid #90caf9;
+  border-radius: 8px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.18);
+  padding: 16px 10px 16px 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  z-index: 1000;
+  min-width: 310px;
+  max-width: 480px;
+  max-height: 80vh;
+  overflow-y: auto;
+  transition: all 0.3s cubic-bezier(.4, 0, .2, 1);
+}
+.closeIconButton {
+  position: absolute;
+  display: flex;
+  right: 0;
+  top: 0;
+  width: 30px;
+  height: 30px;
+  background-color: inherit;
+  border: none;
+  align-items: center;
+  justify-content: center;
+  border-radius: 3px;
+  transition: background ease 0.3s;
+  z-index: 10;
+}
+.closeIconButton:hover {
+  background-color: red;
+}
+.panelHeader{
+  text-align: center;
+  padding:5px 15px;
+  color: #2d3748;
+}
+.form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 96%;
+  gap: 12px;
+  background: #f1f5f9;
+  border-radius: 12px;
+  padding: 24px 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.formGroup {
+  display: grid;
+  grid-template-columns: 2fr 3fr;
+  justify-content: center;
+  gap: 10px;
+  align-items: center;
+
+}
+
+.label {
+  font-size: 1.05rem;
+  font-weight: 500;
+  color: #2d3748;
+  min-width: 130px;
+  justify-self: center;
+}
+
+.input {
+  font-size: 1.08rem;
+  padding: 8px 10px;
+  border-radius: 9px;
+  border: 1.5px solid #90caf9;
+  margin-right: 0;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(144, 202, 249, 0.08);
+  max-width: 100%;
+  justify-self: center;
+  box-sizing: border-box;
+  appearance: none;
+}
+
+.input:focus {
+  border-color: #1976d2;
+  box-shadow: 0 0 0 2px #90caf9;
+}
+.selectContainer {
+  font-size: 1.08rem;
+  border-radius: 9px;
+  border: 1.5px solid #90caf9;
+  margin-right: 0;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(144, 202, 249, 0.08);
+  max-width: 100%;
+  justify-self: center;
+  box-sizing: border-box;
+  appearance: none;
+}
+
+.noFoundMessage {
+  text-align: center;
+  font-size: 20px;
+  margin-bottom: 30px;
+  color: rgb(199, 10, 10);
+}
+
+.formActions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+}
+
+.formActions button {
+  flex: 1;
+  padding: 7px 10px;
+  font-size: 1.05rem;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  color: #fff;
+  border: none;
+  max-width: 100px;
+  transition: background 0.3s ease, box-shadow 0.3s ease;
+}
+.cancelBtn,.deleteServiceBtn {
+  background: linear-gradient(90deg, #f44336 0%, #e57373 100%);
+  box-shadow: 0 2px 8px rgba(244, 67, 54, 0.08);
+}
+
+.saveBtn {
+  background: linear-gradient(90deg, #4caf50 0%, #81c784 100%);
+  box-shadow: 0 2px 8px rgba(76, 175, 80, 0.08);
+}
+
+.cancelBtn:hover, .deleteServiceBtn:hover{
+  background: linear-gradient(90deg, #d32f2f 0%, #f44336 100%);
+  box-shadow: 0 4px 16px rgba(244, 67, 54, 0.12);
+}
+
+.saveBtn:hover {
+  background: linear-gradient(90deg, #388e3c 0%, #4caf50 100%);
+  box-shadow: 0 4px 16px rgba(76, 175, 80, 0.12);
+}
+.saveBtn:disabled {
+  background-color: #b0bec5;
+  cursor: not-allowed;
+  color: #eceff1;
+}
+.saveBtn:disabled:hover {
+  background-color: #b0bec5;
+  box-shadow:unset;
+}
+.error {
+  color: #d7263d;
+  font-size: small;
+  margin-top: -0.5rem;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  text-align: end;
+  width: 98%;
+  max-width: 98%;
+}
+.serviceHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.selectedBadge {
+  display: inline-block;
+  background-color: #1976d2;
+  color: white;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+.clearBtn {
+  background-color: transparent;
+  border: 1px solid #1976d2;
+  color: #1976d2;
+  padding: 2px 8px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.clearBtn:hover {
+  background-color: #1976d2;
+  color: white;
+}
+.noService{
+  width: 80%;
+  margin: 5px auto;
+  color: rgb(162, 64, 64);
+  text-align: center;
+}
+.serviceContainer{
+  max-height: 300px;
+  overflow-y: auto;
+  padding: 10px 5px;
+}
+.service {
+  background-color: #e3f2fd;
+  border: 1.8px solid #90caf9;
+  border-radius: 10px;
+  margin-bottom: 5px;
+  padding: 7px;
+  box-shadow: inset 0 2px 5px rgba(144, 202, 249, 0.4);
+  transition: background-color 0.3s ease;
+}
+.service:hover {
+  background-color: #bbdefb;
+  border-color: #64b5f6;
+  box-shadow: inset 0 2px 8px rgba(100, 181, 246, 0.6);
+}
+.service label{
+  display: flex;
+    gap: 10px;
+    align-items: center;
+    justify-content:start;
+}
+.service .serviceWrapper{
+  width: 100%;
+  display: flex;
+    gap: 10px;
+    align-items: center;
+    justify-content: space-between;
+}
+.deleteServiceBtn{
+  border: none;
+  cursor: pointer;
+  border-radius: 3px;
+}
+.deleteWarning{
+  padding: 20px;
+}

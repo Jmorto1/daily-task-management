@@ -1,0 +1,18 @@
+{
+    "title":"Add New Service",
+    "subservices":"Subservices",
+    "activity":"Activities",
+    "freq":"Frequency",
+    "freqError":"Frequency is required",
+    "time":"Time",
+    "timeError":"Time is required",
+    "invalidTimeError":"Please enter the time in H:MM format .",
+    "quality":"Quality",
+    "qualityEror":"Quality is required",
+    "invalidQualityError":"Please enter a number followed % .",
+    "addActivity":"+ Add Activity",
+    "addSubService":"+ Add Subservice",
+    "cancel":"Cancel",
+    "save":"Save",
+    "message":"New Service Added successfully."
+}

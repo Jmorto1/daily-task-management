@@ -1,12 +1,14 @@
 {
     "city":"አዲስ አበባ",
+    "department":"ፅህፈት ቤቶች",
     "myTask":"የኔ አፈፃፀም",
     "service":"አገልግሎቶች",
     "employees": "ሁሉም ሰራተኞች",
-    "allGroups": "ሁሉም ቡድኖች",
+    "allTeams": "ሁሉም ቡድኖች",
+    "teamMember":"የቡድን አባላት",
     "reports": "ሪፖርቶች",
     "about": "መግለጫ",
-    "editInfo": "መረጃ አተካክል",
+    "editInfo": "መረጃ ያስተካክሉ",
     "changePassword": "የይለፍ ቃል ቀይር",
     "logOut": "ውጣ",
     "headerTitle": "የኢኖቬሽን እና ቴክኖሎጂ ክፍል ቢሮ"

@@ -1,5 +1,6 @@
-import { MdMiscellaneousServices, MdYard } from "react-icons/md";
+import { MdMiscellaneousServices } from "react-icons/md";
 import {
+  FaBuilding,
   FaTasks,
   FaUserTie,
   FaUsers,
@@ -14,8 +15,9 @@ import { useNavigate } from "react-router-dom";
 import amDashboard from "../locates/amharic/dashboard.json";
 import enDashboard from "../locates/english/dashboard.json";
 import styles from "../styles/dashboard.module.css";
-import Language from "../components/languages";
+import Language from "../components/subComponent/languages";
 import { useLang } from "../hooks/useLang";
+import DepartmentManagement from "../components/departmentManagement";
 import EditInfo from "../components/editInfo";
 import About from "../components/about";
 import Services from "../components/services";
@@ -23,6 +25,8 @@ import Employee from "../components/employee.";
 import MyTasks from "../components/myTask";
 import ChangePassword from "../components/changePassword";
 import Report from "../components/report";
+import AllTeams from "../components/allTeams";
+import TeamMembers from "../components/TeamMembers";
 import { useIsMoblie } from "../hooks/useIsMobile";
 import { useIsOpen } from "../hooks/useIsOpen";
 export default function Dashboard() {
@@ -35,12 +39,30 @@ export default function Dashboard() {
   const isMobile = useIsMoblie();
   const navlistRef = useRef<HTMLDivElement | null>(null);
   const { isOpen, setIsOpen } = useIsOpen(navlistRef);
+  const [image, setImage] = useState<File | null>(null);
+  const [preview, setPreview] = useState<string>("");
+  const inputRef = useRef<HTMLInputElement>(null);
   const { lang, setLang } = useLang();
   const translate = {
     am: amDashboard,
     en: enDashboard,
   };
   const text = translate[lang];
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = e.target.files?.[0];
+    if (!selectedFile) return;
+    if (!selectedFile.type.startsWith("image/")) {
+      alert("Only image files are allowed!");
+      return;
+    }
+
+    setImage(selectedFile);
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setPreview(reader.result as string);
+    };
+    reader.readAsDataURL(selectedFile);
+  };
   useEffect(() => {
     if (!isMobile) {
       setIsOpen(false);
@@ -131,6 +153,17 @@ export default function Dashboard() {
               <ul>
                 <li
                   onClick={() => {
+                    setActiveView("departments");
+                  }}
+                  className={
+                    activeView === "departments" ? styles.activebtn : ""
+                  }
+                >
+                  <FaBuilding className={styles.icons} />
+                  {text.department}
+                </li>
+                <li
+                  onClick={() => {
                     setActiveView("services");
                   }}
                   className={activeView === "services" ? styles.activebtn : ""}
@@ -147,9 +180,25 @@ export default function Dashboard() {
                   <FaTasks className={styles.icons} />
                   {text.myTask}
                 </li>
-                <li>
+                <li
+                  onClick={() => {
+                    setActiveView("allTeams");
+                  }}
+                  className={activeView === "allTeams" ? styles.activebtn : ""}
+                >
                   <FaUsers className={styles.icons} />
-                  {text.allGroups}
+                  {text.allTeams}
+                </li>
+                <li
+                  onClick={() => {
+                    setActiveView("teamMembers");
+                  }}
+                  className={
+                    activeView === "teamMembers" ? styles.activebtn : ""
+                  }
+                >
+                  <FaUserTie className={styles.icons} />
+                  {text.teamMember}
                 </li>
                 <li
                   onClick={() => {
@@ -193,11 +242,49 @@ export default function Dashboard() {
                 setToggleDropdown((prevState) => !prevState);
               }}
             >
-              <div className={styles.avator}>A</div>
+              <div
+                className={styles.profile}
+                style={{
+                  backgroundImage: preview ? `url(${preview})` : undefined,
+                }}
+              >
+                {!preview && <div>A</div>}
+              </div>
             </div>
             {toggleDropdown && (
               <div className={styles.profileDropdown}>
-                <div className={styles.avator}>A</div>
+                <div className={styles.profileHandler}>
+                  <div
+                    className={styles.profile}
+                    style={{
+                      backgroundImage: preview ? `url(${preview})` : undefined,
+                    }}
+                  >
+                    {!preview && <div>A</div>}
+                  </div>
+                  <div>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      ref={inputRef}
+                      style={{ display: "none" }}
+                      onChange={handleFileChange}
+                    />
+                    <button
+                      onClick={() => {
+                        inputRef.current?.click();
+                      }}
+                      className={styles.uploadButton}
+                      title={
+                        preview
+                          ? "Change Profile Picture"
+                          : "Upload Profile Picture"
+                      }
+                    >
+                      <span>+</span>
+                    </button>
+                  </div>
+                </div>
                 <div className={styles.role}>Admin</div>
                 <ul>
                   <li
@@ -241,11 +328,14 @@ export default function Dashboard() {
               setActiveView={setActiveView}
             />
           )}
+          {activeView === "departments" && <DepartmentManagement />}
           {activeView === "services" && <Services />}
-          {activeView === "myTasks" && <MyTasks />}
-          {activeView === "report" && <Report />}
+          {activeView === "myTasks" && <MyTasks preview={preview} />}
+          {activeView === "allTeams" && <AllTeams />}
+          {activeView === "teamMembers" && <TeamMembers />}
+          {activeView === "report" && <Report preview={preview} />}
           {activeView === "employee" && <Employee />}
-          {activeView === "about" && <About />}
+          {activeView === "about" && <About preview={preview} />}
         </div>
       </div>
     </div>

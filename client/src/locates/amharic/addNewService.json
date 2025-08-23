@@ -1,0 +1,18 @@
+{
+    "title":"አዲስ አገልግሎት ያክሉ",
+    "subservices": "ንዑስ-አገልግሎቶች",
+    "activity": "ተግባራቶች",
+    "freq":"መጠን",
+    "freqError":"መጠን ያስፈልጋል",
+    "time":"ጊዜ",
+    "timeError":"ጊዜ ያስፈልጋል",
+    "invalidTimeError":"እባክዎ ሰዓትን በ H:MM ቅርጽ ያስገቡ",
+    "quality":"ጥራት",
+    "qualityEror":"ጥራት ያስፈልጋል",
+    "addActivity": "+ ተግባር አክል",
+    "invalidQualityError":"እባክዎ ቁጥርን ከ % ጋር ያስገቡ",
+    "addSubService": "+ ንዑስ አገልግሎት አክል",
+    "cancel": "ይቅር",
+    "save": "መዝግብ",
+    "message":"አዲስ አገልግሎት በተሳካ ሁኔታ ተጨምሩአል"
+}

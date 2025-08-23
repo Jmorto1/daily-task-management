@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { FaUser, FaPhone, FaLock, FaEye, FaEyeSlash } from "react-icons/fa";
-import Language from "../components/languages";
+import Language from "../components/subComponent/languages";
 import styles from "../styles/SignupPage.module.css";
 
 export default function SignupPage() {

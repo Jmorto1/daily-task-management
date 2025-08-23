@@ -1,0 +1,22 @@
+{
+    "service":"አገልግሎት",
+    "subService":"ንዑስ-አገልግሎት",
+    "activity":"ተገባር",
+    "edit":"አስተካክል",
+    "delete":"አጥፋ",
+    "cancel":"ተው",
+    "save":"መዝግብ",
+    "freq":"መጠን",
+    "time":"ጊዜ",
+    "quality":"ጥራት",
+    "freqError":"መጠን ያስፈልጋል",
+    "timeError":"ጊዜ ያስፈልጋል",
+    "qualityError":"ጥራት ያስፈልጋል",
+    "invalidQualityError":"እባክዎ ቁጥርን ከ % ጋር ያስገቡ",
+    "editMessage":"በተሳካ ሁኔታ ተስተካክሏል",
+    "deleteMessage":"በተሳካ ሁኔታ ጠፍቷል",
+    "no": "ይቅር",
+    "yes": "አዎ",
+    "deleteDeptWarning":"ን ለማጥፋት እርግጠኛ ነዎት?"
+}
+

@@ -33,3 +33,80 @@ a:hover {
 ul{
   list-style: none;
 }
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: transparent;
+  z-index: 999;
+  pointer-events: auto;}
+.successMessageWrapper{
+  position: absolute;
+  display: flex;
+  justify-content: flex-end;
+  top: 15px;
+  right: 30px;
+  width: calc(100% - 30px);
+  background: linear-gradient(135deg, #f8fafc 0%, #e3e8ee 100%);
+  border: none;
+  border-radius: 10px;
+  z-index: 2000;
+}
+.successMessage {
+  text-align: right;
+  color: #01f90e;
+  padding: 10px;
+  border-radius: 10px;
+  font-weight: 600;
+  opacity: 1;
+  transition: opacity 0.3s ease;
+  z-index: 2000;
+}
+
+.successMessage::after {
+  content: '';
+  display: block;
+  height: 3px;
+  background-color: #01f90e;
+  border-radius: 2px;
+  margin-top: 6px;
+  animation: disappear 3s linear forwards;
+}
+
+@keyframes disappear {
+  from {
+    width: 100%;
+    opacity: 1;
+  }
+
+  to {
+    width: 0;
+    opacity: 0;
+  }
+}
+.select__control {
+  min-height: 30px;
+  font-size: 14px;
+}
+
+
+.select__menu {
+  max-height:120px;
+  overflow-y: auto;
+
+}
+
+.select__menu-list {
+  overflow-y:auto; 
+  max-height: none !important;
+  padding: 0;
+}
+
+.select__option {
+  padding: 5px 10px;
+  font-size: 14px;
+  cursor: pointer;
+}
+.select__single-value{
+  font-size: 16px;
+  font-weight: 500;
+}

@@ -1,9 +1,11 @@
 {
     "city":"Addis Ababa",
+    "department":"Departments",
     "service":"services",
     "myTask":"My Tasks",
     "employees": "All Employees",
-    "allGroups": "All Groups",
+    "allTeams": "All Teams",
+    "teamMember":"Team Members",
     "reports": "Reports",
     "about": "About",
     "editInfo": "Edit Info",

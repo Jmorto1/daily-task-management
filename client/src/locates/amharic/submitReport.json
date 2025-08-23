@@ -1,0 +1,16 @@
+{
+    "title":"የሪፖርት ማስገቢያ ቅጽ",
+    "activity":"ተገባር",
+    "freq":"መጠን",
+    "startingTime":"የተጀመረበት ሰዓት",
+    "endingTime":"የተጠናቀበት ሰዓት",
+    "hour":"የወሰደው ጊዜ",
+    "date": "ቀን",
+    "cancel": "ይቅር",
+    "submit": "አስገባ",
+    "freqError": "መጠን ቢያንስ 1 መሆን አለበት",
+    "startingTimeError":"የተጀመረበት ሰዓት ያስፈልጋል",
+    "endingTimeError":"የተጠናቀበት ሰዓት ያስፈልጋል",
+    "dateError": "ቀን ያስፈልጋል",
+    "message":"ተገባር ሪፖርት በተሳካ ሁኔታ ገብቱታል"
+}

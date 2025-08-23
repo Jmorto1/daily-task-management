@@ -1,64 +1,124 @@
 import { useEffect, useRef, useState } from "react";
-import SearchBar from "./searchBar";
+import { FiSend } from "react-icons/fi";
+import { FiMoreVertical } from "react-icons/fi";
+import { MdArrowForward, MdArrowBack } from "react-icons/md";
+import SearchBar from "./subComponent/searchBar";
 import amService from "../locates/amharic/service.json";
 import enService from "../locates/english/service.json";
-import AddNewService from "./addNewService";
-import MoreService from "./moreService";
+import AddNewService from "./subComponent/addNewService";
+import MoreService from "./subComponent/moreService";
+import SubmitReport from "./subComponent/submitReport";
+import ChangeService from "./subComponent/changeService";
 import { useAppData } from "../hooks/useAppData";
 import { useLang } from "../hooks/useLang";
 import styles from "../styles/services.module.css";
 
-interface Activity {
-  id: number;
-  name: string;
+export interface Activity {
+  id: string;
+  name: {
+    am: string;
+    en: string;
+  };
   frequency?: string;
   time?: string;
   quality?: string;
 }
 
-interface SubService {
-  id: number;
-  name: string;
+export interface SubService {
+  id: string;
+  name: {
+    en: string;
+    am: string;
+  };
   activities: Activity[];
 }
 
-interface MainService {
-  id: number;
-  name: string;
+export interface MainService {
+  id: string;
+  name: {
+    en: string;
+    am: string;
+  };
   subServices: SubService[];
 }
 
 const services: MainService[] = [
   {
-    id: 1,
-    name: "Service A",
+    id: "1",
+    name: {
+      en: "Service A",
+      am: "አገልግሎት A",
+    },
     subServices: [
       {
-        id: 101,
-        name: "Sub Service A1",
+        id: "101",
+        name: {
+          en: "Sub Service A1",
+          am: "ንዑስ አገልግሎት A1",
+        },
         activities: [
           {
-            id: 1001,
-            name: "Activity A1-1Activity A1-1Activity A1-1Activity A1-1Activity A1-1Activity A1-1Activity A1-1Activity A1-1Activity A1-1",
+            id: "1001",
+            name: {
+              en: "Activity A1Activity A1Activity A1Activity A1Activity A1Activity A1",
+              am: "እንቅስቃሴ A1",
+            },
           },
-          { id: 1002, name: "Activity A1-2" },
+          {
+            id: "1002",
+            name: {
+              en: "Activity A1-2",
+              am: "እንቅስቃሴ A1-2",
+            },
+            frequency: "2",
+            time: "10:00",
+            quality: "100%",
+          },
         ],
       },
       {
-        id: 102,
-        name: "Sub Service A2",
-        activities: [{ id: 1003, name: "Activity A2-1" }],
+        id: "102",
+        name: {
+          en: "Sub Service A2",
+          am: "ንዑስ አገልግሎት A2",
+        },
+        activities: [
+          {
+            id: "1003",
+            name: {
+              en: "Activity A2-1",
+              am: "እንቅስቃሴ A2-1",
+            },
+          },
+        ],
       },
     ],
   },
   {
-    id: 2,
-    name: "Service B",
+    id: "2",
+    name: {
+      en: "Service B",
+      am: "አገልግሎት B",
+    },
     subServices: [
       {
-        id: 201,
-        name: "Sub Service B1",
-        activities: [{ id: 2001, name: "Activity B1-1" }],
+        id: "201",
+        name: {
+          en: "Sub Service B1",
+          am: "ንዑስ አገልግሎት B1",
+        },
+        activities: [
+          {
+            id: "2001",
+            name: {
+              en: "Activity B1-1",
+              am: "እንቅስቃሴ B1-1",
+            },
+            frequency: " 2",
+            time: "8:00",
+            quality: "100%",
+          },
+        ],
       },
     ],
   },
@@ -90,95 +150,34 @@ export default function Services() {
   };
   const text = translate[lang];
 
-  const user = useAppData();
+  const { user, setUser } = useAppData();
   const [searchQuery, setSearchQuery] = useState("");
-  const [openMain, setOpenMain] = useState<number | null>(null);
-  const [openSub, setOpenSub] = useState<number | null>(null);
+  const [openMain, setOpenMain] = useState<string | null>(null);
+  const [openSub, setOpenSub] = useState<string | null>(null);
   const [boxWidth, setBoxWidth] = useState(0);
   const boxRef = useRef<HTMLDivElement | null>(null);
 
   const [selected, setSelected] = useState<
-    | { type: "main"; mainId: number }
-    | { type: "sub"; mainId: number; subId: number }
-    | { type: "activity"; mainId: number; subId: number; actId: number }
+    | { type: "main"; mainId: string }
+    | { type: "sub"; mainId: string; subId: string }
+    | { type: "activity"; mainId: string; subId: string; actId: string }
     | null
   >(null);
-
-  const [editMode, setEditMode] = useState(false);
-  const [editFields, setEditFields] = useState<any>({});
+  const [submitReport, setSubmitReport] = useState<boolean>(false);
+  let [activityProp, setActivityProp] = useState<Activity | null>(null);
   const [more, setMore] = useState<boolean>(false);
   const [addNew, setAddNew] = useState<boolean>(false);
-  const handleEdit = () => {
-    if (!selected) return;
 
-    if (selected.type === "main") {
-      setEditFields({
-        nameAm: "",
-        nameEn: services.find((s) => s.id === selected.mainId)?.name || "",
-      });
-    } else if (selected.type === "sub") {
-      setEditFields({
-        nameAm: "",
-        nameEn:
-          services
-            .find((s) => s.id === selected.mainId)
-            ?.subServices.find((sub) => sub.id === selected.subId)?.name || "",
-      });
-    } else if (selected.type === "activity") {
-      const act = services
-        .find((s) => s.id === selected.mainId)
-        ?.subServices.find((sub) => sub.id === selected.subId)
-        ?.activities.find((act) => act.id === selected.actId);
-      setEditFields({
-        name: act?.name || "",
-        frequency: act?.frequency || "",
-        time: act?.time || "",
-        quality: act?.quality || "",
-      });
-    }
-    setEditMode(true);
-  };
-
-  const handleEditFieldChange = (field: string, value: string) => {
-    setEditFields((prev: any) => ({ ...prev, [field]: value }));
-  };
-
-  const handleEditSave = () => {
-    // In a real app, you would update your state or make an API call here
-    console.log("Saved changes:", editFields);
-    setEditMode(false);
-  };
-
-  const handleDelete = () => {
-    if (!selected) return;
-    const confirmMessage =
-      selected.type === "main"
-        ? `Delete main service ${selected.mainId}?`
-        : selected.type === "sub"
-        ? `Delete subservice ${selected.subId}?`
-        : `Delete activity ${selected.actId}?`;
-
-    if (window.confirm(confirmMessage)) {
-      console.log("Deleted:", selected);
-      setSelected(null);
-    }
-  };
-
-  const closePanel = () => {
-    setSelected(null);
-    setEditMode(false);
-  };
-
-  const toggleMain = (id: number) => {
+  const toggleMain = (id: string) => {
     setOpenMain(openMain === id ? null : id);
     setOpenSub(null);
   };
 
-  const toggleSub = (mainId: number, subId: number) => {
+  const toggleSub = (mainId: string, subId: string) => {
     setOpenSub(openSub === subId ? null : subId);
   };
 
-  const selectActivity = (mainId: number, subId: number, actId: number) => {
+  const selectActivity = (mainId: string, subId: string, actId: string) => {
     setSelected({
       type: "activity",
       mainId,
@@ -186,9 +185,10 @@ export default function Services() {
       actId,
     });
   };
-  const [adminMode, setAdminMode] = useState("admin");
+  const [mode, setMode] = useState("notUser");
+  const isAdminClickable = user.role === "admin" && mode === "notUser";
   const filteredServices = services.filter((service) =>
-    service.name.toLowerCase().includes(searchQuery.toLowerCase())
+    service.name[lang].toLowerCase().includes(searchQuery.toLowerCase())
   );
   useEffect(() => {
     const resizeObserver = new ResizeObserver(([entry]) => {
@@ -203,7 +203,7 @@ export default function Services() {
     <div className={styles.container}>
       <div className={styles.header}>
         <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
-        {user !== "admin" ? (
+        {user.role === "user" ? (
           <button
             className={styles.moreButton}
             onClick={() => {
@@ -212,34 +212,38 @@ export default function Services() {
           >
             {text.more}
           </button>
-        ) : adminMode === "admin" ? (
+        ) : mode === "notUser" ? (
           <div className={styles.buttonGroup}>
             <button
               className={styles.mineButton}
               onClick={() => {
-                setAdminMode("user");
+                setMode("user");
               }}
             >
-              {text.mine}
+              <MdArrowForward />
+              <span>{text.mine}</span>
             </button>
-            <button
-              className={styles.addButton}
-              onClick={() => {
-                setAddNew(true);
-              }}
-            >
-              {text.add}
-            </button>
+            {user.role === "admin" && (
+              <button
+                className={styles.addButton}
+                onClick={() => {
+                  setAddNew(true);
+                }}
+              >
+                {text.add}
+              </button>
+            )}
           </div>
         ) : (
           <div className={styles.buttonGroup}>
             <button
               className={styles.allButton}
               onClick={() => {
-                setAdminMode("admin");
+                setMode("notUser");
               }}
             >
-              {text.all}
+              <span>{text.all}</span>
+              <MdArrowBack />
             </button>
             <button
               className={styles.moreButton}
@@ -260,369 +264,268 @@ export default function Services() {
             <div className={styles.serviceHeader} ref={boxRef}>
               {text.title}
             </div>
-            {filteredServices.map((main) => (
-              <div key={main.id} className={styles.mainService}>
-                <button
-                  onClick={() => toggleMain(main.id)}
-                  onDoubleClick={() =>
-                    setSelected({ type: "main", mainId: main.id })
-                  }
-                  className={styles.mainButton}
-                  aria-expanded={openMain === main.id}
-                  aria-controls={`main-${main.id}`}
-                >
-                  <ArrowIcon open={openMain === main.id} />
-                  <span className={styles.mainText}>{main.name}</span>
-                </button>
-
-                {openMain === main.id && (
-                  <div
-                    id={`main-${main.id}`}
-                    className={styles.subServicesContainer}
+            {filteredServices.map((main) => {
+              const handleSelectService = () =>
+                setSelected({ type: "main", mainId: main.id });
+              return (
+                <div key={main.id} className={styles.mainService}>
+                  <button
+                    onClick={() => toggleMain(main.id)}
+                    className={styles.mainButton}
+                    aria-expanded={openMain === main.id}
+                    aria-controls={`main-${main.id}`}
                   >
-                    <div className={styles.subServiceTitle}>
-                      {text.subservice}
-                    </div>
-                    {main.subServices.map((sub) => (
-                      <div key={sub.id} className={styles.subService}>
-                        <button
-                          onClick={() => toggleSub(main.id, sub.id)}
-                          onDoubleClick={() =>
-                            setSelected({
-                              type: "sub",
-                              mainId: main.id,
-                              subId: sub.id,
-                            })
-                          }
-                          className={styles.subButton}
-                          aria-expanded={openSub === sub.id}
-                          aria-controls={`sub-${sub.id}`}
-                        >
-                          <ArrowIcon open={openSub === sub.id} />
-                          <span className={styles.subText}>{sub.name}</span>
-                        </button>
-
-                        {openSub === sub.id && (
-                          <>
-                            {boxWidth > 580 && (
-                              <div className={styles.activityHeader}>
-                                <div className={styles.cell}>No.</div>
-                                <div className={styles.cell}>Activity Name</div>
-                                <div className={styles.cell}>Frequency</div>
-                                <div className={styles.cell}>Time</div>
-                                <div className={styles.cell}>Quality</div>
-                                <div className={styles.cell}></div>
-                              </div>
-                            )}
-                            <ul
-                              id={`sub-${sub.id}`}
-                              className={styles.activitiesList}
+                    <ArrowIcon open={openMain === main.id} />
+                    <span className={styles.mainText}>{main.name[lang]}</span>
+                    {isAdminClickable && (
+                      <span
+                        className={styles.actionContainer}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleSelectService();
+                        }}
+                      >
+                        <FiMoreVertical />
+                      </span>
+                    )}
+                  </button>
+                  {openMain === main.id && (
+                    <div
+                      id={`main-${main.id}`}
+                      className={styles.subServicesContainer}
+                    >
+                      <div className={styles.subServiceTitle}>
+                        {text.subservice}
+                      </div>
+                      {main.subServices.map((sub) => {
+                        const handleSelectSubService = () =>
+                          setSelected({
+                            type: "sub",
+                            mainId: main.id,
+                            subId: sub.id,
+                          });
+                        return (
+                          <div key={sub.id} className={styles.subService}>
+                            <button
+                              onClick={() => toggleSub(main.id, sub.id)}
+                              className={styles.subButton}
+                              aria-expanded={openSub === sub.id}
+                              aria-controls={`sub-${sub.id}`}
                             >
-                              {sub.activities.map((act, index) => (
-                                <li
-                                  key={act.id}
-                                  className={styles.activityItem}
-                                  onDoubleClick={() =>
-                                    selectActivity(main.id, sub.id, act.id)
-                                  }
-                                  style={{ cursor: "pointer" }}
+                              <ArrowIcon open={openSub === sub.id} />
+                              <span className={styles.subText}>
+                                {sub.name[lang]}
+                              </span>
+                              {isAdminClickable && (
+                                <span
+                                  className={styles.actionContainer}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleSelectSubService();
+                                  }}
                                 >
-                                  {boxWidth > 580 ? (
-                                    <div className={styles.activityRow}>
-                                      <div className={styles.cell}>
-                                        {index + 1}
-                                      </div>
-                                      <div className={styles.cell}>
-                                        {act.name}
-                                      </div>
-                                      <div className={styles.cell}>
-                                        {act.frequency || "N/A"}
-                                      </div>
-                                      <div className={styles.cell}>
-                                        {act.time || "N/A"}
-                                      </div>
-                                      <div className={styles.cell}>
-                                        {act.quality || "N/A"}
-                                      </div>
-                                      <div className={styles.cell}>
-                                        <button className={styles.submitButton}>
-                                          Submit Report
-                                        </button>
-                                      </div>
+                                  <FiMoreVertical />
+                                </span>
+                              )}
+                            </button>
+
+                            {openSub === sub.id && (
+                              <>
+                                {boxWidth > 580 && (
+                                  <div className={styles.activityHeader}>
+                                    <div className={styles.cell}>
+                                      {text.num}
                                     </div>
-                                  ) : (
-                                    <div className={styles.mobileActivityBox}>
-                                      <div className={styles.row}>
-                                        <span>No.</span>
-                                        <span>{index + 1}</span>
-                                      </div>
-                                      <div className={styles.row}>
-                                        <span>Name</span>
-                                        <span>{act.name}</span>
-                                      </div>
-                                      <div className={styles.row}>
-                                        <span>Frequency</span>
-                                        <span>{act.frequency || "N/A"}</span>
-                                      </div>
-                                      <div className={styles.row}>
-                                        <span>Time</span>
-                                        <span>{act.time || "N/A"}</span>
-                                      </div>
-                                      <div className={styles.row}>
-                                        <span>Quality</span>
-                                        <span>{act.quality || "N/A"}</span>
-                                      </div>
-                                      <div className={styles.row}>
-                                        <button className={styles.submitButton}>
-                                          Submit
-                                        </button>
-                                      </div>
+                                    <div className={styles.cell}>
+                                      {text.ActName}
                                     </div>
+                                    <div className={styles.cell}>
+                                      {text.freq}
+                                    </div>
+                                    <div className={styles.cell}>
+                                      {text.time}
+                                    </div>
+                                    <div className={styles.cell}>
+                                      {text.quality}
+                                    </div>
+                                    <div className={styles.cell}></div>
+                                  </div>
+                                )}
+                                <ul
+                                  id={`sub-${sub.id}`}
+                                  className={styles.activitiesList}
+                                >
+                                  {sub.activities.map(
+                                    (act: Activity, index: number) => {
+                                      const handleSelectActivity = () => {
+                                        selectActivity(main.id, sub.id, act.id);
+                                      };
+                                      return (
+                                        <li
+                                          key={act.id}
+                                          className={styles.activityItem}
+                                        >
+                                          {boxWidth > 580 ? (
+                                            <div className={styles.activityRow}>
+                                              <div className={styles.cell}>
+                                                {index + 1}
+                                              </div>
+                                              <div className={styles.cell}>
+                                                {act.name[lang]}
+                                              </div>
+                                              <div className={styles.cell}>
+                                                {act.frequency || "N/A"}
+                                              </div>
+                                              <div className={styles.cell}>
+                                                {act.time || "N/A"}
+                                              </div>
+                                              <div className={styles.cell}>
+                                                {act.quality || "N/A"}
+                                              </div>
+
+                                              {isAdminClickable ? (
+                                                <div className={styles.cell}>
+                                                  <span
+                                                    className={
+                                                      styles.actionContainer
+                                                    }
+                                                    style={{
+                                                      position: "unset",
+                                                      right: "unset",
+                                                    }}
+                                                    onClick={(e) => {
+                                                      e.stopPropagation();
+                                                      handleSelectActivity();
+                                                    }}
+                                                  >
+                                                    <FiMoreVertical />
+                                                  </span>
+                                                </div>
+                                              ) : (
+                                                (user.role === "user" ||
+                                                  mode === "user") && (
+                                                  <div className={styles.cell}>
+                                                    <button
+                                                      className={
+                                                        styles.submitButton
+                                                      }
+                                                      onClick={() => {
+                                                        setActivityProp(act);
+                                                        setSubmitReport(true);
+                                                      }}
+                                                    >
+                                                      <FiSend
+                                                        className={styles.icon}
+                                                      />
+                                                    </button>
+                                                  </div>
+                                                )
+                                              )}
+                                            </div>
+                                          ) : (
+                                            <div
+                                              className={
+                                                styles.mobileActivityBox
+                                              }
+                                            >
+                                              <div className={styles.row}>
+                                                <span>{text.num}</span>
+                                                <span>{index + 1}</span>
+                                              </div>
+                                              <div className={styles.row}>
+                                                <span>{text.ActName}</span>
+                                                <span>{act.name[lang]}</span>
+                                              </div>
+                                              <div className={styles.row}>
+                                                <span>{text.freq}</span>
+                                                <span>
+                                                  {act.frequency || "N/A"}
+                                                </span>
+                                              </div>
+                                              <div className={styles.row}>
+                                                <span>{text.time}</span>
+                                                <span>{act.time || "N/A"}</span>
+                                              </div>
+                                              <div className={styles.row}>
+                                                <span>{text.quality}</span>
+                                                <span>
+                                                  {act.quality || "N/A"}
+                                                </span>
+                                              </div>
+
+                                              {isAdminClickable ? (
+                                                <div className={styles.row}>
+                                                  <span
+                                                    className={
+                                                      styles.actionContainer
+                                                    }
+                                                    style={{
+                                                      position: "unset",
+                                                      right: "unset",
+                                                    }}
+                                                    onClick={(e) => {
+                                                      e.stopPropagation();
+                                                      handleSelectActivity();
+                                                    }}
+                                                  >
+                                                    <FiMoreVertical />
+                                                  </span>
+                                                </div>
+                                              ) : (
+                                                (user.role === "user" ||
+                                                  mode === "user") && (
+                                                  <div className={styles.row}>
+                                                    <button
+                                                      className={
+                                                        styles.submitButton
+                                                      }
+                                                      onClick={() => {
+                                                        setActivityProp(act);
+                                                        setSubmitReport(true);
+                                                      }}
+                                                    >
+                                                      <FiSend
+                                                        className={styles.icon}
+                                                      />
+                                                    </button>
+                                                  </div>
+                                                )
+                                              )}
+                                            </div>
+                                          )}
+                                        </li>
+                                      );
+                                    }
                                   )}
-                                </li>
-                              ))}
-                            </ul>
-                          </>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            ))}
-            {selected && (
-              <div className={styles.overlay}>
-                <div
-                  className={
-                    editMode
-                      ? `${styles.actionsPanelCentered}`
-                      : `${styles.actionsPanel}`
-                  }
-                >
-                  <div className={styles.panelHeader}>
-                    <h3 className={styles.headerTitile}>
-                      {selected.type === "main" &&
-                        `Service: ${
-                          services.find((s) => s.id === selected.mainId)?.name
-                        }`}
-                      {selected.type === "sub" &&
-                        `Subservice: ${
-                          services
-                            .find((s) => s.id === selected.mainId)
-                            ?.subServices.find(
-                              (sub) => sub.id === selected.subId
-                            )?.name
-                        }`}
-                      {selected.type === "activity" &&
-                        `Activity: ${
-                          services
-                            .find((s) => s.id === selected.mainId)
-                            ?.subServices.find(
-                              (sub) => sub.id === selected.subId
-                            )
-                            ?.activities.find(
-                              (act) => act.id === selected.actId
-                            )?.name
-                        }`}
-                    </h3>
-                    <button
-                      onClick={closePanel}
-                      className={styles.closeIconButton}
-                      aria-label="Close panel"
-                    >
-                      <svg
-                        width="20"
-                        height="20"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M6 18L18 6M6 6l12 12"
-                        />
-                      </svg>
-                    </button>
-                  </div>
-
-                  {editMode ? (
-                    <form
-                      className={styles.form}
-                      onSubmit={(e) => {
-                        e.preventDefault();
-                        handleEditSave();
-                      }}
-                    >
-                      {(selected.type === "main" ||
-                        selected.type === "sub") && (
-                        <>
-                          <div className={styles.formGroup}>
-                            <label className={styles.label}>Name</label>
-                            <input
-                              className={styles.input}
-                              value={editFields.nameEn}
-                              onChange={(e) =>
-                                handleEditFieldChange("nameEn", e.target.value)
-                              }
-                              placeholder="English name"
-                              required
-                            />
+                                </ul>
+                              </>
+                            )}
                           </div>
-                          <div className={styles.formGroup}>
-                            <label className={styles.label}>ስም</label>
-                            <input
-                              className={styles.input}
-                              value={editFields.nameAm}
-                              onChange={(e) =>
-                                handleEditFieldChange("nameAm", e.target.value)
-                              }
-                              placeholder="አማርኛ ስም"
-                              required
-                            />
-                          </div>
-                        </>
-                      )}
-
-                      {selected.type === "activity" && (
-                        <>
-                          <div className={styles.formGroup}>
-                            <label className={styles.label}>Name</label>
-                            <input
-                              className={styles.input}
-                              value={editFields.name}
-                              onChange={(e) =>
-                                handleEditFieldChange("nameEn", e.target.value)
-                              }
-                              placeholder=" name"
-                              required
-                            />
-                          </div>
-                          <div className={styles.formGroup}>
-                            <label className={styles.label}>ስም</label>
-                            <input
-                              className={styles.input}
-                              value={editFields.name}
-                              onChange={(e) =>
-                                handleEditFieldChange("nameAm", e.target.value)
-                              }
-                              placeholder="ስም"
-                              required
-                            />
-                          </div>
-
-                          <div className={styles.formGroup}>
-                            <label className={styles.label}>Frequency</label>
-                            <input
-                              type="number"
-                              min="1"
-                              className={styles.input}
-                              value={editFields.frequency}
-                              onChange={(e) =>
-                                handleEditFieldChange(
-                                  "frequency",
-                                  e.target.value
-                                )
-                              }
-                              placeholder="e.g. 3"
-                              required
-                            />
-                          </div>
-                          <div className={styles.formGroup}>
-                            <label className={styles.label}>Time</label>
-                            <input
-                              className={styles.input}
-                              value={editFields.time}
-                              onChange={(e) =>
-                                handleEditFieldChange("time", e.target.value)
-                              }
-                              type="time"
-                              placeholder="HH:MM"
-                              required
-                            />
-                          </div>
-
-                          <div className={styles.formGroup}>
-                            <label className={styles.label}>Quality</label>
-                            <input
-                              className={styles.input}
-                              value={editFields.quality}
-                              onChange={(e) =>
-                                handleEditFieldChange("quality", e.target.value)
-                              }
-                              placeholder="100%"
-                              required
-                            />
-                          </div>
-                        </>
-                      )}
-
-                      <div className={styles.formActions}>
-                        <button
-                          type="button"
-                          className={styles.cancelButton}
-                          onClick={() => setEditMode(false)}
-                        >
-                          Cancel
-                        </button>
-                        <button type="submit" className={styles.saveButton}>
-                          Save
-                        </button>
-                      </div>
-                    </form>
-                  ) : (
-                    <div className={styles.viewActions}>
-                      <button
-                        onClick={handleEdit}
-                        className={styles.editButton}
-                      >
-                        <svg
-                          width="16"
-                          height="16"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                          />
-                        </svg>
-                        <span>Edit</span>
-                      </button>
-                      <button
-                        onClick={handleDelete}
-                        className={styles.deleteButton}
-                      >
-                        <svg
-                          width="16"
-                          height="16"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                          />
-                        </svg>
-                        <span>Delete</span>
-                      </button>
+                        );
+                      })}
                     </div>
                   )}
                 </div>
-              </div>
+              );
+            })}
+            {selected && (
+              <ChangeService
+                selected={selected}
+                setSelected={setSelected}
+                services={services}
+              />
             )}
           </>
         )}
       </div>
       {more && <MoreService setMore={setMore} />}
       {addNew && <AddNewService setAddNew={setAddNew} />}
+      {submitReport && (
+        <SubmitReport
+          setSubmitReport={setSubmitReport}
+          activity={activityProp}
+        />
+      )}
     </div>
   );
 }

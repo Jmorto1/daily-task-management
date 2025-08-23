@@ -124,7 +124,7 @@
 .avatorWrapper:hover {
     background-color: rgb(214, 209, 206);
 }
-.avator{
+.profile{
     width: 35px;
     height: 35px;
     aspect-ratio: 1/1;
@@ -137,6 +137,10 @@
     justify-content: center;
     cursor: pointer;
     transition: box-shadow ease 0.3s;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    overflow: hidden;
 }
 
 .profileDropdown {
@@ -157,7 +161,12 @@
     align-items: center;
     gap: 10px;
 }
-.profileDropdown .avator{
+.profileHandler{
+    position: relative;
+    padding: 0;
+    margin: 0;
+}
+.profileDropdown .profile{
     width: 100px;
     height: 100px;
     font-size: 40px;
@@ -167,6 +176,36 @@
     color: rgb(96, 125, 132);
     font-size: 20px;
     
+}
+.uploadButton {
+    position: absolute;
+    top: 70px;
+    right: 0;
+    width: 30px;
+    height: 30px;
+    border: none;
+    border-radius: 50%;
+    background-color: #264566;
+    color: #ded9d9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 25px;
+    font-weight: bold;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.uploadButton:hover {
+    background-color: #1d3248;
+}
+.uploadButton span{
+    text-align: center;
+    margin: 0;
+    padding: 5px 0 0 3px;
 }
 .profileDropdown ul {
     list-style: none;

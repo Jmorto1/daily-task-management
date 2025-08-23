@@ -34,6 +34,10 @@
     
 }
 .allButton,.mineButton{
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    justify-content: center;
     box-shadow: 2px 3px 10px rgba(0, 0, 0, 0.15);
     background: linear-gradient(135deg, #1976d2, #1565c0);
 }
@@ -66,7 +70,7 @@
     margin: 10px auto;
 }
 /*services header*/
-.serviceHeader {
+.serviceHeader{
     margin: 0;
     margin-bottom: 6px;
     padding-bottom: 8px;
@@ -75,6 +79,13 @@
     font-size: 24px;
     font-weight: 600;
     
+}
+.reportTitle{
+    margin-top: 6px;
+    text-align: center;
+    color: #476786;
+    font-size: 24px;
+    font-weight: 600;
 }
 /* Main Service */
 .mainService {
@@ -96,11 +107,12 @@
 /* Main Service button */
 .mainButton {
     cursor: pointer;
+    position: relative;
     background: none;
     border: none;
     display: flex;
     align-items: center;
-    width: 100%;
+    min-width: 100%;
     padding: 0;
     font-weight: 700;
     font-size: 18px;
@@ -117,6 +129,19 @@
 /* Text spacing */
 .mainText {
     margin-left: 14px;
+}
+.actionContainer{
+    position: absolute;
+    align-self: center;
+    display: flex;
+    align-items: center;
+    right: 10px;
+    align-items: center;
+    font-size: 20px;
+}
+.actionContainer:hover {
+    color: #1976d2;
+    font-size: 25px;
 }
 
 /* Sub Services Container */
@@ -153,11 +178,12 @@
 /* Sub Service button */
 .subButton {
     cursor: pointer;
+    position: relative;
     background: none;
     border: none;
     display: flex;
     align-items: center;
-    width: 100%;
+    min-width: 100%;
     padding: 0;
     font-weight: 600;
     font-size: 15px;
@@ -185,9 +211,10 @@
 .activityHeader,
 .activityRow {
     display: grid;
-    grid-template-columns: 1fr 2fr 1fr 1fr 1fr 2fr;
-    gap: 12px;
+    grid-template-columns: 0.5fr 1.5fr 1fr 1fr 1fr 1fr;
+    gap: 10px;
     align-items: center;
+    justify-content: center;
     padding: 12px 16px;
     box-sizing: border-box;
     font-weight: 500;
@@ -202,20 +229,19 @@
 }
 
 .activityItem {
-    
     background-color: #ffffff;
     border: 1.2px solid #cfd8dc;
     border-radius: 6px;
     margin: 4px 0;
+    padding: 6px 14px;
     box-shadow: 0 1px 3px rgba(207, 216, 220, 0.6);
     transition: background-color 0.3s ease, border-color 0.3s ease;
+    cursor: default !important;
+    user-select: text;
 }
 .activityItem:hover {
-    background-color: #f1f8ff;
-}
-
-.submitButton button:hover {
-    background-color: #1565c0;
+    background-color: #a4c2cf91;
+    border-color: #90caf9;
 }
 /* mobileActivityBox*/
 .mobileActivityBox{
@@ -231,7 +257,7 @@
     text-align: start;
 }
 .row *{
-    width: 50%;
+    width: 100%;
     word-break: break-word;
 }
 .row span:nth-child(1) {
@@ -241,33 +267,54 @@
 .row span:nth-child(2){
     padding-left: 20px;
 }
+.cell{
+    min-width: 100%;
+    align-self: self-start;
+    text-align: start;
+}
+.activityHeader .cell{
+    text-align: start;
+}
 /* Individual Activity Item */
 .submitButton {
-    padding: 6px 10px;
-    background-color: #1976d2;
-    color: white;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 100px;
+    min-height: 40px;
+    padding: 0 24px;
+    background: linear-gradient(135deg, #43cea2 0%, #185a9d 100%);
+    color: #fff;
     border: none;
-    border-radius: 4px;
-    font-size: 13px;
+    border-radius: 8px;
+    font-size: 1.08rem;
+    font-weight: 600;
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    box-shadow: 0 2px 8px rgba(67, 206, 162, 0.10);
+    transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
     margin: 0 auto;
-}
-.activityItem {
-    background-color: #ffffff;
-    border: 1.2px solid #cfd8dc;
-    border-radius: 6px;
-    margin: 4px 0;
-    padding: 6px 14px;
-    box-shadow: 0 1px 3px rgba(207, 216, 220, 0.6);
-    transition: background-color 0.3s ease, border-color 0.3s ease;
-    cursor: default;
-    user-select: text;
+    outline: none;
+    gap: 8px;
+    user-select: none;
 }
 
-.activityItem:hover {
-    background-color: #e3f2fd;
-    border-color: #90caf9;
+.submitButton:active {
+    transform: scale(0.98);
+}
+
+.submitButton:focus-visible {
+    box-shadow: 0 0 0 3px #90caf9;
+}
+
+.submitButton:hover {
+    background: linear-gradient(135deg, #185a9d 0%, #43cea2 100%);
+    box-shadow: 0 4px 16px rgba(67, 206, 162, 0.16);
+}
+
+.submitButton .icon {
+    font-size: 1.4em;
+    display: inline-flex;
+    align-items: center;
 }
 
 /* Arrow circular wrapper */
@@ -331,7 +378,7 @@
     max-width: 100%;
     transition: all 0.3s cubic-bezier(.4, 0, .2, 1);
 } 
-.actionsPanelCentered ,.addNew,.more{
+.actionsPanelCentered ,.addNew,.more,.submitReport{
 position: fixed;
 top: 50%;
 left: 50%;
@@ -457,15 +504,6 @@ z-index: 10;
     box-sizing: border-box;
     appearance: none;
 }
-
-input[type="time"].input {
-    width: 100%;
-    min-width: 0;
-    max-width: 100%;
-    box-sizing: border-box;
-    appearance: none;
-}
-
 .input:focus {
     border-color: #1976d2;
     box-shadow: 0 0 0 2px #90caf9;
@@ -476,6 +514,18 @@ input[type="time"].input {
     color: #2d3748;
     min-width: 130px;
     justify-self: center;
+}
+.error{
+    color: #d7263d;
+    font-size: small;
+    padding-right: 20%;
+    margin-top: -0.5rem;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    text-align: end;
+    width: 98%;
+    max-width: 98%;
 }
 /*viewActions*/
 .viewActions{
@@ -519,6 +569,9 @@ input[type="time"].input {
     text-align: left;
 }
 .subServiceForm {
+    display: flex;
+    flex-direction: column;
+    gap:12px;
     background: #e3f2fd;
     border: 1.2px solid #90caf9;
     border-radius: 8px;
@@ -650,7 +703,7 @@ margin-bottom: 12px;
 
     .actionsPanel,
     .actionsPanelCentered,
-    .addNew,.more {
+    .addNew,.more ,.submitReport{
         padding: 12px 2vw;
         max-width: 90%;
     }

@@ -1,0 +1,21 @@
+{
+    "service":"Service",
+    "subService":"SubService",
+    "activity":"Activity",
+    "edit":"Edit",
+    "delete":"Delete",
+    "cancel":"Cancel",
+    "save":"Save",
+    "freq":"Frequency",
+    "time":"Time",
+    "quality":"Quality",
+    "freqError":"frequency is required.",
+    "timeError":"time is required.",
+    "qualityError":"quality is required.",
+    "invalidQualityError":"Please enter a number with %.",
+    "editMessage":"Edited successfully.",
+    "deleteMessage":"Deleted successfully.",
+    "no": "No",
+    "yes": "Yes",
+    "deleteDeptWarning":"Are you sure you want to delete "
+}

@@ -1,0 +1,17 @@
+{
+    "title":"ተጨማሪ አገልግሎት ያክሉ",
+    "freq":"መጠን",
+    "startingTime":"የተጀመረበት ሰዓት",
+    "endingTime":"የተጠናቀበት ሰዓት",
+    "hour":"የወሰደው ጊዜ",
+    "date": "ቀን",
+    "cancel": "ይቅር",
+    "save": "መዝግብ",
+    "nameAmError":"የአገልግሎት ስም ያስፈልጋል",
+    "nameEnError":"Service name is required.",
+    "freqError": "መጠን ቢያንስ 1 መሆን አለበት",
+    "startingTimeError":"የተጀመረበት ሰዓት ያስፈልጋል",
+    "endingTimeError":"የተጠናቀበት ሰዓት ያስፈልጋል",
+    "dateError": "ቀን ያስፈልጋል",
+    "message":"ተጨማሪ አገልግሎት በተሳካ ሁኔታ ገብቱታል"
+}

@@ -5,5 +5,10 @@
     "mine":"Mine",
     "title":"Available Services",
     "subservice":"Sub Services",
-    "noFound":"No services found"
+    "noFound":"No services found",
+    "num":"No.",
+    "ActName":"Activity Name",
+    "freq":"Frequency",
+    "time":"Time",
+    "quality":"Quality"
 }

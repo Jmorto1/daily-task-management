@@ -48,7 +48,7 @@
 }
 
 .select {
-  padding: 8px 16px;
+  min-width: 150px;
   text-align: center;
   border-radius: 8px;
   border: 1.5px solid #b0b7c3;

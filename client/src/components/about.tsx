@@ -3,7 +3,7 @@ import enAbout from "../locates/english/about.json";
 import { useLang } from "../hooks/useLang";
 import { FaUser, FaBriefcase, FaPhone, FaBuilding } from "react-icons/fa";
 import styles from "../styles/about.module.css";
-export default function About() {
+export default function About({ preview }: { preview: string | null }) {
   const { lang, setLang } = useLang();
   const translate = {
     am: amAbout,
@@ -13,7 +13,15 @@ export default function About() {
   return (
     <div className={styles.card}>
       <div className={styles.profileHeader}>
-        <FaUser className={styles.icon} />
+        {preview ? (
+          <div
+            className={styles.profileImage}
+            style={{ backgroundImage: preview ? `url(${preview})` : undefined }}
+          ></div>
+        ) : (
+          <FaUser className={styles.icon} />
+        )}
+
         <h2 className={styles.fullName}>Yealem Birhanu</h2>
       </div>
 

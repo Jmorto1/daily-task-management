@@ -1,6 +1,6 @@
 import { FaSearch } from "react-icons/fa";
-import styles from "../styles/searchBar.module.css";
-import { useLang } from "../hooks/useLang";
+import styles from "../../styles/searchBar.module.css";
+import { useLang } from "../../hooks/useLang";
 interface searchBarProps {
   searchQuery: string;
   setSearchQuery: (value: string) => void;

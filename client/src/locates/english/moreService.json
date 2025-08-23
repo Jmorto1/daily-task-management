@@ -1,0 +1,22 @@
+{
+    "title":"Add Additional Service",
+    "freq":"Frequency",
+    "startingTime":"Starting Time",
+    "endingTime":"Ending Time",
+    "hour":"Total Hour",
+    "date":"Date",
+    "cancel":"Cancel",
+    "save":"Save",
+    "nameAmError":"የአገልግሎት ስም ያስፈልጋል::",
+    "nameEnError":"Service name is required.",
+    "freqError":"Frequency must be at least 1.",
+    "startingTimeError":"Starting time is required.",
+    "endingTimeError":"Ending time is required.",
+    "invalidHourError":"Please enter the time in H:MM format .",
+    "dateError":"Date is required.",
+    "message":"Additional Service submitted successfully."
+
+
+
+}
+

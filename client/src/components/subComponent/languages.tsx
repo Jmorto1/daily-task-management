@@ -1,6 +1,6 @@
 import { FaGlobe } from "react-icons/fa";
-import "../styles/language.css";
-import { useLang } from "../hooks/useLang";
+import "../../styles/language.css";
+import { useLang } from "../../hooks/useLang";
 import type React from "react";
 export default function Language() {
   const { lang, setLang } = useLang();
