@@ -1,0 +1,13 @@
+{
+    "title":"Welcome",
+    "subTitle":"Please enter your credentials",
+    "phone":"Phone Number",
+    "password":"Password",
+    "forgot":"Forgot password?",
+    "login":"Log In",
+    "logging":"Logging In...",
+    "signup":"Sing Up",
+    "noAccount":"Don't have an account?",
+    "error":"Invalid phone number or password"
+
+}

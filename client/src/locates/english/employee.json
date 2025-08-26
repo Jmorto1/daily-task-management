@@ -1,0 +1,26 @@
+{
+    "allemp":"All Employees",
+    "pendingEmp":"Pending Employees",
+    "num":"No.",
+    "phoneNo":"Phone Number",
+    "name":"Name",
+    "gender":"Gender",
+    "team":"Team",
+    "profession":"Profession",
+    "action":"Actions",
+    "cancel":"Cancel",
+    "save":"Save",
+    "edit":"Edit",
+    "delete":"Delete",
+    "no":"No",
+    "yes":"Yes",
+    "approve":"Approve",
+    "approveEmp":"Approve Employee",
+    "changeTeam":"Change Team for ",
+    "selectTeam":"Select Team",
+    "deleteWarning":"Are you sure you want to delete ",
+    "approvedMessage":"Employee approved successfully",
+    "teamChangeMessage":"Team changed successfully",
+
+    "deleteMessage":"Employee deleted successfully"
+}

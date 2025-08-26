@@ -11,27 +11,73 @@ export default function ChangePassword({ onClose }: ChangePasswordProps) {
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [error, setError] = useState("");
+  const emptyErrors = {
+    current: "",
+    new: "",
+    confirm: "",
+    notMatch: "",
+    noSixChar: "",
+  };
+  const [errors, setErrors] = useState<{
+    current: string;
+    new: string;
+    confirm: string;
+    notMatch: string;
+    noSixChar: string;
+  }>(emptyErrors);
   const [showCurrent, setShowCurrent] = useState(false);
   const [showNew, setShowNew] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const { lang, setLang } = useLang();
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const translate = {
     en: enChangePassword,
     am: amChangePassword,
   };
   const text = translate[lang];
+  const validate = () => {
+    let isValid = true;
+    const newErrors = emptyErrors;
+    if (!currentPassword.trim()) {
+      newErrors.current = text.newError;
+      isValid = false;
+    }
+    if (!newPassword.trim()) {
+      newErrors.new = text.curError;
+      isValid = false;
+    }
+    if (!confirmPassword.trim()) {
+      newErrors.confirm = text.cnfError;
+      isValid = false;
+    }
+    if (
+      currentPassword.trim() &&
+      newPassword.trim() &&
+      confirmPassword.trim()
+    ) {
+      if (newPassword.trim() !== confirmPassword.trim()) {
+        newErrors.notMatch = text.notMatch;
+        isValid = false;
+      } else if (newPassword.trim().length < 6) {
+        newErrors.noSixChar = text.noSixCharError;
+        isValid = false;
+      } else if (currentPassword.trim() !== "password") {
+        newErrors.current = text.wrongPswd;
+        isValid = false;
+      }
+    }
+    setErrors(newErrors);
+    return isValid;
+  };
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (newPassword !== confirmPassword) {
-      setError(
-        "የአዲሱ የሚስጥር ቁልፍ አይደለም እና ማረጋገጫው (New password and confirmation do not match)"
-      );
+    if (!validate()) {
       return;
     }
-    setError("");
-    alert("የይለፍ ቃል ተቀይሯል (Password changed successfully)");
-    onClose();
+    setShowSuccessMessage(true);
+    setTimeout(() => {
+      setShowSuccessMessage(false);
+    }, 3000);
   };
 
   return (
@@ -45,8 +91,10 @@ export default function ChangePassword({ onClose }: ChangePasswordProps) {
               type={showCurrent ? "text" : "password"}
               className={styles.input}
               value={currentPassword}
-              onChange={(e) => setCurrentPassword(e.target.value)}
-              required
+              onChange={(e) => {
+                setCurrentPassword(e.target.value);
+                setErrors((prev) => ({ ...prev, current: "" }));
+              }}
             />
             <button
               type="button"
@@ -60,6 +108,7 @@ export default function ChangePassword({ onClose }: ChangePasswordProps) {
             </button>
           </div>
         </div>
+        {errors.current && <div className={styles.error}>{errors.current}</div>}
         <div className={styles.formGroup}>
           <label className={styles.label}>{text.newPswd}</label>
           <div className={styles.inputWrapper}>
@@ -67,8 +116,16 @@ export default function ChangePassword({ onClose }: ChangePasswordProps) {
               type={showNew ? "text" : "password"}
               className={styles.input}
               value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-              required
+              onChange={(e) => {
+                setNewPassword(e.target.value);
+                setErrors((prev) => ({ ...prev, new: "", notMatch: "" }));
+                if (
+                  e.target.value.trim().length > 5 &&
+                  confirmPassword.trim().length > 5
+                ) {
+                  setErrors((prev) => ({ ...prev, noSixChar: "" }));
+                }
+              }}
             />
             <button
               type="button"
@@ -80,6 +137,7 @@ export default function ChangePassword({ onClose }: ChangePasswordProps) {
             </button>
           </div>
         </div>
+        {errors.new && <div className={styles.error}>{errors.new}</div>}
         <div className={styles.formGroup}>
           <label className={styles.label}>{text.cnfrmPswd}</label>
           <div className={styles.inputWrapper}>
@@ -87,8 +145,16 @@ export default function ChangePassword({ onClose }: ChangePasswordProps) {
               type={showConfirm ? "text" : "password"}
               className={styles.input}
               value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              required
+              onChange={(e) => {
+                setConfirmPassword(e.target.value);
+                setErrors((prev) => ({ ...prev, confirm: "", notMatch: "" }));
+                if (
+                  e.target.value.trim().length > 5 &&
+                  newPassword.trim().length > 5
+                ) {
+                  setErrors((prev) => ({ ...prev, noSixChar: "" }));
+                }
+              }}
             />
             <button
               type="button"
@@ -102,18 +168,30 @@ export default function ChangePassword({ onClose }: ChangePasswordProps) {
             </button>
           </div>
         </div>
-
-        {error && <p className={styles.errorMessage}>{error}</p>}
-
+        {errors.confirm && <div className={styles.error}>{errors.confirm}</div>}
+        {errors.notMatch && (
+          <div className={styles.error}>{errors.notMatch}</div>
+        )}
+        {errors.noSixChar && (
+          <div className={styles.error}>{errors.noSixChar}</div>
+        )}
         <div className={styles.buttonGroup}>
-          <button type="submit" className={styles.saveBtn}>
-            {text.save}
-          </button>
           <button type="button" onClick={onClose} className={styles.cancelBtn}>
             {text.cancel}
           </button>
+          <button type="submit" className={styles.saveBtn}>
+            {text.save}
+          </button>
         </div>
       </form>
+      {showSuccessMessage && (
+        <>
+          <div className="successMessageWrapper">
+            <div className="successMessage">{text.message}</div>
+          </div>
+          <div className="overlay" style={{ zIndex: "1001" }}></div>
+        </>
+      )}
     </div>
   );
 }

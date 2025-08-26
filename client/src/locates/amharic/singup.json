@@ -1,0 +1,19 @@
+{
+  "title":  "አካውንት ይክፈቱ",
+  "phone": "ስልክ ቁጥር",
+  "selectDept": "ፅ/ቤት ይምረጡ",
+  "password": "የሚስጥር ቃል",
+  "CfrmPassword": "የሚስጥር ቃልን አረጋግጥ",
+  "signup": "አካውንት ክፈት",
+  "login": "ወደ አካውንትዎ ይግቡ",
+  "haveAccount": "ከዚህ ቀደም አካውንት አለዎት?",
+  "phoneError": "ስልክ ቁጥር ያስገቡ",
+  "invalidPhone": "ስልክ ቁጥር 10 ቁጥሮች መሆን አለበት",
+  "deptError": "ዲፓርትመንት ይምረጡ",
+  "passwordError": "የይለፍ ቃል ያስገቡ",
+  "cfrmPasswordError": "የይለፍ ቃልን አረጋግጥ",
+  "notMatch": "የይለፍ ቃላቶቹ አይዛመድም",
+  "notSixChar": "የይለፍ ቃል ቢያንስ 6 ቁልፎች መሆን አለበት",
+  "message": "አካውንት ከፍትዋል። እባክዎ የሃላፊ ማረጋገጫ ይጠብቁ"
+
+}

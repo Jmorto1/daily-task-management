@@ -1,0 +1,18 @@
+{
+    "title":"Create an Account",
+    "phone":"Phone Number",
+    "selectDept":"Select Department",
+    "password":"Password",
+    "CfrmPassword":"Confirm Password",
+    "signup":"Sign UP",
+    "login":"Log In",
+    "haveAccount":"Already have an account?",
+    "phoneError":"Enter Phone Number",
+    "invalidPhone":"Phone number should be 10 digits",
+    "deptError":"Select Department",
+    "passwordError":"Enter password",
+    "cfrmPasswordError":"Confirm password",
+    "notMatch":"password and confirm password did not match",
+    "notSixChar":"password should be atleast 6 character",
+    "message":"account created successfully. wait for admin aproval."
+}

@@ -32,7 +32,7 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
   const [appData, setAppData] = useState<AppData>({
     id: "1",
     name: "yealem",
-    role: "admin",
+    role: "groupLeader",
   });
 
   return (

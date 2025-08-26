@@ -29,11 +29,15 @@ import AllTeams from "../components/allTeams";
 import TeamMembers from "../components/TeamMembers";
 import { useIsMoblie } from "../hooks/useIsMobile";
 import { useIsOpen } from "../hooks/useIsOpen";
+import { useAppData } from "../hooks/useAppData";
 export default function Dashboard() {
+  const { user, setUser } = useAppData();
   const navigate = useNavigate();
   const [toggleDropdown, setToggleDropdown] = useState(false);
   const profileRef = useRef<HTMLDivElement | null>(null);
-  const [activeView, setActiveView] = useState<string>("services");
+  const [activeView, setActiveView] = useState<string>(
+    user.role !== "sysAdmin" ? "services" : "departments"
+  );
   const prevView = useRef(activeView);
   const excludeFromHistory = ["changePassword", "editInfo"];
   const isMobile = useIsMoblie();
@@ -151,72 +155,97 @@ export default function Dashboard() {
           <div className={styles.menuList} ref={navlistRef}>
             <nav className={styles.menuListNav}>
               <ul>
-                <li
-                  onClick={() => {
-                    setActiveView("departments");
-                  }}
-                  className={
-                    activeView === "departments" ? styles.activebtn : ""
-                  }
-                >
-                  <FaBuilding className={styles.icons} />
-                  {text.department}
-                </li>
-                <li
-                  onClick={() => {
-                    setActiveView("services");
-                  }}
-                  className={activeView === "services" ? styles.activebtn : ""}
-                >
-                  <MdMiscellaneousServices className={styles.icons} />
-                  {text.service}
-                </li>
-                <li
-                  onClick={() => {
-                    setActiveView("myTasks");
-                  }}
-                  className={activeView === "myTasks" ? styles.activebtn : ""}
-                >
-                  <FaTasks className={styles.icons} />
-                  {text.myTask}
-                </li>
-                <li
-                  onClick={() => {
-                    setActiveView("allTeams");
-                  }}
-                  className={activeView === "allTeams" ? styles.activebtn : ""}
-                >
-                  <FaUsers className={styles.icons} />
-                  {text.allTeams}
-                </li>
-                <li
-                  onClick={() => {
-                    setActiveView("teamMembers");
-                  }}
-                  className={
-                    activeView === "teamMembers" ? styles.activebtn : ""
-                  }
-                >
-                  <FaUserTie className={styles.icons} />
-                  {text.teamMember}
-                </li>
-                <li
-                  onClick={() => {
-                    setActiveView("report");
-                  }}
-                  className={activeView === "report" ? styles.activebtn : ""}
-                >
-                  <FaFileAlt className={styles.icons} />
-                  {text.reports}
-                </li>
-                <li
-                  onClick={() => {
-                    setActiveView("employee");
-                  }}
-                  className={activeView === "employee" ? styles.activebtn : ""}
-                >
-                  <FaUserTie className={styles.icons} /> {text.employees}
-                </li>
+                {user.role === "sysAdmin" && (
+                  <li
+                    onClick={() => {
+                      setActiveView("departments");
+                    }}
+                    className={
+                      activeView === "departments" ? styles.activebtn : ""
+                    }
+                  >
+                    <FaBuilding className={styles.icons} />
+                    {text.department}
+                  </li>
+                )}
+                {user.role !== "sysAdmin" && (
+                  <>
+                    <li
+                      onClick={() => {
+                        setActiveView("services");
+                      }}
+                      className={
+                        activeView === "services" ? styles.activebtn : ""
+                      }
+                    >
+                      <MdMiscellaneousServices className={styles.icons} />
+                      {text.service}
+                    </li>
+                    <li
+                      onClick={() => {
+                        setActiveView("myTasks");
+                      }}
+                      className={
+                        activeView === "myTasks" ? styles.activebtn : ""
+                      }
+                    >
+                      <FaTasks className={styles.icons} />
+                      {text.myTask}
+                    </li>
+                  </>
+                )}
+                {user.role === "admin" && (
+                  <li
+                    onClick={() => {
+                      setActiveView("allTeams");
+                    }}
+                    className={
+                      activeView === "allTeams" ? styles.activebtn : ""
+                    }
+                  >
+                    <FaUsers className={styles.icons} />
+                    {text.allTeams}
+                  </li>
+                )}
+                {user.role === "groupLeader" && (
+                  <li
+                    onClick={() => {
+                      setActiveView("teamMembers");
+                    }}
+                    className={
+                      activeView === "teamMembers" ? styles.activebtn : ""
+                    }
+                  >
+                    <FaUserTie className={styles.icons} />
+                    {text.teamMember}
+                  </li>
+                )}
+                {user.role === "admin" ||
+                  (user.role === "groupLeader" && (
+                    <li
+                      onClick={() => {
+                        setActiveView("report");
+                      }}
+                      className={
+                        activeView === "report" ? styles.activebtn : ""
+                      }
+                    >
+                      <FaFileAlt className={styles.icons} />
+                      {text.reports}
+                    </li>
+                  ))}
+                {user.role === "admin" && (
+                  <li
+                    onClick={() => {
+                      setActiveView("employee");
+                    }}
+                    className={
+                      activeView === "employee" ? styles.activebtn : ""
+                    }
+                  >
+                    <FaUserTie className={styles.icons} /> {text.employees}
+                  </li>
+                )}
                 <li
                   onClick={() => {
                     setActiveView("about");
@@ -307,7 +336,7 @@ export default function Dashboard() {
                   </li>
                   <li
                     onClick={() => {
-                      navigate("login" /*,{replace:true}*/);
+                      navigate("/", { replace: true });
                     }}
                   >
                     <FaSignOutAlt className={styles.icons} />

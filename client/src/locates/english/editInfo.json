@@ -5,5 +5,8 @@
 	"office":"Office",
 	"phoneNo":"Phone Number",
 	"save":"Save",
-	"cancel":"Cancel"
+	"cancel":"Cancel",
+	"phoneError":"please enter Phone number",
+	"invalidPhone":"phone number should be 10 digits",
+	"message":"Information updated successfully"
 }

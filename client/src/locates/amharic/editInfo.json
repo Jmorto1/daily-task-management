@@ -5,5 +5,9 @@
 	"office":"ቢሮ",
 	"phoneNo":"ስልክ ቁጥር",
 	"save":"መዝግብ",
-	"cancel":"ሰርዝ"
+	"cancel":"ተው",
+	"phoneError":"እባክዎ ስልክ ቁጥር ያስገቡ",
+	"invalidPhone":"ስልክ ቁጥሩ 10 ቁጥሎች መሆን አለበት",
+	"message": "መረጃው በተሳካ ሁኔታ ተስተካክሏል"
+
 }

@@ -1,0 +1,26 @@
+{
+    "title":"Team Members",
+    "num":"No.",
+    "name":"Name",
+    "phoneNo":"Phone Number",
+    "gender":"Gender",
+    "profession":"Profession",
+    "action":"Actions",
+    "assignService":"Assign Service",
+    "seeService":"See Service",
+    "selected":"Selected",
+    "clear":"Clear",
+    "cancel":"Cancel",
+    "save":"Save",
+    "delete":"Delete",
+    "no":"No",
+    "yes":"Yes",
+    "assignTitile":"Assign Service to ",
+    "assignMessage":"Services Assigned Successfully",
+    "assignedTitle":"Assigned Services to ",
+    "deleteWarning":"Are you sure you wan to to delete ",
+    "deleteMessage":"Service deleted Successfully",
+    "noService":"No Service Found",
+    "noMember":"No Team Memeber Found."
+
+}

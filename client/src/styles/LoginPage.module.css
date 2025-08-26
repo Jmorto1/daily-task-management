@@ -6,8 +6,13 @@
     padding: 1rem;
     background-color: #f8f9fa;
     border-radius: 20px;
+    position: relative;
 }
-
+.language {
+    position: absolute;
+    right: 5px;
+    top: 5px;
+}
 .loginCard {
     width: 100%;
     max-width: 420px;

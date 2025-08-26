@@ -377,11 +377,11 @@ export default function AllTeams() {
   const createValidate = () => {
     let isValid = true;
     const newErrors: CreateErrors = emptyCreateErrors;
-    if (!createForm.nameAm) {
+    if (!createForm.nameAm.trim()) {
       newErrors.nameAm = "የቡድን ስም ያስፈልጋል";
       isValid = false;
     }
-    if (!createForm.nameEn) {
+    if (!createForm.nameEn.trim()) {
       newErrors.nameEn = "team name is required";
       isValid = false;
     }
@@ -826,7 +826,7 @@ export default function AllTeams() {
       {/* see services */}
       {seeService && (
         <div className="overlay">
-          <div className={styles.assignService}>
+          <div className={styles.seeService}>
             <button
               className={styles.closeIconButton}
               aria-label="Close panel"

@@ -165,7 +165,7 @@
   color: #000;
 }
 
-.addTeam ,.assignService,.assignService,.deleteService,.changeLeader{
+.addTeam ,.assignService,.seeService,.deleteService,.changeLeader{
   position: fixed;
   top: 50%;
   left: 50%;
@@ -413,6 +413,7 @@
   border: none;
   cursor: pointer;
   border-radius: 3px;
+  color: white;
 }
 .deleteWarning{
   padding: 20px;

@@ -1,0 +1,26 @@
+{
+    "title":"የ ቡድን አባላት",
+    "num":"ተቁ.",
+    "name":"ስም",
+    "phoneNo":"ስልክ ቁጥር",
+    "gender":"ፆታ",
+    "profession":"ሙያ",
+    "action":"ማስተካካያዎች",
+    "assignService":"አገልግሎት አክል",
+    "seeService":"አገልግሎቶችን እይ",
+    "selected":"ተመርጧል",
+    "clear":"አጽዳ",
+    "cancel":"ተው",
+    "save":"መዝግብ",
+    "delete":"አጥፋ",
+    "no":"ተው",
+    "yes":"አዎ",
+    "assignTitile":"አገልግሎቶችን ጨምር",
+    "assignMessage":"አገልግሎቶች በተሳካ ሁኔታ ተጨምረዋል",
+    "assignedTitle":"የተመደቡ አገልግሎቶች",
+    "deleteWarning":"ለማጥፋት እርግጠኛ ነዎት?",
+    "deleteMessage":"አገልግሎት በተሳካ ሁኔታ ጠፍቷል",
+    "noService":"አገልግሎት አልተገኘም",
+    "noMember":"የ ቡድን አባል አልተገኘም."
+
+}
