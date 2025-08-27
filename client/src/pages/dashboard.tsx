@@ -207,7 +207,7 @@ export default function Dashboard() {
                     {text.allTeams}
                   </li>
                 )}
-                {user.role === "groupLeader" && (
+                {user.role === "teamLeader" && (
                   <li
                     onClick={() => {
                       setActiveView("teamMembers");
@@ -221,7 +221,7 @@ export default function Dashboard() {
                   </li>
                 )}
                 {user.role === "admin" ||
-                  (user.role === "groupLeader" && (
+                  (user.role === "teamLeader" && (
                     <li
                       onClick={() => {
                         setActiveView("report");

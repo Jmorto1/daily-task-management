@@ -2,6 +2,9 @@ import { useState } from "react";
 import type { FormEvent } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import styles from "../../styles/PasswordAuth.module.css";
+import { useLang } from "../../hooks/useLang";
+import passwordAuthAm from "../../locates/amharic/passwordAuth.json";
+import passwordAuthEn from "../../locates/english/passwordAuth.json";
 
 interface PasswordAuthProps {
   handleAuthResult: (success: boolean) => void;
@@ -12,6 +15,12 @@ export default function PasswordAuth({
   handleAuthResult,
   setPasswordAuth,
 }: PasswordAuthProps) {
+  const { lang, setLang } = useLang();
+  const translate = {
+    am: passwordAuthAm,
+    en: passwordAuthEn,
+  };
+  const text = translate[lang];
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -19,7 +28,7 @@ export default function PasswordAuth({
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     if (!password) {
-      setError("Password is required");
+      setError(text.pswdError);
       return;
     }
     setError("");
@@ -32,7 +41,7 @@ export default function PasswordAuth({
         }, 500);
       } else {
         handleAuthResult(false);
-        setError("Wrong Password");
+        setError(text.wrongPswd);
       }
       setIsSubmitting(false);
     }, 1000);
@@ -62,14 +71,14 @@ export default function PasswordAuth({
             />
           </svg>
         </button>
-        <h2 className={styles.header}>Authenticate Action</h2>
+        <h2 className={styles.header}>{text.title}</h2>
         <form
           onSubmit={handleSubmit}
           className={styles.authForm}
           autoComplete="off"
         >
           <label htmlFor="auth-password" className={styles.authLabel}>
-            Enter your password
+            {text.enterPassword}
           </label>
           <div className={styles.inputContainer}>
             <input
@@ -83,7 +92,7 @@ export default function PasswordAuth({
                 }
               }}
               className={styles.authInput}
-              placeholder="Password"
+              placeholder={text.password}
               disabled={isSubmitting}
             />
             <span
@@ -100,7 +109,7 @@ export default function PasswordAuth({
             disabled={isSubmitting}
             style={{ opacity: isSubmitting ? 0.7 : 1 }}
           >
-            {isSubmitting ? "Verifying..." : "Verify"}
+            {isSubmitting ? text.verifying : text.verify}
           </button>
         </form>
       </div>

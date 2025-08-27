@@ -21,7 +21,7 @@ import type { ReactNode } from "react";
 type AppData = {
   id: string;
   name: string;
-  role: "admin" | "user" | "groupLeader" | "sysAdmin";
+  role: "admin" | "user" | "teamLeader" | "sysAdmin";
 };
 type AppDataContextType = {
   user: AppData;
@@ -32,7 +32,7 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
   const [appData, setAppData] = useState<AppData>({
     id: "1",
     name: "yealem",
-    role: "groupLeader",
+    role: "admin",
   });
 
   return (
