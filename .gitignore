@@ -1,0 +1,57 @@
+# ====================
+# Backend (Django / Python)
+# ====================
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environment
+env/
+venv/
+
+# SQLite database
+*.sqlite3
+
+# Django logs
+*.log
+
+# Django migrations (optional: track or not)
+# */migrations/*.py
+# !*/migrations/__init__.py
+
+# Environment variables
+.env
+
+# ====================
+# Frontend (React / Node)
+# ====================
+
+# Node modules and build
+node_modules/
+dist/
+dist-ssr/
+build/
+*.local
+
+# Debug logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# ====================
+# Editor / OS Files
+# ====================
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
