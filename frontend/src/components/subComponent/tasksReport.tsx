@@ -11,8 +11,8 @@ import { FiMoreVertical, FiEdit, FiTrash2 } from "react-icons/fi";
 import tasksReportAm from "../../locates/amharic/tasksReport.json";
 import tasksReportEn from "../../locates/english/tasksReport.json";
 import type { TeamUserOption } from "../report";
+import { useAppData } from "../../hooks/useAppData";
 interface tasksReportProps {
-  preview: string;
   parent: "report" | "myTask";
   selectedTeamUser?: TeamUserOption | null;
 }
@@ -431,12 +431,12 @@ const additionalActivities: Activity[] | null = [
 ];
 
 export default function TaskReport({
-  preview,
   parent,
   selectedTeamUser,
 }: tasksReportProps) {
+  const { profileImage } = useAppData();
   const today = new Date();
-  const { lang, setLang } = useLang();
+  const { lang } = useLang();
   const translate = {
     am: tasksReportAm,
     en: tasksReportEn,
@@ -657,9 +657,9 @@ export default function TaskReport({
         minCellHeight: headerHeight,
       },
       didDrawCell: (data) => {
-        if (data.column.index === 0 && preview) {
+        if (data.column.index === 0 && profileImage) {
           const imgY = data.cell.y + (data.cell.height - 50) / 2;
-          doc.addImage(preview, "PNG", data.cell.x + 10, imgY, 75, 50);
+          doc.addImage(profileImage, "PNG", data.cell.x + 10, imgY, 75, 50);
         }
         doc.setFont("NotoSansEthiopic", "normal"); // reset font
       },
@@ -809,9 +809,9 @@ export default function TaskReport({
     const imageTopMargin = 5; // extra space above image
     const imageBottomMargin = 5; // extra space below image
     const imageHeight = 70; // image display height
-    if (preview) {
+    if (profileImage) {
       const imageId = workbook.addImage({
-        base64: preview,
+        base64: profileImage,
         extension: "png",
       });
       sheet.addImage(imageId, {

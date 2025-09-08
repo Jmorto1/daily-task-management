@@ -13,33 +13,20 @@ import {
   FiPlus,
 } from "react-icons/fi";
 import { MdChangeCircle } from "react-icons/md";
+import { useAppData } from "../hooks/useAppData";
+import type { Team, User } from "../context/appDataContext";
+
 type Service = {
-  id: string;
+  id: number;
   name: {
     am: string;
     en: string;
   };
-  teamIDs?: string[];
-  adminID?: string;
-};
-type Team = {
-  id: string;
-  name: {
-    am: string;
-    en: string;
-  };
-};
-type Employee = {
-  id: string;
-  name: {
-    am: string;
-    en: string;
-  };
-  role: "user" | "teamLeader" | "admin";
-  teamID: string;
+  teamIDs?: number[];
+  adminID?: number;
 };
 type OptionLeader = {
-  value: Employee;
+  value: User;
   label: string;
 };
 type CreateForm = {
@@ -53,227 +40,32 @@ type CreateErrors = {
   leader?: string;
 };
 export default function AllTeams() {
-  const { lang, setLang } = useLang();
+  const { lang } = useLang();
   const translate = {
     am: allTeamsAm,
     en: allTeamsEn,
   };
   const text = translate[lang];
-  const teams: Team[] = [
-    {
-      id: "t1",
-      name: { am: "የጽዳት ቡድን", en: "Cleaning Team" },
-    },
-    {
-      id: "t2",
-      name: { am: "የግብርና ቡድን", en: "Gardening Team" },
-    },
-    {
-      id: "t3",
-      name: { am: "የጥገና ቡድን", en: "Maintenance Team" },
-    },
-    {
-      id: "t4",
-      name: { am: "የደህንነት ቡድን", en: "Security Team" },
-    },
-  ];
-  type Employee = {
-    id: string;
-    name: {
-      am: string;
-      en: string;
-    };
-    role: "user" | "teamLeader" | "admin";
-    teamID: string;
-  };
-
-  const employees: Employee[] = [
-    // Cleaning Team
-    {
-      id: "e1",
-      name: { am: "ሀና መኮንን", en: "Hanna Mekonnen" },
-      role: "teamLeader",
-      teamID: "t1",
-    },
-    {
-      id: "e2",
-      name: { am: "አበበ ተስፋዬ", en: "Abebe Tesfaye" },
-      role: "user",
-      teamID: "t1",
-    },
-    {
-      id: "e3",
-      name: { am: "ሀና አለም", en: "Hana Alem" },
-      role: "user",
-      teamID: "t1",
-    },
-    {
-      id: "e4",
-      name: { am: "ሀዋርያ አለም", en: "Hawarya Alem" },
-      role: "teamLeader",
-      teamID: "t2",
-    },
-    {
-      id: "e5",
-      name: { am: "መሀሪ ደሳለኝ", en: "Mehari Desalegn" },
-      role: "user",
-      teamID: "t2",
-    },
-    {
-      id: "e6",
-      name: { am: "ሰላም ተስፋዬ", en: "Selam Tesfaye" },
-      role: "user",
-      teamID: "t2",
-    },
-
-    {
-      id: "e7",
-      name: { am: "ዮሴፍ ተፈራ", en: "Yoseph Tefera" },
-      role: "teamLeader",
-      teamID: "t3",
-    },
-    {
-      id: "e8",
-      name: { am: "አልሙ ተክለ", en: "Almu Tekle" },
-      role: "user",
-      teamID: "t3",
-    },
-    {
-      id: "e9",
-      name: { am: "ሀና ደሳለኝ", en: "Hanna Desalegn" },
-      role: "user",
-      teamID: "t3",
-    },
-    {
-      id: "e10",
-      name: { am: "ሰላም ወልደቀርበ", en: "Selam Woldekerbe" },
-      role: "teamLeader",
-      teamID: "t4",
-    },
-    {
-      id: "e11",
-      name: { am: "ተስፋዬ ሀገር", en: "Tesfaye Hager" },
-      role: "user",
-      teamID: "t4",
-    },
-    {
-      id: "e12",
-      name: { am: "ሀና ተፈራ", en: "Hanna Tefera" },
-      role: "user",
-      teamID: "t4",
-    },
-  ];
-  const admin: Employee = {
-    id: "admin1",
-    name: {
-      am: "የአለም ብርሃኑ",
-      en: "yealem",
-    },
-    role: "admin",
-    teamID: "null",
-  };
-  const services: Service[] = [
-    // Cleaning Services assigned to multiple teams
-    {
-      id: "s1",
-      name: {
-        am: "የመጀመሪያ ክፍል ጽዳት",
-        en: "Lobby CleaningLobby CleaningLobby CleaningLobby CleaningLobby CleaningLobby CleaningLobby Cleaning",
-      },
-      teamIDs: ["t1", "t2"],
-    },
-    {
-      id: "s2",
-      name: { am: "መመገቢያ ጽዳት", en: "Dining Area Cleaning" },
-      teamIDs: ["t1"],
-    },
-    {
-      id: "s3",
-      name: { am: "መስኮት ማጽዳት", en: "Window Cleaning" },
-      teamIDs: ["t1", "t3"],
-    },
-
-    // Gardening Services
-    {
-      id: "s4",
-      name: { am: "አትክልት እንክብካቤ", en: "Vegetable Care" },
-      teamIDs: ["t2"],
-    },
-    {
-      id: "s5",
-      name: { am: "አበባ መዝራት", en: "Flower Planting" },
-      teamIDs: ["t2", "t1"],
-    },
-
-    // Maintenance Services
-    {
-      id: "s6",
-      name: { am: "ኤሌክትሪክ ጥገና", en: "Electrical Repair" },
-      teamIDs: ["t3"],
-    },
-    {
-      id: "s7",
-      name: { am: "ውሃ ቱቦ ጥገና", en: "Plumbing Repair" },
-      teamIDs: ["t3"],
-    },
-
-    // Security Services
-    {
-      id: "s8",
-      name: { am: "መግቢያ ክትትል", en: "Entrance Monitoring" },
-      teamIDs: ["t4"],
-    },
-    {
-      id: "s9",
-      name: { am: "ካሜራ ክትትል", en: "CCTV Monitoring" },
-      teamIDs: ["t4", "t1"],
-    },
-
-    // Services assigned only to Admin
-    {
-      id: "s10",
-      name: { am: "የግል ሪፖርት አስተዳደር", en: "Personal Report Management" },
-      adminID: "admin1",
-    },
-    {
-      id: "s11",
-      name: { am: "የኮንፈረንስ ክፍል ቦታ ማስያዝ", en: "Conference Room Booking" },
-      adminID: "admin1",
-    },
-
-    // Services assigned to both admin and teams
-    {
-      id: "s12",
-      name: { am: "ጽዳት እና አስተዳደር", en: "Cleaning & Admin Task" },
-      teamIDs: ["t1", "t2"],
-      adminID: "admin1",
-    },
-
-    // Unassigned services (for testing)
-    {
-      id: "s13",
-      name: { am: "ተራ አገልግሎት", en: "Unassigned Test Service 1" },
-    },
-    {
-      id: "s14",
-      name: { am: "ሌላ አገልግሎት", en: "Unassigned Test Service 2" },
-    },
-  ];
+  const { teams, setTeams, employees, setEmployees, user, serverAddress } =
+    useAppData();
+  const services: Service[] = [];
   const [createTeam, setCreateTeam] = useState(false);
   const [editTeam, setEditTeam] = useState(false);
+  const [submitType, setSubmitType] = useState("");
   const [selectedTeam, setSelectedTeam] = useState<Team | null>(null);
   const [assignService, setAssignService] = useState<{
-    value: Team | Employee;
+    value: Team | User;
     type: "admin" | "team";
   } | null>(null);
   const [seeService, SetSeeService] = useState<{
-    value: Team | Employee;
+    value: Team | User;
     type: "admin" | "team";
   } | null>(null);
-  const [selectedServices, setSelectedServices] = useState<string[]>([]);
+
+  const [selectedServices, setSelectedServices] = useState<number[]>([]);
   const [deleteService, setDeleteService] = useState<{
     service: Service;
-    adminTeam: Employee | Team;
+    adminTeam: User | Team;
     type: "team" | "admin";
   } | null>(null);
   const [deleteTeam, setDeleteTeam] = useState<Team | null>(null);
@@ -283,7 +75,7 @@ export default function AllTeams() {
       label: emp.name[lang],
     };
   });
-  const [actionDropdown, setActionDropdown] = useState<string | null>(null);
+  const [actionDropdown, setActionDropdown] = useState<number | null>(null);
   const dropdownRef = useRef<{ [key: string]: HTMLDivElement | null }>({});
   const moreVerticalRef = useRef<{ [key: string]: HTMLButtonElement | null }>(
     {}
@@ -309,7 +101,6 @@ export default function AllTeams() {
       document.removeEventListener("scroll", handleScroll, true);
     };
   }, [actionDropdown]);
-
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [width, setWidht] = useState<number>(0);
   useEffect(() => {
@@ -324,6 +115,7 @@ export default function AllTeams() {
   }, [createTeam]);
   const [passwordAuth, setPasswordAuth] = useState<boolean>(false);
   const [showSuccessMessage, setShowSuccessMessage] = useState<boolean>(false);
+  const [showFailMessage, setShowFailMessage] = useState<boolean>(false);
   const emptyCreateForm: CreateForm = { nameEn: "", nameAm: "", leader: null };
   const emptyCreateErrors: CreateErrors = {
     nameEn: "",
@@ -343,7 +135,7 @@ export default function AllTeams() {
 
     return employees
       .filter(
-        (emp) => !(emp.role === "teamLeader" && emp.teamID === changeLeader.id)
+        (emp) => emp.role !== "teamLeader" && emp.team?.id === changeLeader.id
       )
       .map((emp) => ({
         value: emp,
@@ -354,7 +146,7 @@ export default function AllTeams() {
   const filteredServices = (): Service[] => {
     if (assignService) {
       if (assignService.type === "admin") {
-        return services.filter((service) => service.adminID !== admin.id);
+        return services.filter((service) => service.adminID !== user.id);
       } else {
         return services.filter(
           (service) => !service.teamIDs?.includes(assignService.value.id)
@@ -362,7 +154,7 @@ export default function AllTeams() {
       }
     } else if (seeService) {
       if (seeService.type === "admin") {
-        return services.filter((service) => service.adminID === admin.id);
+        return services.filter((service) => service.adminID === user.id);
       } else {
         return services.filter(
           (service) =>
@@ -401,17 +193,149 @@ export default function AllTeams() {
     setCreateFrom((prev) => ({ ...prev, [field]: value }));
     setCreateErrors((prev) => ({ ...prev, [field]: "" }));
   };
+  //close panels
+  const closeCreateEditPanel = () => {
+    {
+      setCreateErrors(emptyCreateErrors);
+      setCreateFrom(emptyCreateForm);
+      setCreateTeam(false);
+      setSelectedTeam(null);
+      setEditTeam(false);
+    }
+  };
+  const closeChangeLeaderPanel = () => {
+    setSelectedLeader(null);
+    setChangeLeaderError("");
+    setChangeLeader(null);
+  };
   const handleCreateSubmit = (e: FormEvent) => {
     e.preventDefault();
     if (!createValidate()) return;
+    setSubmitType("createTeam");
     setPasswordAuth(true);
   };
+  async function handleCreateTeamApi() {
+    if (user.department && createForm.leader) {
+      try {
+        const team = {
+          name: {
+            am: createForm.nameAm,
+            en: createForm.nameEn,
+          },
+          department_id: user.department.id,
+        };
+        const response1 = await fetch(`${serverAddress}/teams/`, {
+          method: "POST",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(team),
+        });
+
+        if (response1.ok) {
+          const newTeam = await response1.json();
+          setTeams((prev) => [...prev, newTeam]);
+          const leader = {
+            id: createForm.leader.value.id,
+            role: "teamLeader",
+            team_id: newTeam.id,
+          };
+          const response2 = await fetch(`${serverAddress}/users/`, {
+            method: "PATCH",
+            credentials: "include",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(leader),
+          });
+          if (response2.ok) {
+            const updatedEmp = await response2.json();
+            const index = employees.findIndex((e) => e.id === updatedEmp.id);
+            if (index !== -1) {
+              setEmployees((prev) => [
+                ...prev.slice(0, index),
+                updatedEmp,
+                ...prev.slice(index + 1),
+              ]);
+            } else {
+              setEmployees((prev) => [...prev, updatedEmp]);
+            }
+          }
+          setShowSuccessMessage(true);
+          setTimeout(() => {
+            closeCreateEditPanel();
+            setShowSuccessMessage(false);
+          }, 3000);
+        } else {
+          setShowFailMessage(true);
+          setTimeout(() => {
+            setShowFailMessage(false);
+          }, 3000);
+        }
+      } catch (error) {
+        console.error("error:", error);
+        setShowFailMessage(true);
+        setTimeout(() => {
+          setShowFailMessage(false);
+        }, 3000);
+      }
+    }
+  }
   const handleEditSubmit = (e: FormEvent) => {
     e.preventDefault();
     if (!createValidate()) return;
+    setSubmitType("editTeam");
     setPasswordAuth(true);
   };
-  const handleCheckboxChange = (serviceId: string) => {
+  async function handleEditTeamApi() {
+    if (selectedTeam) {
+      try {
+        const team = {
+          name: {
+            am: createForm.nameAm,
+            en: createForm.nameEn,
+          },
+        };
+        const response = await fetch(
+          `${serverAddress}/teams/${selectedTeam.id}/`,
+          {
+            method: "PATCH",
+            credentials: "include",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(team),
+          }
+        );
+
+        if (response.ok) {
+          const updatedTeam = await response.json();
+          const index = teams.findIndex((t) => t.id === updatedTeam.id);
+          if (index !== -1) {
+            setTeams((prev) => [
+              ...prev.slice(0, index),
+              updatedTeam,
+              ...prev.slice(index + 1),
+            ]);
+          } else {
+            setTeams((prev) => [...prev, updatedTeam]);
+          }
+          setShowSuccessMessage(true);
+          setTimeout(() => {
+            closeCreateEditPanel();
+            setShowSuccessMessage(false);
+          }, 3000);
+        } else {
+          setShowFailMessage(true);
+          setTimeout(() => {
+            setShowFailMessage(false);
+          }, 3000);
+        }
+      } catch (error) {
+        console.error("error:", error);
+        setShowFailMessage(true);
+        setTimeout(() => {
+          setShowFailMessage(false);
+        }, 3000);
+      }
+    }
+  }
+  const handleCheckboxChange = (serviceId: number) => {
     setSelectedServices((prev) =>
       prev.includes(serviceId)
         ? prev.filter((id) => id !== serviceId)
@@ -428,27 +352,171 @@ export default function AllTeams() {
   };
   const handleDeleteTeamSubmit = (e: FormEvent) => {
     e.preventDefault();
+    setSubmitType("deleteTeam");
     setPasswordAuth(true);
   };
+  async function handleDeleteTeamApi() {
+    if (deleteTeam) {
+      try {
+        const leader = employees.find(
+          (emp) => emp.team?.id === deleteTeam.id && emp.role === "teamLeader"
+        );
+        let leaderUpdated = true;
+        if (leader) {
+          const response = await fetch(`${serverAddress}/users/`, {
+            method: "PATCH",
+            credentials: "include",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ id: leader.id, role: "user" }),
+          });
+          if (!response.ok) {
+            leaderUpdated = false;
+          }
+        }
+        if (leaderUpdated) {
+          const response = await fetch(
+            `${serverAddress}/teams/${deleteTeam.id}/`,
+            {
+              method: "DELETE",
+              credentials: "include",
+            }
+          );
+
+          if (response.ok) {
+            setTeams((prev) => prev.filter((t) => t.id !== deleteTeam.id));
+            setShowSuccessMessage(true);
+            setTimeout(() => {
+              setDeleteTeam(null);
+              setShowSuccessMessage(false);
+            }, 3000);
+          } else {
+            setShowFailMessage(true);
+            setTimeout(() => {
+              setShowFailMessage(false);
+            }, 3000);
+          }
+        } else {
+          setShowFailMessage(true);
+          setTimeout(() => {
+            setShowFailMessage(false);
+          }, 3000);
+        }
+      } catch (error) {
+        console.error("error:", error);
+        setShowFailMessage(true);
+        setTimeout(() => {
+          setShowFailMessage(false);
+        }, 3000);
+      }
+    }
+  }
   const handleChangeLeaderSubmit = (e: FormEvent) => {
     e.preventDefault();
     if (!selectedLeader) {
       setChangeLeaderError(text.leaderError);
       return;
     }
+    setSubmitType("changeLeader");
     setPasswordAuth(true);
   };
+  async function handleChangeLeaderApi() {
+    if (changeLeader && selectedLeader) {
+      try {
+        const prevLeader = employees.find(
+          (emp) => emp.team?.id === changeLeader.id && emp.role === "teamLeader"
+        );
+        let leaderUpdated = true;
+        if (prevLeader) {
+          const response = await fetch(`${serverAddress}/users/`, {
+            method: "PATCH",
+            credentials: "include",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ id: prevLeader.id, role: "user" }),
+          });
+          if (response.ok) {
+            const updatedEmp = await response.json();
+            const index = employees.findIndex(
+              (emp) => emp.id === updatedEmp.id
+            );
+            if (index !== -1) {
+              setEmployees((prev) => [
+                ...prev.slice(0, index),
+                updatedEmp,
+                ...prev.slice(index + 1),
+              ]);
+            } else {
+              setEmployees((prev) => [...prev, updatedEmp]);
+            }
+          } else {
+            leaderUpdated = false;
+          }
+        }
+        if (leaderUpdated) {
+          const newLeader = {
+            id: selectedLeader.value.id,
+            role: "teamLeader",
+            team_id: changeLeader.id,
+          };
+          const response = await fetch(`${serverAddress}/users/`, {
+            method: "PATCH",
+            credentials: "include",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(newLeader),
+          });
+          if (response.ok) {
+            const updatedEmp = await response.json();
+            const index = employees.findIndex(
+              (emp) => emp.id === updatedEmp.id
+            );
+            if (index !== -1) {
+              setEmployees((prev) => [
+                ...prev.slice(0, index),
+                updatedEmp,
+                ...prev.slice(index + 1),
+              ]);
+            } else {
+              setEmployees((prev) => [...prev, updatedEmp]);
+            }
+            setShowSuccessMessage(true);
+            setTimeout(() => {
+              closeChangeLeaderPanel();
+              setShowSuccessMessage(false);
+            }, 3000);
+          } else {
+            setShowFailMessage(true);
+            setTimeout(() => {
+              setShowFailMessage(false);
+            }, 3000);
+          }
+        } else {
+          setShowFailMessage(true);
+          setTimeout(() => {
+            setShowFailMessage(false);
+          }, 3000);
+        }
+      } catch (error) {
+        console.error("error:", error);
+        setShowFailMessage(true);
+        setTimeout(() => {
+          setShowFailMessage(false);
+        }, 3000);
+      }
+    }
+  }
   const handleAuthResult = (success: boolean) => {
     if (success) {
       setPasswordAuth(false);
-      setShowSuccessMessage(true);
-      setTimeout(() => {
-        setShowSuccessMessage(false);
-        setDeleteService(null);
-      }, 3000);
-    } else {
-      return;
+      if (submitType === "createTeam") {
+        handleCreateTeamApi();
+      } else if (submitType === "editTeam") {
+        handleEditTeamApi();
+      } else if (submitType === "deleteTeam") {
+        handleDeleteTeamApi();
+      } else if (submitType === "changeLeader") {
+        handleChangeLeaderApi();
+      }
     }
+    setSubmitType("");
   };
   return (
     <div className={styles.container}>
@@ -467,14 +535,14 @@ export default function AllTeams() {
             <button
               className={styles.adminAssignBtn}
               onClick={() => {
-                setAssignService({ value: admin, type: "admin" });
+                setAssignService({ value: user, type: "admin" });
               }}
             >
               {text.assignService}
             </button>
             <button
               onClick={() => {
-                SetSeeService({ value: admin, type: "admin" });
+                SetSeeService({ value: user, type: "admin" });
               }}
               className={styles.adminSeeBtn}
             >
@@ -501,7 +569,7 @@ export default function AllTeams() {
           <tbody className={styles.tableBody}>
             {teams.map((team, index) => {
               const leader = employees.find(
-                (emp) => emp.teamID === team.id && emp.role === "teamLeader"
+                (emp) => emp.team?.id === team.id && emp.role === "teamLeader"
               );
               return (
                 <tr key={team.id}>
@@ -600,13 +668,7 @@ export default function AllTeams() {
             <button
               className={styles.closeIconButton}
               aria-label="Close panel"
-              onClick={() => {
-                setCreateErrors(emptyCreateErrors);
-                setCreateFrom(emptyCreateForm);
-                setCreateTeam(false);
-                setSelectedTeam(null);
-                setEditTeam(false);
-              }}
+              onClick={closeCreateEditPanel}
             >
               <svg
                 width="20"
@@ -694,13 +756,7 @@ export default function AllTeams() {
                 <button
                   type="button"
                   className={styles.cancelBtn}
-                  onClick={() => {
-                    setCreateErrors(emptyCreateErrors);
-                    setCreateFrom(emptyCreateForm);
-                    setCreateTeam(false);
-                    setSelectedTeam(null);
-                    setEditTeam(false);
-                  }}
+                  onClick={closeCreateEditPanel}
                 >
                   {text.cancel}
                 </button>
@@ -712,10 +768,21 @@ export default function AllTeams() {
             {showSuccessMessage && (
               <>
                 <div className="successMessageWrapper">
-                  <div className="successMessage">{text.addMessage}</div>
+                  <div className="successMessage">
+                    {createTeam ? text.addMessage : text.editMessage}
+                  </div>
                 </div>
                 <div className="overlay" style={{ zIndex: "1001" }}></div>
               </>
+            )}
+            {showFailMessage && (
+              <div className="failMessageWrapper">
+                <div className="failMessage">
+                  {lang === "en"
+                    ? "Request failed.Please try again later."
+                    : "ጥያቄዎን ማስተናገድ አልተቻለም። እባክዎን እንደገና ይሞክሩ።"}
+                </div>
+              </div>
             )}
           </div>
         </div>
@@ -970,11 +1037,7 @@ export default function AllTeams() {
             <button
               className={styles.closeIconButton}
               aria-label="Close panel"
-              onClick={() => {
-                setSelectedLeader(null);
-                setChangeLeaderError("");
-                setChangeLeader(null);
-              }}
+              onClick={closeChangeLeaderPanel}
             >
               <svg
                 width="20"
@@ -1031,11 +1094,7 @@ export default function AllTeams() {
                 <button
                   type="button"
                   className={styles.cancelBtn}
-                  onClick={() => {
-                    setSelectedLeader(null);
-                    setChangeLeaderError("");
-                    setChangeLeader(null);
-                  }}
+                  onClick={closeChangeLeaderPanel}
                 >
                   {text.cancel}
                 </button>
@@ -1051,6 +1110,15 @@ export default function AllTeams() {
                 </div>
                 <div className="overlay" style={{ zIndex: "1001" }}></div>
               </>
+            )}
+            {showFailMessage && (
+              <div className="failMessageWrapper">
+                <div className="failMessage">
+                  {lang === "en"
+                    ? "Request failed.Please try again later."
+                    : "ጥያቄዎን ማስተናገድ አልተቻለም። እባክዎን እንደገና ይሞክሩ።"}
+                </div>
+              </div>
             )}
           </div>
         </div>
@@ -1117,6 +1185,15 @@ export default function AllTeams() {
                 </div>
                 <div className="overlay" style={{ zIndex: "1001" }}></div>
               </>
+            )}
+            {showFailMessage && (
+              <div className="failMessageWrapper">
+                <div className="failMessage">
+                  {lang === "en"
+                    ? "Request failed.Please try again later."
+                    : "ጥያቄዎን ማስተናገድ አልተቻለም። እባክዎን እንደገና ይሞክሩ።"}
+                </div>
+              </div>
             )}
           </div>
         </div>

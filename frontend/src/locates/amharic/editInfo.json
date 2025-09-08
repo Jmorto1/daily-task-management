@@ -1,8 +1,9 @@
 {
 	"editInfo":"መረጃዎን ያስተካክሉ",
 	"name":"ስም",
-	"fatherName":"የአባት ስም",
+	"profession":"ሙያ",
 	"office":"ቢሮ",
+
 	"phoneNo":"ስልክ ቁጥር",
 	"save":"መዝግብ",
 	"cancel":"ተው",

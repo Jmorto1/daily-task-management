@@ -150,7 +150,7 @@ export default function Services() {
   };
   const text = translate[lang];
 
-  const { user, setUser } = useAppData();
+  const { user } = useAppData();
   const [searchQuery, setSearchQuery] = useState("");
   const [openMain, setOpenMain] = useState<string | null>(null);
   const [openSub, setOpenSub] = useState<string | null>(null);

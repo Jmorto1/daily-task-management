@@ -31,7 +31,14 @@ import { useIsMoblie } from "../hooks/useIsMobile";
 import { useIsOpen } from "../hooks/useIsOpen";
 import { useAppData } from "../hooks/useAppData";
 export default function Dashboard() {
-  const { user, setUser } = useAppData();
+  const {
+    emptyUser,
+    user,
+    setUser,
+    serverAddress,
+    setIsLoggedIn,
+    profileImage,
+  } = useAppData();
   const navigate = useNavigate();
   const [toggleDropdown, setToggleDropdown] = useState(false);
   const profileRef = useRef<HTMLDivElement | null>(null);
@@ -43,16 +50,14 @@ export default function Dashboard() {
   const isMobile = useIsMoblie();
   const navlistRef = useRef<HTMLDivElement | null>(null);
   const { isOpen, setIsOpen } = useIsOpen(navlistRef);
-  const [image, setImage] = useState<File | null>(null);
-  const [preview, setPreview] = useState<string>("");
   const inputRef = useRef<HTMLInputElement>(null);
-  const { lang, setLang } = useLang();
+  const { lang } = useLang();
   const translate = {
     am: amDashboard,
     en: enDashboard,
   };
   const text = translate[lang];
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const selectedFile = e.target.files?.[0];
     if (!selectedFile) return;
     if (!selectedFile.type.startsWith("image/")) {
@@ -60,12 +65,42 @@ export default function Dashboard() {
       return;
     }
 
-    setImage(selectedFile);
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setPreview(reader.result as string);
-    };
-    reader.readAsDataURL(selectedFile);
+    const formData = new FormData();
+    formData.append("profile", selectedFile);
+    formData.append("id", String(user.id)); // include id in the body
+
+    try {
+      const response = await fetch(`${serverAddress}/users/`, {
+        method: "PATCH",
+        credentials: "include",
+        body: formData, // DO NOT set Content-Type manually
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setUser(data);
+      } else {
+        console.error("Server response not OK", await response.text());
+      }
+    } catch (error) {
+      console.error("Upload error:", error);
+      alert("Failed to upload image");
+    }
+  }
+
+  const handleLogout = async () => {
+    const res = await fetch(`${serverAddress}/users/logout/`, {
+      method: "POST",
+      credentials: "include",
+    });
+
+    if (res.ok) {
+      setUser(emptyUser);
+      setIsLoggedIn(false);
+      navigate("/login", { replace: true });
+    } else {
+      throw new Error("Logout failed");
+    }
   };
   useEffect(() => {
     if (!isMobile) {
@@ -262,7 +297,9 @@ export default function Dashboard() {
       </div>
       <div className={styles.contentArea}>
         <div className={styles.Header}>
-          <div className={styles.HeaderTitle}>{text.headerTitle}</div>
+          <div className={styles.HeaderTitle}>
+            {user.department ? user.department.name[lang] : text.headerTitle}
+          </div>
           <Language />
           <div className={styles.avatorContainer} ref={profileRef}>
             <div
@@ -274,10 +311,14 @@ export default function Dashboard() {
               <div
                 className={styles.profile}
                 style={{
-                  backgroundImage: preview ? `url(${preview})` : undefined,
+                  backgroundImage: profileImage
+                    ? `url(${profileImage})`
+                    : undefined,
                 }}
               >
-                {!preview && <div>A</div>}
+                {!profileImage && (
+                  <div>{user.name[lang] && user.name[lang][0]}</div>
+                )}
               </div>
             </div>
             {toggleDropdown && (
@@ -286,10 +327,14 @@ export default function Dashboard() {
                   <div
                     className={styles.profile}
                     style={{
-                      backgroundImage: preview ? `url(${preview})` : undefined,
+                      backgroundImage: profileImage
+                        ? `url(${profileImage})`
+                        : undefined,
                     }}
                   >
-                    {!preview && <div>A</div>}
+                    {!profileImage && (
+                      <div>{user.name[lang] && user.name[lang][0]}</div>
+                    )}
                   </div>
                   <div>
                     <input
@@ -305,7 +350,7 @@ export default function Dashboard() {
                       }}
                       className={styles.uploadButton}
                       title={
-                        preview
+                        profileImage
                           ? "Change Profile Picture"
                           : "Upload Profile Picture"
                       }
@@ -314,7 +359,7 @@ export default function Dashboard() {
                     </button>
                   </div>
                 </div>
-                <div className={styles.role}>Admin</div>
+                <div className={styles.role}>{user.name[lang]}</div>
                 <ul>
                   <li
                     onClick={() => {
@@ -334,11 +379,7 @@ export default function Dashboard() {
                     <FaKey className={styles.icons} />
                     {text.changePassword}
                   </li>
-                  <li
-                    onClick={() => {
-                      navigate("/", { replace: true });
-                    }}
-                  >
+                  <li onClick={handleLogout}>
                     <FaSignOutAlt className={styles.icons} />
                     {text.logOut}
                   </li>
@@ -359,12 +400,12 @@ export default function Dashboard() {
           )}
           {activeView === "departments" && <DepartmentManagement />}
           {activeView === "services" && <Services />}
-          {activeView === "myTasks" && <MyTasks preview={preview} />}
+          {activeView === "myTasks" && <MyTasks />}
           {activeView === "allTeams" && <AllTeams />}
           {activeView === "teamMembers" && <TeamMembers />}
-          {activeView === "report" && <Report preview={preview} />}
+          {activeView === "report" && <Report />}
           {activeView === "employee" && <Employee />}
-          {activeView === "about" && <About preview={preview} />}
+          {activeView === "about" && <About />}
         </div>
       </div>
     </div>

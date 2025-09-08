@@ -3,7 +3,7 @@ import styles from "../styles/report.module.css";
 import { FaUsers, FaUser } from "react-icons/fa";
 import Select, { type SingleValue } from "react-select";
 import { useLang } from "../hooks/useLang";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useAppData } from "../hooks/useAppData";
 
 type teamUser = {
@@ -47,8 +47,8 @@ const teams: teamUser[] = [
   },
 ];
 
-export default function Report({ preview }: { preview: string }) {
-  const { lang, setLang } = useLang();
+export default function Report() {
+  const { lang } = useLang();
 
   const optionTeam: TeamUserOption[] = teams.map((team) => ({
     value: team,
@@ -60,7 +60,7 @@ export default function Report({ preview }: { preview: string }) {
   });
   const [selectedTeamUser, setSelectedTeamUser] =
     useState<TeamUserOption | null>(optionTeam[0]);
-  const { user, setUser } = useAppData();
+  const { user } = useAppData();
   const teamTitle = lang === "en" ? "Teams Report" : "የቡድን ሪፖርት";
   const memberTitle = lang === "en" ? "Team Members Report" : "የቡድን አባላት ሪፖርት";
   const TeamSelectLabel = lang === "en" ? "Select Team:" : "ቡድን ምረጥ:";
@@ -97,11 +97,7 @@ export default function Report({ preview }: { preview: string }) {
         </div>
       </div>
       <div className={styles.reportContent}>
-        <TaskReport
-          preview={preview}
-          parent={parent}
-          selectedTeamUser={selectedTeamUser}
-        />
+        <TaskReport parent={parent} selectedTeamUser={selectedTeamUser} />
       </div>
     </div>
   );

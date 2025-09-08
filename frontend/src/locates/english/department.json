@@ -2,7 +2,7 @@
     "addDept":"Add Department",
     "editDept":"Edit Department",
     "title":"Departments",
-    "num":"NO.",
+    "num":"No.",
     "name":"Name",
     "admin":"Admins",
     "adminSingle":"Admin",
@@ -34,5 +34,6 @@
     "editMessage":"Successfully updated.",
     "deleteMessage":"Successfully deleted.",
     "transferMessage":"Successfully transferred",
-    "preventDelete":"You can not delete department which has Employees."
+    "preventDelete":"You can not delete department which has Employees.",
+    "oneDeptLeft":"It should be atleast 1 department"
 }

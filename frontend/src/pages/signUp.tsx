@@ -15,21 +15,15 @@ import Select from "react-select";
 import type { SingleValue } from "react-select";
 import singupAm from "../locates/amharic/singup.json";
 import singupEn from "../locates/english/singup.json";
-
-type Department = {
-  id: string;
-  name: {
-    am: string;
-    en: string;
-  };
-};
-
+import { useAppData } from "../hooks/useAppData";
+import type { Department } from "../context/appDataContext";
 type DeptOption = {
   value: Department;
   label: string;
 };
 
 export default function SignupPage() {
+  const { departments, serverAddress } = useAppData();
   const { lang } = useLang();
   const translate = {
     am: singupAm,
@@ -37,33 +31,20 @@ export default function SignupPage() {
   };
   const text = translate[lang];
   // Sample department data
-  const departments: Department[] = [
-    { id: "d1", name: { am: "የሂሳብ መምሪያ", en: "Finance Department" } },
-    { id: "d2", name: { am: "የሰው ኃይል አስተዳደር", en: "Human Resources" } },
-    { id: "d3", name: { am: "የቴክኖሎጂ አገልግሎት", en: "IT Department" } },
-    { id: "d4", name: { am: "የግብይት እና ሽያጭ", en: "Sales and Marketing" } },
-    { id: "d5", name: { am: "የአስተዳደር አገልግሎት", en: "Administration" } },
-    { id: "d6", name: { am: "የህግ አገልግሎት", en: "Legal Department" } },
-    {
-      id: "d7",
-      name: { am: "የግንባታ እና ጥገና", en: "Maintenance and Construction" },
-    },
-  ];
-
   const optionDept: DeptOption[] = departments.map((dept) => ({
     value: dept,
     label: dept.name[lang],
   }));
 
-  // ✅ Form state
-  const [formData, setFormData] = useState({
+  const emptyFormData = {
     name: { am: "", en: "" },
     department: null as Department | null,
     phoneNumber: "",
-    email: "",
     password: "",
     confirmPassword: "",
-  });
+  };
+  // ✅ Form state
+  const [formData, setFormData] = useState(emptyFormData);
 
   // ✅ Error state
   const [formErrors, setFormErrors] = useState({
@@ -71,11 +52,12 @@ export default function SignupPage() {
     nameEn: "",
     department: "",
     phoneNumber: "",
-    email: "",
     password: "",
     confirmPassword: "",
   });
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const [showFailMessage, setShowFailMessage] = useState<boolean>(false);
+  const [phoneExists, setPhoneExists] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
@@ -121,10 +103,12 @@ export default function SignupPage() {
     }
     if (!formData.confirmPassword.trim()) {
       errors.confirmPassword = text.cfrmPasswordError;
+      valid = false;
     }
     if (formData.password.trim() && formData.confirmPassword.trim()) {
       if (formData.password.trim() !== formData.confirmPassword.trim()) {
         errors.confirmPassword = text.notMatch;
+        valid = false;
       } else if (formData.password.length < 6) {
         errors.confirmPassword = text.notSixChar;
         valid = false;
@@ -134,11 +118,8 @@ export default function SignupPage() {
     return valid;
   };
 
-  // ✅ Handle Input Change
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-
-    // Handle nested name fields
     if (name === "nameAm" || name === "nameEn") {
       setFormData((prev) => ({
         ...prev,
@@ -154,16 +135,50 @@ export default function SignupPage() {
     }
   };
 
-  // ✅ Handle Submit
-  const handleSubmit = (e: React.FormEvent) => {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (validate()) {
-      setShowSuccessMessage(true);
-      setTimeout(() => {
-        setShowSuccessMessage(false);
-      }, 3000);
+      try {
+        const user = {
+          name: formData.name,
+          phone_number: formData.phoneNumber.trim(),
+          department_id: formData.department?.id,
+          password: formData.password.trim(),
+          status: "pending",
+        };
+        user.name.en = user.name.en.replace(/\b\w/g, (c) => c.toUpperCase());
+        const response = await fetch(`${serverAddress}/users/`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(user),
+        });
+        if (response.ok) {
+          setShowSuccessMessage(true);
+          setTimeout(() => {
+            setShowSuccessMessage(false);
+            setFormData(emptyFormData);
+          }, 3000);
+        } else {
+          const data = await response.json();
+          console.error(data.errors);
+          if (data.field === "phone_number") {
+            setPhoneExists(true);
+          }
+          setShowFailMessage(true);
+          setTimeout(() => {
+            setShowFailMessage(false);
+            setPhoneExists(false);
+          }, 3000);
+        }
+      } catch (error) {
+        console.error("error :", error);
+        setShowFailMessage(true);
+        setTimeout(() => {
+          setShowFailMessage(false);
+        }, 3000);
+      }
     }
-  };
+  }
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [width, setWidht] = useState<number>(0);
   useEffect(() => {
@@ -267,7 +282,14 @@ export default function SignupPage() {
                   width: `${width}px`,
                   paddingLeft: "25px",
                 }),
-                placeholder: (provided, state) => ({
+                menu: (provided: any) => ({
+                  ...provided,
+                  width: `${width}px`,
+                  minWidth: `${width}px`,
+                  fontWeight: "500",
+                  fontSize: "17px",
+                }),
+                placeholder: (provided) => ({
                   ...provided,
                   fontWeight: "500",
                   fontSize: "17px",
@@ -335,6 +357,19 @@ export default function SignupPage() {
               </div>
               <div className="overlay" style={{ zIndex: "1001" }}></div>
             </>
+          )}
+          {showFailMessage && (
+            <div className="failMessageWrapper">
+              <div className="failMessage">
+                {phoneExists
+                  ? lang === "en"
+                    ? "User with this phone number already exists.Please change the Phone number"
+                    : "በዚህ ስልክ ቁጥር የተከፈተ አካውንት አለ።እባክዎ ስልኩን ይቀይሩ።"
+                  : lang === "en"
+                  ? "Request failed.Please try again later."
+                  : "ጥያቄዎን ማስተናገድ አልተቻለም። እባክዎን እንደገና ይሞክሩ።"}
+              </div>
+            </div>
           )}
         </form>
 

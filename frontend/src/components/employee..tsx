@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, type FormEvent } from "react";
+import { useState, useEffect, useRef, type FormEvent } from "react";
 import styles from "../styles/employee.module.css";
 import { useIsMoblie } from "../hooks/useIsMobile";
 import { FiMoreVertical, FiTrash2, FiEdit } from "react-icons/fi";
@@ -7,152 +7,99 @@ import employeeAm from "../locates/amharic/employee.json";
 import employeeEn from "../locates/english/employee.json";
 import PasswordAuth from "./subComponent/passwordAuth";
 import Select, { type SingleValue } from "react-select";
-type Team = {
-  id: string;
-  name: {
-    am: string;
-    en: string;
-  };
+import { useAppData } from "../hooks/useAppData";
+import type { User, Team } from "../context/appDataContext";
+type Gender = {
+  am: string;
+  en: string;
 };
-type Employee = {
-  id: string;
-  name: {
-    en: string;
-    am: string;
-  };
-  phone: string;
-  gender: {
-    am: string;
-    en: string;
-  };
-  profession: {
-    am: string;
-    en: string;
-  };
-  teamid: string;
+type GenderOption = {
+  value: Gender;
+  label: string;
 };
-
-type PendingEmployee = {
-  id: string;
-  name: {
-    en: string;
-    am: string;
-  };
-  phone: string;
-};
-
-const teams: Team[] = [
-  { id: "t1", name: { am: "ሽያጭ", en: "Sales" } },
-  { id: "t2", name: { am: "ገበያ", en: "Marketing" } },
-  { id: "t3", name: { am: "ድጋፍ", en: "Support" } },
-  { id: "t4", name: { am: "ልማት", en: "Development" } },
-  { id: "t5", name: { am: "ሰው ኃይል", en: "HR" } },
-];
-
-const employees: Employee[] = [
-  {
-    id: "e1",
-    name: { en: "John Doe", am: "ጆን ዶ" },
-    phone: "0911111111",
-    gender: { am: "ወንድ", en: "Male" },
-    profession: { am: "አስተዳዳሪ", en: "Manager" },
-    teamid: "t1",
-  },
-  {
-    id: "e2",
-    name: { en: "Jane Smith", am: "ጄን ስሚዝ" },
-    phone: "0922222222",
-    gender: { am: "ሴት", en: "Female" },
-    profession: { am: "አበልጻጊ", en: "Developer" },
-    teamid: "t4",
-  },
-  {
-    id: "e3",
-    name: { en: "Alice Johnson", am: "አሊስ ጆንሰን" },
-    phone: "0933333333",
-    gender: { am: "ሴት", en: "Female" },
-    profession: { am: "አርቲስት", en: "Designer" },
-    teamid: "t2",
-  },
-  {
-    id: "e4",
-    name: { en: "Michael Brown", am: "ሚካኤል ብራውን" },
-    phone: "0944444444",
-    gender: { am: "ወንድ", en: "Male" },
-    profession: { am: "ተንታኝ", en: "Analyst" },
-    teamid: "t3",
-  },
-  {
-    id: "e5",
-    name: { en: "Sara Wilson", am: "ሳራ ዊልሰን" },
-    phone: "0955555555",
-    gender: { am: "ሴት", en: "Female" },
-    profession: { am: "መሞከሪ", en: "Tester" },
-    teamid: "t5",
-  },
-];
-const allGenders = [
-  {
-    id: "m",
-    am: "ወንድ",
-    en: "Male",
-  },
-  {
-    id: "f",
-    am: "ሴት",
-    en: "Female",
-  },
-];
-const emptyEmployee = (): Employee => ({
-  id: "",
-  name: { en: "", am: "" },
-  phone: "",
-  gender: { am: "", en: "" },
-  profession: {
-    am: "",
-    en: "",
-  },
-  teamid: "",
-});
 type TeamOption = { value: Team; label: string };
+type approvingForm = {
+  id: number | null;
+  profession: {
+    am: string;
+    en: string;
+  };
+  gender: GenderOption | null;
+  team: TeamOption | null;
+};
+type UpatedUser = {
+  id: number | null;
+  profession: {
+    am: string;
+    en: string;
+  };
+  status: "user";
+  gender?: Gender;
+  team_id?: number;
+};
 export default function EmployeeManager() {
-  const [pendingEmployees, setPendingEmployees] = useState<PendingEmployee[]>([
-    {
-      id: "101",
-      name: { en: "Daniel Green", am: "ዳንኤል ግሪን" },
-      phone: "0966666666",
-    },
-    {
-      id: "102",
-      name: { en: "Emily White", am: "ኤሚሊ ዋይት" },
-      phone: "0977777777",
-    },
-    {
-      id: "103",
-      name: { en: "Robert King", am: "ሮበርት ኪንግ" },
-      phone: "0988888888",
-    },
-  ]);
-  const { lang, setLang } = useLang();
+  const {
+    employees,
+    setEmployees,
+    pendingEmployees,
+    setPendingEmployees,
+    teams,
+    serverAddress,
+  } = useAppData();
+  const { lang } = useLang();
   const translate = {
     am: employeeAm,
     en: employeeEn,
   };
   const text = translate[lang];
+  const teamOption: TeamOption[] = teams.map((team) => {
+    return {
+      value: team,
+      label: team.name[lang],
+    };
+  });
+  const allGenders: Gender[] = [
+    {
+      am: "ወንድ",
+      en: "Male",
+    },
+    {
+      am: "ሴት",
+      en: "Female",
+    },
+  ];
+  const genderOption: GenderOption[] = allGenders.map((g) => {
+    return {
+      value: g,
+      label: g[lang],
+    };
+  });
+  const emptyApprovingForm: approvingForm = {
+    id: null,
+    profession: {
+      am: "",
+      en: "",
+    },
+    gender: genderOption[0] || null,
+    team: teamOption[0] || null,
+  };
   const isMobile = useIsMoblie(960);
   const [showPending, setShowPending] = useState(false);
   const [passwordAuth, setPasswordAuth] = useState<boolean>(false);
   const [showSuccessMessage, setShowSuccessMessage] = useState<boolean>(false);
-  const [approvingForm, setApprovingForm] = useState<Employee>(emptyEmployee());
-  const [isApproving, setIsApproving] = useState<PendingEmployee | null>(null);
+  const [showFailMessage, setShowFailMessage] = useState<boolean>(false);
+  const [approvingForm, setApprovingForm] =
+    useState<approvingForm>(emptyApprovingForm);
+  const [isApproving, setIsApproving] = useState<User | null>(null);
   const [selectedTeam, setSelectedTeam] = useState<TeamOption | null>(null);
   const [professionErrors, setProfessionError] = useState<{
     am: String;
     en: string;
   }>({ am: "", en: "" });
   const [selectTeamError, setSelectTeamError] = useState("");
-  const [editEmployee, setEditEmployee] = useState<Employee | null>(null);
-  const [deleteEmployee, setDeleteEmployee] = useState<Employee | null>(null);
+  const [editEmployee, setEditEmployee] = useState<User | null>(null);
+  const [deleteEmployee, setDeleteEmployee] = useState<User | null>(null);
+  const [submitType, setSubmitType] = useState("");
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [width, setWidht] = useState<number>(0);
   useEffect(() => {
@@ -183,24 +130,33 @@ export default function EmployeeManager() {
       document.removeEventListener("mousedown", handleMousedown);
     };
   }, [actionDropdown]);
+  //closing panels
+  const closeApprovingPanel = () => {
+    setApprovingForm(emptyApprovingForm);
+    setIsApproving(null);
+  };
+  const closeEditEmployeePanel = () => {
+    {
+      setEditEmployee(null);
+      setSelectTeamError("");
+      setSelectedTeam(null);
+    }
+  };
   // Start approving pending employee
-  const startApproving = (pendEmp: PendingEmployee) => {
+  const startApproving = (pendEmp: User) => {
     setApprovingForm((prev) => ({
       ...prev,
       id: pendEmp.id,
-      name: pendEmp.name,
-      phone: pendEmp.phone,
     }));
     setIsApproving(pendEmp);
   };
   const handleApprovingChange = (field: string, value: any) => {
     setApprovingForm((prev) => {
       if (field === "gender") {
-        const gender = allGenders.find((g) => g.id === value);
-        return gender ? { ...prev, gender } : prev;
+        return { ...prev, gender: value };
       }
       if (field === "team") {
-        return { ...prev, teamid: value };
+        return { ...prev, team: value };
       }
       if (field === "professionAm") {
         setProfessionError((prev) => ({ ...prev, am: "" }));
@@ -213,7 +169,7 @@ export default function EmployeeManager() {
       return prev;
     });
   };
-  const handleapprovingSubmint = (e: FormEvent) => {
+  async function handleapprovingSubmint(e: FormEvent) {
     e.preventDefault();
     if (
       !approvingForm.profession.am.trim() ||
@@ -230,42 +186,175 @@ export default function EmployeeManager() {
       }
       return;
     }
+    try {
+      const user: UpatedUser = {
+        id: approvingForm.id,
+        profession: approvingForm.profession,
+        status: "user",
+      };
+      if (approvingForm.gender && approvingForm.gender.value) {
+        user.gender = approvingForm.gender.value;
+      }
+      if (approvingForm.team && approvingForm.team.value.id) {
+        user.team_id = approvingForm.team.value.id;
+      }
 
-    setShowSuccessMessage(true);
-    setTimeout(() => {
-      setShowSuccessMessage(false);
-    }, 3000);
-  };
-  const handlePendingDelete = (pendEmp: PendingEmployee) => {
-    setPendingEmployees((prev) => prev.filter((emp) => emp.id !== pendEmp.id));
-  };
+      const response = await fetch(`${serverAddress}/users/`, {
+        method: "PATCH",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(user),
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setPendingEmployees((prev) => prev.filter((p) => p.id !== data.id));
+        setEmployees((prev) => [...prev, data]);
+        setShowSuccessMessage(true);
+        setTimeout(() => {
+          closeApprovingPanel();
+          setShowSuccessMessage(false);
+        }, 3000);
+      } else {
+        setShowFailMessage(true);
+        setTimeout(() => {
+          setShowFailMessage(false);
+        }, 3000);
+      }
+    } catch (error) {
+      console.error("error :", error);
+      setShowFailMessage(true);
+      setTimeout(() => {
+        setShowFailMessage(false);
+      }, 3000);
+    }
+  }
+  async function handlePendingDelete(pendEmp: User) {
+    try {
+      const response = await fetch(`${serverAddress}/users/`, {
+        method: "DELETE",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: pendEmp.id }),
+      });
+      if (response.ok) {
+        setPendingEmployees((prev) =>
+          prev.filter((emp) => emp.id !== pendEmp.id)
+        );
+      }
+    } catch (error) {
+      console.error("error:", error);
+    }
+  }
   const handleEditSubmint = (e: FormEvent) => {
     e.preventDefault();
     if (!selectedTeam) {
       setSelectTeamError(text.selectTeam);
       return;
     }
+    setSubmitType("editEmp");
     setPasswordAuth(true);
   };
+  async function handleEditApi() {
+    if (selectedTeam && editEmployee) {
+      try {
+        const updatedEmp = {
+          id: editEmployee.id,
+          team_id: selectedTeam.value.id,
+          role: "user",
+        };
+        const response = await fetch(`${serverAddress}/users/`, {
+          method: "PATCH",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(updatedEmp),
+        });
+        if (response.ok) {
+          const data = await response.json();
+
+          const index = employees.findIndex((e) => e.id === data.id);
+          if (index !== -1) {
+            setEmployees((prev) => [
+              ...prev.slice(0, index),
+              data,
+              ...prev.slice(index + 1),
+            ]);
+          } else {
+            setEmployees((prev) => [...prev, data]);
+          }
+          setShowSuccessMessage(true);
+          setTimeout(() => {
+            closeEditEmployeePanel();
+            setShowSuccessMessage(false);
+          }, 3000);
+        } else {
+          setShowFailMessage(true);
+          setTimeout(() => {
+            setShowFailMessage(false);
+          }, 3000);
+        }
+      } catch (error) {
+        console.error("error :", error);
+        setShowFailMessage(true);
+        setTimeout(() => {
+          setShowFailMessage(false);
+        }, 3000);
+      }
+    }
+  }
   const handleDeleteEmployeeSubmit = (e: FormEvent) => {
     e.preventDefault();
     setPasswordAuth(true);
+    setSubmitType("deleteEmp");
   };
+  async function handleDeleteEmployeeApi() {
+    if (deleteEmployee) {
+      try {
+        const response = await fetch(`${serverAddress}/users/`, {
+          method: "DELETE",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id: deleteEmployee.id }),
+        });
+        if (response.ok) {
+          setEmployees((prev) =>
+            prev.filter((emp) => emp.id !== deleteEmployee.id)
+          );
+          setShowSuccessMessage(true);
+          setTimeout(() => {
+            setDeleteEmployee(null);
+            setShowSuccessMessage(false);
+          }, 3000);
+        } else {
+          setShowFailMessage(true);
+          setTimeout(() => {
+            setShowFailMessage(false);
+          }, 3000);
+        }
+      } catch (error) {
+        console.error("error :", error);
+        setShowFailMessage(true);
+        setTimeout(() => {
+          setShowFailMessage(false);
+        }, 3000);
+      }
+    }
+  }
   const handleAuthResult = (success: boolean) => {
     if (success) {
       setPasswordAuth(false);
-      setShowSuccessMessage(true);
-      setTimeout(() => {
-        setShowSuccessMessage(false);
-      }, 3000);
-    } else {
-      return;
+      if (submitType === "deleteEmp") {
+        handleDeleteEmployeeApi();
+      } else if (submitType === "editEmp") {
+        handleEditApi();
+      }
     }
+    setSubmitType("");
+    return;
   };
   return (
     <div className={styles.container}>
       <h2 className={styles.title}>{text.allemp}</h2>
-
+      {/* pending employee */}
       {pendingEmployees.length > 0 && (
         <>
           <button
@@ -289,7 +378,7 @@ export default function EmployeeManager() {
                     </div>
                     <div className={styles.column}>
                       <div className={styles.header}>{text.phoneNo}</div>
-                      <div>{p.phone}</div>
+                      <div>{p.phone_number}</div>
                     </div>
                     <div
                       className={`${styles.pendingActions} ${styles.column}`}
@@ -331,7 +420,7 @@ export default function EmployeeManager() {
               </div>
               <div>
                 <div>{text.phoneNo}</div>
-                <div>{emp.phone}</div>
+                <div>{emp.phone_number}</div>
               </div>
               <div>
                 <div>{text.gender}</div>
@@ -340,7 +429,7 @@ export default function EmployeeManager() {
               <div>
                 <div>{text.team}</div>
                 <div>
-                  {teams.find((team) => team.id === emp.teamid)?.name[lang]}
+                  {teams.find((team) => team.id === emp.team?.id)?.name[lang]}
                 </div>
               </div>
               <div>
@@ -410,10 +499,10 @@ export default function EmployeeManager() {
                 <tr key={emp.id}>
                   <td>{idx + 1}</td>
                   <td>{emp.name[lang]}</td>
-                  <td>{emp.phone}</td>
+                  <td>{emp.phone_number}</td>
                   <td>{emp.gender[lang]}</td>
                   <td>
-                    {teams.find((team) => team.id === emp.teamid)?.name[lang]}
+                    {teams.find((team) => team.id === emp.team?.id)?.name[lang]}
                   </td>
                   <td>{emp.profession[lang]}</td>
                   <td
@@ -468,10 +557,7 @@ export default function EmployeeManager() {
             <button
               className={styles.closeIconButton}
               aria-label="Close panel"
-              onClick={() => {
-                setApprovingForm(emptyEmployee());
-                setIsApproving(null);
-              }}
+              onClick={closeApprovingPanel}
             >
               <svg
                 width="20"
@@ -505,54 +591,46 @@ export default function EmployeeManager() {
                 <input
                   type="text"
                   className={styles.input}
-                  value={isApproving.phone}
+                  value={isApproving.phone_number}
                   readOnly
                 />
               </div>
               <div className={styles.formGroup}>
                 <label className={styles.label}>{text.gender}</label>
-                <select
-                  name="gender"
-                  className={styles.input}
-                  value={
-                    approvingForm.gender.en
-                      ? allGenders.find((g) => g.en === approvingForm.gender.en)
-                          ?.id
-                      : ""
-                  }
-                  onChange={(e) =>
-                    handleApprovingChange("gender", e.target.value)
-                  }
-                  style={{
-                    width: `${width}px`,
+                <Select
+                  value={approvingForm.gender}
+                  options={genderOption}
+                  onChange={(option: SingleValue<GenderOption>) => {
+                    handleApprovingChange("gender", option);
                   }}
-                >
-                  {allGenders.map((g) => (
-                    <option key={g.id} value={g.id}>
-                      {g[lang]}
-                    </option>
-                  ))}
-                </select>
+                  classNamePrefix="select"
+                  styles={{
+                    control: (base) => ({
+                      ...base,
+                      width: `${width}px`,
+                    }),
+                  }}
+                />
               </div>
               <div className={styles.formGroup}>
                 <label className={styles.label}>{text.team}</label>
-                <select
-                  name="team"
-                  value={approvingForm.teamid}
-                  className={styles.input}
-                  onChange={(e) =>
-                    handleApprovingChange(e.target.name, e.target.value)
-                  }
-                  style={{
-                    width: `${width}px`,
+
+                <Select
+                  value={approvingForm.team}
+                  isSearchable
+                  isMulti={false}
+                  options={teamOption}
+                  onChange={(option: SingleValue<TeamOption>) => {
+                    handleApprovingChange("team", option);
                   }}
-                >
-                  {teams.map((t) => (
-                    <option key={t.id} value={t.id}>
-                      {t.name[lang]}
-                    </option>
-                  ))}
-                </select>
+                  classNamePrefix="select"
+                  styles={{
+                    control: (base) => ({
+                      ...base,
+                      width: `${width}px`,
+                    }),
+                  }}
+                />
               </div>
               <div className={styles.formGroup}>
                 <label className={styles.label}>ሙያ</label>
@@ -588,10 +666,7 @@ export default function EmployeeManager() {
                 <button
                   className={styles.cancelBtn}
                   type="button"
-                  onClick={() => {
-                    setApprovingForm(emptyEmployee());
-                    setIsApproving(null);
-                  }}
+                  onClick={closeApprovingPanel}
                 >
                   {text.cancel}
                 </button>
@@ -608,6 +683,15 @@ export default function EmployeeManager() {
                 </div>
               </>
             )}
+            {showFailMessage && (
+              <div className="failMessageWrapper">
+                <div className="failMessage">
+                  {lang === "en"
+                    ? "Request failed.Please try again later."
+                    : "ጥያቄዎን ማስተናገድ አልተቻለም። እባክዎን እንደገና ይሞክሩ።"}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -618,11 +702,7 @@ export default function EmployeeManager() {
             <button
               className={styles.closeIconButton}
               aria-label="Close panel"
-              onClick={() => {
-                setEditEmployee(null);
-                setSelectTeamError("");
-                setSelectedTeam(null);
-              }}
+              onClick={closeEditEmployeePanel}
             >
               <svg
                 width="20"
@@ -656,7 +736,7 @@ export default function EmployeeManager() {
                   isSearchable
                   isMulti={false}
                   options={teams
-                    .filter((team) => team.id !== editEmployee.teamid)
+                    .filter((team) => team.id !== editEmployee.team?.id)
                     .map((team) => ({
                       value: team,
                       label: team.name[lang],
@@ -676,11 +756,7 @@ export default function EmployeeManager() {
                 <button
                   className={styles.cancelBtn}
                   type="button"
-                  onClick={() => {
-                    setEditEmployee(null);
-                    setSelectTeamError("");
-                    setSelectedTeam(null);
-                  }}
+                  onClick={closeEditEmployeePanel}
                 >
                   {text.cancel}
                 </button>
@@ -697,9 +773,19 @@ export default function EmployeeManager() {
                 </div>
               </>
             )}
+            {showFailMessage && (
+              <div className="failMessageWrapper">
+                <div className="failMessage">
+                  {lang === "en"
+                    ? "Request failed.Please try again later."
+                    : "ጥያቄዎን ማስተናገድ አልተቻለም። እባክዎን እንደገና ይሞክሩ።"}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}
+      {/* delete employee */}
       {deleteEmployee && (
         <div className="overlay">
           <div className={styles.deleteEmployee}>
@@ -757,6 +843,15 @@ export default function EmployeeManager() {
                 </div>
                 <div className="overlay" style={{ zIndex: "1001" }}></div>
               </>
+            )}
+            {showFailMessage && (
+              <div className="failMessageWrapper">
+                <div className="failMessage">
+                  {lang === "en"
+                    ? "Request failed.Please try again later."
+                    : "ጥያቄዎን ማስተናገድ አልተቻለም። እባክዎን እንደገና ይሞክሩ።"}
+                </div>
+              </div>
             )}
           </div>
         </div>

@@ -39,7 +39,7 @@ ul{
   background: transparent;
   z-index: 999;
   pointer-events: auto;}
-.successMessageWrapper{
+.successMessageWrapper,.failMessageWrapper{
   position: absolute;
   display: flex;
   justify-content: flex-end;
@@ -61,7 +61,16 @@ ul{
   transition: opacity 0.3s ease;
   z-index: 2000;
 }
-
+.failMessage{
+  text-align: right;
+    color: #f90101;
+    padding: 10px;
+    border-radius: 10px;
+    font-weight: 600;
+    opacity: 1;
+    transition: opacity 0.3s ease;
+    z-index: 2000;
+}
 .successMessage::after {
   content: '';
   display: block;
@@ -69,7 +78,7 @@ ul{
   background-color: #01f90e;
   border-radius: 2px;
   margin-top: 6px;
-  animation: disappear 3s linear forwards;
+  animation: disappear 2s linear forwards;
 }
 
 @keyframes disappear {

@@ -6,6 +6,7 @@ import Language from "../components/subComponent/languages";
 import { useLang } from "../hooks/useLang";
 import loginAm from "../locates/amharic/login.json";
 import loginEn from "../locates/english/login.json";
+import { useAppData } from "../hooks/useAppData";
 
 interface LoginFormData {
   phone: string;
@@ -13,7 +14,8 @@ interface LoginFormData {
 }
 
 export default function LoginPage() {
-  const { lang, setLang } = useLang();
+  const { setUser, setIsLoggedIn, serverAddress } = useAppData();
+  const { lang } = useLang();
   const translate = {
     am: loginAm,
     en: loginEn,
@@ -36,24 +38,42 @@ export default function LoginPage() {
       [name]: value,
     }));
   };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     setIsLoading(true);
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate API call
-      if (
-        formData.phone === "0912345678" &&
-        formData.password === "password123"
-      ) {
+      const phone_number = formData.phone;
+      const password = formData.password;
+
+      const start = Date.now();
+
+      const res = await fetch(`${serverAddress}/users/login/`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ phone_number, password }),
+      });
+      const data = await res.json();
+      const elapsed = Date.now() - start;
+      if (elapsed < 1000) {
+        await new Promise((resolve) => setTimeout(resolve, 1000 - elapsed));
+      }
+
+      if (res.ok && data.user) {
+        setUser(data.user);
+        setIsLoggedIn(true);
         navigate("/dashboard", { replace: true });
       } else {
-        throw new Error(text.error);
+        if (data.detail === "pending") {
+          setError(text.pendingError);
+        } else {
+          setError(text.error);
+        }
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Login failed");
+      setError(text.randomError);
     } finally {
       setIsLoading(false);
     }
@@ -121,7 +141,9 @@ export default function LoginPage() {
           <button
             type="submit"
             className={styles.loginButton}
-            disabled={!formData.password || !formData.phone || isLoading}
+            disabled={
+              !formData.password.trim().length || !formData.phone || isLoading
+            }
           >
             {isLoading ? text.logging : text.login}
           </button>

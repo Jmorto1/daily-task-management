@@ -12,110 +12,16 @@ import {
   FiMove,
 } from "react-icons/fi";
 import PasswordAuth from "./subComponent/passwordAuth";
-type Employee = {
-  id: string;
-  name: {
-    en: string;
-    am: string;
-  };
-  deptID: string;
-  role: string;
-};
-type Department = {
-  id: string;
-  name: {
-    en: string;
-    am: string;
-  };
-};
+import { useAppData } from "../hooks/useAppData";
+import type { Department, User } from "../context/appDataContext";
 type optionEmployees = {
-  value: Employee;
+  value: User;
   label: string;
 };
 type optionDepts = {
   value: Department;
   label: string;
 };
-const initialDepartments: Department[] = [
-  {
-    id: "1",
-    name: {
-      en: "dept1",
-      am: "የሰው ኃብት",
-    },
-  },
-  {
-    id: "2",
-    name: {
-      en: "dept2",
-      am: "ፋይናንስ",
-    },
-  },
-  {
-    id: "3",
-    name: {
-      en: "dept3",
-      am: "ቴክኖሎጂ",
-    },
-  },
-  {
-    id: "4",
-    name: {
-      en: "dept4",
-      am: "የሰው ኃብት",
-    },
-  },
-  {
-    id: "5",
-    name: {
-      en: "dept5",
-      am: "ፋይናንስ",
-    },
-  },
-  {
-    id: "6",
-    name: {
-      en: "dept6",
-      am: "ቴክኖሎጂ",
-    },
-  },
-  {
-    id: "7",
-    name: {
-      en: "dept7",
-      am: "የሰው ኃብት",
-    },
-  },
-  {
-    id: "8",
-    name: {
-      en: "dept8",
-      am: "ፋይናንስ",
-    },
-  },
-  {
-    id: "9",
-    name: {
-      en: "dept9",
-      am: "ቴክኖሎጂ",
-    },
-  },
-  {
-    id: "10",
-    name: {
-      en: "dept10",
-      am: "የሰው ኃብት",
-    },
-  },
-  {
-    id: "12",
-    name: {
-      en: "dept11",
-      am: "ፋይናንስ",
-    },
-  },
-];
-
 const ArrowIcon = ({ open }: { open: boolean }) => (
   <div className={open ? styles.circleOpen : styles.circleClosed}>
     <svg
@@ -135,82 +41,21 @@ const ArrowIcon = ({ open }: { open: boolean }) => (
   </div>
 );
 export default function DepartmentManagement() {
-  const { lang, setLang } = useLang();
+  const { lang } = useLang();
   const translate = {
     en: departmentEn,
     am: departmentAm,
   };
   const text = translate[lang];
-  const [employees, setEmployees] = useState<Employee[]>([
-    {
-      id: "1",
-      name: { en: "John Smith", am: "ጆን ስሚዝ" },
-      deptID: "1",
-      role: "admin",
-    },
-    {
-      id: "2",
-      name: { en: "Jane Doe", am: "ጄኔ ዶ" },
-      deptID: "12",
-      role: "admin",
-    },
-    {
-      id: "3",
-      name: { en: "John Smith", am: "ጆን ስሚዝ" },
-      deptID: "12",
-      role: "admin",
-    },
-    {
-      id: "4",
-      name: { en: "Jane Doe", am: "ጄኔ ዶ" },
-      deptID: "12",
-      role: "admin",
-    },
-    {
-      id: "5",
-      name: { en: "John Smith", am: "ጆን ስሚዝ" },
-      deptID: "12",
-      role: "admin",
-    },
-    {
-      id: "6",
-      name: { en: "Jane Doe", am: "ጄኔ ዶ" },
-      deptID: "12",
-      role: "admin",
-    },
-    {
-      id: "7",
-      name: { en: "John Smith", am: "ጆን ስሚዝ" },
-      deptID: "12",
-      role: "admin",
-    },
-    {
-      id: "8",
-      name: { en: "Jane Doe", am: "ጄኔ ዶ" },
-      deptID: "12",
-      role: "admin",
-    },
-    {
-      id: "9",
-      name: { en: "Michael Johnson", am: "ማይክል ጆንሰን" },
-      deptID: "12",
-      role: "user",
-    },
-    {
-      id: "10",
-      name: { en: "Emily Davis", am: "ኢምሊ ዴቪስ" },
-      deptID: "12",
-      role: "admin",
-    },
-    {
-      id: "11",
-      name: { en: "Robert Wilson", am: "ሮበርት ዊልሰን" },
-      deptID: "12",
-      role: "teamLeader",
-    },
-  ]);
-
-  const optionEmployees = (employees: Employee[]) => {
+  const {
+    employees,
+    setEmployees,
+    departments,
+    setDepartments,
+    serverAddress,
+  } = useAppData();
+  const [submitType, setSubmitType] = useState("");
+  const optionEmployees = (employees: User[]) => {
     return employees.map((emp) => ({
       value: emp,
       label: emp.name[lang],
@@ -222,8 +67,6 @@ export default function DepartmentManagement() {
       label: dept.name[lang],
     }));
   };
-  const [departments, setDepartments] =
-    useState<Department[]>(initialDepartments);
   const [addEditDept, setAddEditDept] = useState(false);
   const [editingDept, setEditingDept] = useState<Department | null>(null);
   const [deleteAdmin, setDeleteAdmin] = useState<optionEmployees[] | null>(
@@ -233,11 +76,12 @@ export default function DepartmentManagement() {
   const [addAdmin, setAddAdmin] = useState<optionEmployees[] | null>(null);
   const [addAdminPanel, setAddAdminPanel] = useState(false);
   const [deleteDept, setDeleteDept] = useState<Department | null>();
-  const [moveEmployee, setMoveEmployee] = useState<Employee | null>(null);
+  const [moveEmployee, setMoveEmployee] = useState<User | null>(null);
   const [prevDept, setPrevDept] = useState<Department | null>(null);
   const [moveEmployeePanel, setMoveEmployeePanel] = useState(false);
   const [passwordAuth, setPasswordAuth] = useState<boolean>(false);
   const [showSuccessMessage, setShowSuccessMessage] = useState<boolean>(false);
+  const [showFailMessage, setShowFailMessage] = useState<boolean>(false);
   const [deptForm, setDeptForm] = useState({
     nameEn: "",
     nameAm: "",
@@ -255,9 +99,9 @@ export default function DepartmentManagement() {
   const [addAdminError, setAddAdminError] = useState("");
   const [moveEmployeeError, setMoveEmployeeError] = useState("");
   const [deptOptions, setDeptOptions] = useState<optionDepts[] | null>(null);
-  const [adminDropdown, setAdminDropdown] = useState<string | null>(null);
-  const [empDropdown, setEmpDropdown] = useState<string | null>(null);
-  const [actionDropdown, setActionDropdown] = useState<string | null>(null);
+  const [adminDropdown, setAdminDropdown] = useState<number | null>(null);
+  const [empDropdown, setEmpDropdown] = useState<number | null>(null);
+  const [actionDropdown, setActionDropdown] = useState<number | null>(null);
 
   const [userQuery, setUserQuery] = useState<{
     [deptId: string]: string;
@@ -353,6 +197,34 @@ export default function DepartmentManagement() {
       setDeptForm({ nameEn: "", nameAm: "" });
     }
   }, [editingDept]);
+
+  //close panel
+  const closeAddEditPanel = () => {
+    setEditingDept(null);
+    setAddEditDept(false);
+    setDeptForm({ nameAm: "", nameEn: "" });
+    setDeptError({ nameAm: "", nameEn: "" });
+  };
+  const closeDeleteAdminPanel = () => {
+    setDeleteAdmin(null);
+    setDeleteAdminPanel(false);
+    setDeleteAdminForm(null);
+    setDeleteAdminError("");
+  };
+  const closeAddAdminPanel = () => {
+    setAddAdmin(null);
+    setAddAdminPanel(false);
+    setAddAdminForm(null);
+    setAddAdminError("");
+  };
+  const closeMoveEmployeePanel = () => {
+    setMoveEmployee(null);
+    setMoveEmployeePanel(false);
+    setMoveEmployeeForm(null);
+    setPrevDept(null);
+    setDeptOptions(null);
+    setMoveEmployeeError("");
+  };
   const validate = () => {
     let valid = true;
     const newError = {
@@ -373,46 +245,344 @@ export default function DepartmentManagement() {
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     if (!validate()) return;
+    if (editingDept) {
+      setSubmitType("editDept");
+    } else {
+      setSubmitType("addDept");
+    }
     setPasswordAuth(true);
   };
+  async function handleAddDeptApi() {
+    const department = {
+      name: {
+        am: deptForm.nameAm,
+        en: deptForm.nameEn,
+      },
+    };
+
+    try {
+      const response = await fetch(`${serverAddress}/departments/`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(department),
+      });
+
+      if (response.ok) {
+        setShowSuccessMessage(true);
+        const newDepartment = await response.json();
+
+        setDepartments((prev) => [...prev, newDepartment]);
+        setTimeout(() => {
+          setShowSuccessMessage(false);
+          closeAddEditPanel();
+        }, 2000);
+      } else {
+        setShowFailMessage(true);
+        setTimeout(() => {
+          setShowFailMessage(false);
+        }, 3000);
+      }
+    } catch (error) {
+      console.error("Error adding department:", error);
+      setShowFailMessage(true);
+      setTimeout(() => {
+        setShowFailMessage(false);
+      }, 2000);
+    }
+  }
+  async function handleEditDeptApi() {
+    const department = {
+      name: {
+        am: deptForm.nameAm,
+        en: deptForm.nameEn,
+      },
+    };
+    if (editingDept) {
+      try {
+        const response = await fetch(
+          `${serverAddress}/departments/${editingDept.id}/`,
+          {
+            method: "PUT",
+            credentials: "include",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(department),
+          }
+        );
+
+        if (response.ok) {
+          setShowSuccessMessage(true);
+          const newDepartment = await response.json();
+
+          setDepartments((prev) => {
+            let index = prev.findIndex((d) => d.id === editingDept.id);
+            if (index !== -1) {
+              return [
+                ...prev.slice(0, index),
+                newDepartment,
+                ...prev.slice(index + 1),
+              ];
+            } else {
+              return [...prev, newDepartment];
+            }
+          });
+          setTimeout(() => {
+            setShowSuccessMessage(false);
+            closeAddEditPanel();
+          }, 2000);
+        } else {
+          console.error("Failed:", await response.json());
+          setShowFailMessage(true);
+          setTimeout(() => {
+            setShowFailMessage(false);
+          }, 2000);
+        }
+      } catch (error) {
+        console.error("Error adding department:", error);
+        setShowFailMessage(true);
+        setTimeout(() => {
+          setShowFailMessage(false);
+        }, 2000);
+      }
+    }
+  }
   const handleAddAdminSubmit = (e: FormEvent) => {
     e.preventDefault();
     if (!addAdminForm) {
       setAddAdminError(text.selectEmployee);
       return;
     }
+    setSubmitType("addAdmin");
     setPasswordAuth(true);
   };
+  async function handleAddAdminApi() {
+    if (addAdminForm) {
+      try {
+        const user = {
+          id: addAdminForm.value.id,
+          role: "admin",
+        };
+        const response = await fetch(`${serverAddress}/users/`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(user),
+          credentials: "include",
+        });
+        if (response.ok) {
+          setShowSuccessMessage(true);
+          const updatedEmp = await response.json();
+          setEmployees((prev) => {
+            const index = prev.findIndex((p) => p.id === updatedEmp.id);
+            if (index !== -1) {
+              return [
+                ...prev.slice(0, index),
+                updatedEmp,
+                ...prev.slice(index + 1),
+              ];
+            } else {
+              return [...prev, updatedEmp];
+            }
+          });
+          setTimeout(() => {
+            setShowSuccessMessage(false);
+            closeAddAdminPanel();
+          }, 2000);
+        } else {
+          console.error("Failed:", await response.json());
+          setShowFailMessage(true);
+          setTimeout(() => {
+            setShowFailMessage(false);
+          }, 2000);
+        }
+      } catch (error) {
+        console.error("error romoving admin:", error);
+        setShowFailMessage(true);
+        setTimeout(() => {
+          setShowFailMessage(false);
+        }, 2000);
+      }
+    }
+  }
   const handleDeleteAdminSubmit = (e: FormEvent) => {
     e.preventDefault();
     if (!deleteAdminForm) {
       setDeleteAdminError(text.selectAdmin);
       return;
     }
+    setSubmitType("deleteAdmin");
     setPasswordAuth(true);
   };
+  async function handleDeleteAdminApi() {
+    if (deleteAdminForm) {
+      try {
+        const user = {
+          id: deleteAdminForm.value.id,
+          role: "user",
+        };
+        const response = await fetch(`${serverAddress}/users/`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(user),
+          credentials: "include",
+        });
+        if (response.ok) {
+          setShowSuccessMessage(true);
+          const updatedEmp = await response.json();
+          setEmployees((prev) => {
+            const index = prev.findIndex((p) => p.id === updatedEmp.id);
+            if (index !== -1) {
+              return [
+                ...prev.slice(0, index),
+                updatedEmp,
+                ...prev.slice(index + 1),
+              ];
+            } else {
+              return [...prev, updatedEmp];
+            }
+          });
+          setTimeout(() => {
+            setShowSuccessMessage(false);
+            closeDeleteAdminPanel();
+          }, 2000);
+        } else {
+          console.error("Failed:", await response.json());
+          setShowFailMessage(true);
+          setTimeout(() => {
+            setShowFailMessage(false);
+          }, 2000);
+        }
+      } catch (error) {
+        console.error("error romoving admin:", error);
+        setShowFailMessage(true);
+        setTimeout(() => {
+          setShowFailMessage(false);
+        }, 2000);
+      }
+    }
+  }
   const handleDeleteDeptSubmit = (e: FormEvent) => {
     e.preventDefault();
+    setSubmitType("deleteDept");
     setPasswordAuth(true);
   };
+  async function handleDeleteDeptApi() {
+    if (deleteDept) {
+      try {
+        const response = await fetch(
+          `${serverAddress}/departments/${deleteDept.id}/`,
+          {
+            method: "DELETE",
+            credentials: "include",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        if (response.ok) {
+          setShowSuccessMessage(true);
+          setDepartments((prev) => prev.filter((d) => d.id !== deleteDept.id));
+          setTimeout(() => {
+            setShowSuccessMessage(false);
+            setDeleteDept(null);
+          }, 2000);
+        } else {
+          console.error("Failed:", await response.json());
+          setShowFailMessage(true);
+          setTimeout(() => {
+            setShowFailMessage(false);
+          }, 2000);
+        }
+      } catch (error) {
+        console.error("Error adding department:", error);
+        setShowFailMessage(true);
+        setTimeout(() => {
+          setShowFailMessage(false);
+        }, 2000);
+      }
+    }
+  }
   const handleMoveEmployeeSubmit = (e: FormEvent) => {
     e.preventDefault();
     if (!moveEmployeeForm) {
       setMoveEmployeeError(text.selectDept);
       return;
     }
+    setSubmitType("moveEmp");
     setPasswordAuth(true);
   };
+  async function handleMoveEmployeeApi() {
+    if (moveEmployee && moveEmployeeForm) {
+      try {
+        const user = {
+          id: moveEmployee.id,
+          department_id: moveEmployeeForm.value.id,
+          role: "user",
+        };
+        const response = await fetch(`${serverAddress}/users/`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(user),
+          credentials: "include",
+        });
+        if (response.ok) {
+          setShowSuccessMessage(true);
+          const updatedEmp = await response.json();
+          setEmployees((prev) => {
+            const index = prev.findIndex((p) => p.id === updatedEmp.id);
+            if (index !== -1) {
+              return [
+                ...prev.slice(0, index),
+                updatedEmp,
+                ...prev.slice(index + 1),
+              ];
+            } else {
+              return [...prev, updatedEmp];
+            }
+          });
+          setTimeout(() => {
+            setShowSuccessMessage(false);
+            closeMoveEmployeePanel();
+          }, 2000);
+        } else {
+          console.error("Failed:", await response.json());
+          setShowFailMessage(true);
+          setTimeout(() => {
+            setShowFailMessage(false);
+          }, 2000);
+        }
+      } catch (error) {
+        console.error("error transfering employee :", error);
+        setShowFailMessage(true);
+        setTimeout(() => {
+          setShowFailMessage(false);
+        }, 2000);
+      }
+    }
+  }
   const handleAuthResult = (success: boolean) => {
     if (success) {
       setPasswordAuth(false);
-      setShowSuccessMessage(true);
-      setTimeout(() => {
-        setShowSuccessMessage(false);
-      }, 3000);
-    } else {
-      return;
+      if (submitType === "addDept") {
+        handleAddDeptApi();
+        return;
+      } else if (submitType === "editDept") {
+        handleEditDeptApi();
+      } else if (submitType === "deleteAdmin") {
+        handleDeleteAdminApi();
+      } else if (submitType === "addAdmin") {
+        handleAddAdminApi();
+      } else if (submitType === "moveEmp") {
+        handleMoveEmployeeApi();
+      } else if (submitType === "deleteDept") {
+        handleDeleteDeptApi();
+      }
     }
+    setSubmitType("");
   };
   return (
     <div className={styles.container}>
@@ -497,7 +667,8 @@ export default function DepartmentManagement() {
                             {employees
                               .filter(
                                 (e) =>
-                                  e.role === "admin" && e.deptID === dept.id
+                                  e.role === "admin" &&
+                                  e.department?.id === dept.id
                               )
                               .filter((admin) =>
                                 admin.name[lang]
@@ -520,11 +691,14 @@ export default function DepartmentManagement() {
                         <div>
                           {
                             employees.filter(
-                              (e) => e.role === "admin" && e.deptID === dept.id
+                              (e) =>
+                                e.role === "admin" &&
+                                e.department?.id === dept.id
                             ).length
                           }{" "}
                           {employees.filter(
-                            (e) => e.role === "admin" && e.deptID === dept.id
+                            (e) =>
+                              e.role === "admin" && e.department?.id === dept.id
                           ).length > 1
                             ? text.admin
                             : text.adminSingle}
@@ -582,7 +756,7 @@ export default function DepartmentManagement() {
                             }
                           >
                             {employees
-                              .filter((e) => e.deptID === dept.id)
+                              .filter((e) => e.department?.id === dept.id)
                               .filter((emp) =>
                                 emp.name[lang]
                                   .toLowerCase()
@@ -620,8 +794,12 @@ export default function DepartmentManagement() {
                         </div>
                       ) : (
                         <div>
-                          {employees.filter((e) => e.deptID === dept.id).length}{" "}
-                          {employees.filter((e) => e.deptID === dept.id)
+                          {
+                            employees.filter(
+                              (e) => e.department?.id === dept.id
+                            ).length
+                          }{" "}
+                          {employees.filter((e) => e.department?.id === dept.id)
                             .length > 1
                             ? text.employee
                             : text.employeeSingle}
@@ -676,9 +854,10 @@ export default function DepartmentManagement() {
                           </button>
                           <button
                             onClick={() => {
-                              const candidate: Employee[] = employees.filter(
+                              const candidate: User[] = employees.filter(
                                 (e) =>
-                                  e.role !== "admin" && e.deptID === dept.id
+                                  e.role !== "admin" &&
+                                  e.department?.id === dept.id
                               );
                               const optionAdmins = optionEmployees(candidate);
                               setAddAdmin(optionAdmins);
@@ -690,9 +869,10 @@ export default function DepartmentManagement() {
                           </button>
                           <button
                             onClick={() => {
-                              const admins: Employee[] = employees.filter(
+                              const admins: User[] = employees.filter(
                                 (e) =>
-                                  e.role === "admin" && e.deptID === dept.id
+                                  e.role === "admin" &&
+                                  e.department?.id === dept.id
                               );
                               const optionAdmins = optionEmployees(admins);
                               setDeleteAdmin(optionAdmins);
@@ -725,12 +905,7 @@ export default function DepartmentManagement() {
         <div className="overlay">
           <div className={styles.addEditDept}>
             <button
-              onClick={() => {
-                setEditingDept(null);
-                setAddEditDept(false);
-                setDeptForm({ nameAm: "", nameEn: "" });
-                setDeptError({ nameAm: "", nameEn: "" });
-              }}
+              onClick={closeAddEditPanel}
               className={styles.closeIconButton}
               aria-label="Close panel"
             >
@@ -787,12 +962,7 @@ export default function DepartmentManagement() {
                 <button
                   type="button"
                   className={styles.cancelBtn}
-                  onClick={() => {
-                    setEditingDept(null);
-                    setAddEditDept(false);
-                    setDeptForm({ nameAm: "", nameEn: "" });
-                    setDeptError({ nameAm: "", nameEn: "" });
-                  }}
+                  onClick={closeAddEditPanel}
                 >
                   {text.cancel}
                 </button>
@@ -811,6 +981,15 @@ export default function DepartmentManagement() {
                 <div className="overlay" style={{ zIndex: "1001" }}></div>
               </>
             )}
+            {showFailMessage && (
+              <div className="failMessageWrapper">
+                <div className="failMessage">
+                  {lang === "en"
+                    ? "Request failed.Please try again later."
+                    : "ጥያቄዎን ማስተናገድ አልተቻለም። እባክዎን እንደገና ይሞክሩ።"}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -819,12 +998,7 @@ export default function DepartmentManagement() {
         <div className="overlay">
           <div className={styles.addAdmin}>
             <button
-              onClick={() => {
-                setAddAdmin(null);
-                setAddAdminPanel(false);
-                setAddAdminForm(null);
-                setAddAdminError("");
-              }}
+              onClick={closeAddAdminPanel}
               className={styles.closeIconButton}
               aria-label="Close panel"
             >
@@ -870,12 +1044,7 @@ export default function DepartmentManagement() {
                   <button
                     type="button"
                     className={styles.cancelBtn}
-                    onClick={() => {
-                      setAddAdmin(null);
-                      setAddAdminPanel(false);
-                      setAddAdminForm(null);
-                      setAddAdminError("");
-                    }}
+                    onClick={closeAddAdminPanel}
                   >
                     {text.cancel}
                   </button>
@@ -893,6 +1062,15 @@ export default function DepartmentManagement() {
                 <div className="overlay" style={{ zIndex: "1001" }}></div>
               </>
             )}
+            {showFailMessage && (
+              <div className="failMessageWrapper">
+                <div className="failMessage">
+                  {lang === "en"
+                    ? "Request failed.Please try again later."
+                    : "ጥያቄዎን ማስተናገድ አልተቻለም። እባክዎን እንደገና ይሞክሩ።"}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -901,12 +1079,7 @@ export default function DepartmentManagement() {
         <div className="overlay">
           <div className={styles.deleteAdmin}>
             <button
-              onClick={() => {
-                setDeleteAdmin(null);
-                setDeleteAdminPanel(false);
-                setDeleteAdminForm(null);
-                setDeleteAdminError("");
-              }}
+              onClick={closeDeleteAdminPanel}
               className={styles.closeIconButton}
               aria-label="Close panel"
             >
@@ -952,12 +1125,7 @@ export default function DepartmentManagement() {
                   <button
                     type="button"
                     className={styles.cancelBtn}
-                    onClick={() => {
-                      setDeleteAdminPanel(false);
-                      setDeleteAdmin(null);
-                      setDeleteAdminForm(null);
-                      setDeleteAdminError("");
-                    }}
+                    onClick={closeDeleteAdminPanel}
                   >
                     {text.cancel}
                   </button>
@@ -974,6 +1142,15 @@ export default function DepartmentManagement() {
                 </div>
                 <div className="overlay" style={{ zIndex: "1001" }}></div>
               </>
+            )}
+            {showFailMessage && (
+              <div className="failMessageWrapper">
+                <div className="failMessage">
+                  {lang === "en"
+                    ? "Request failed.Please try again later."
+                    : "ጥያቄዎን ማስተናገድ አልተቻለም። እባክዎን እንደገና ይሞክሩ።"}
+                </div>
+              </div>
             )}
           </div>
         </div>
@@ -1004,8 +1181,13 @@ export default function DepartmentManagement() {
                 />
               </svg>
             </button>
-            {employees.filter((e) => e.deptID === deleteDept.id).length > 0 ? (
-              <h2 className={styles.preventDelete}>{text.preventDelete}</h2>
+            {employees.filter((e) => e.department?.id === deleteDept.id)
+              .length > 0 || departments.length < 2 ? (
+              departments.length < 2 ? (
+                <h2 className={styles.preventDelete}>{text.oneDeptLeft}</h2>
+              ) : (
+                <h2 className={styles.preventDelete}>{text.preventDelete}</h2>
+              )
             ) : (
               <form className={styles.form} onSubmit={handleDeleteDeptSubmit}>
                 {lang === "en" ? (
@@ -1046,6 +1228,15 @@ export default function DepartmentManagement() {
                 ></div>
               </>
             )}
+            {showFailMessage && (
+              <div className="failMessageWrapper">
+                <div className="failMessage">
+                  {lang === "en"
+                    ? "Request failed.Please try again later."
+                    : "ጥያቄዎን ማስተናገድ አልተቻለም። እባክዎን እንደገና ይሞክሩ።"}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -1054,14 +1245,7 @@ export default function DepartmentManagement() {
         <div className="overlay">
           <div className={styles.moveEmployee}>
             <button
-              onClick={() => {
-                setMoveEmployee(null);
-                setMoveEmployeePanel(false);
-                setMoveEmployeeForm(null);
-                setPrevDept(null);
-                setDeptOptions(null);
-                setMoveEmployeeError("");
-              }}
+              onClick={closeMoveEmployeePanel}
               className={styles.closeIconButton}
               aria-label="Close panel"
             >
@@ -1120,14 +1304,7 @@ export default function DepartmentManagement() {
                     <button
                       type="button"
                       className={styles.cancelBtn}
-                      onClick={() => {
-                        setMoveEmployee(null);
-                        setMoveEmployeePanel(false);
-                        setMoveEmployeeForm(null);
-                        setPrevDept(null);
-                        setDeptOptions(null);
-                        setMoveEmployeeError("");
-                      }}
+                      onClick={closeMoveEmployeePanel}
                     >
                       {text.cancel}
                     </button>
@@ -1141,10 +1318,19 @@ export default function DepartmentManagement() {
             {showSuccessMessage && (
               <>
                 <div className="successMessageWrapper">
-                  <div className="successMessage">you delete successfully</div>
+                  <div className="successMessage">{text.transferMessage}</div>
                 </div>
                 <div className="overlay" style={{ zIndex: "1001" }}></div>
               </>
+            )}
+            {showFailMessage && (
+              <div className="failMessageWrapper">
+                <div className="failMessage">
+                  {lang === "en"
+                    ? "Request failed.Please try again later."
+                    : "ጥያቄዎን ማስተናገድ አልተቻለም። እባክዎን እንደገና ይሞክሩ።"}
+                </div>
+              </div>
             )}
           </div>
         </div>

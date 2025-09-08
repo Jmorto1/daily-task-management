@@ -5,6 +5,7 @@ import { FaUserEdit } from "react-icons/fa";
 import { useLang } from "../hooks/useLang";
 import type React from "react";
 import { useState } from "react";
+import { useAppData } from "../hooks/useAppData";
 interface propsType {
   prevView: string;
   setActiveView: React.Dispatch<React.SetStateAction<string>>;
@@ -14,11 +15,15 @@ type FormData = {
     am: string;
     en: string;
   };
+  profession: {
+    am: string;
+    en: string;
+  };
   office: {
     am: string;
     en: string;
   };
-  phone: string;
+  phone_number: string;
 };
 type FormError = FormData;
 const emptyError: FormError = {
@@ -26,22 +31,33 @@ const emptyError: FormError = {
     am: "",
     en: "",
   },
+  profession: {
+    am: "",
+    en: "",
+  },
   office: {
     am: "",
     en: "",
   },
-  phone: "",
+  phone_number: "",
 };
 export default function EditInfo({ prevView, setActiveView }: propsType) {
   const { lang } = useLang();
+  const { user, setUser, serverAddress } = useAppData();
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const [showFailMessage, setShowFailMessage] = useState<boolean>(false);
+  const [phoneExists, setPhoneExists] = useState(false);
   const translate = { am: amEditInfo, en: enEditInfo };
   const text = translate[lang];
 
   const [formData, setFormData] = useState<FormData>({
-    name: { am: "", en: "" },
-    office: { am: "", en: "" },
-    phone: "",
+    name: { am: user.name.am, en: user.name.en },
+    profession: {
+      am: user.profession.am,
+      en: user.profession.en,
+    },
+    office: { am: user.office.am, en: user.office.en },
+    phone_number: user.phone_number,
   });
 
   const [formErrors, setFormErrors] = useState<FormError>(emptyError);
@@ -82,6 +98,15 @@ export default function EditInfo({ prevView, setActiveView }: propsType) {
       newErrors.name.en = "Please enter the name in English";
       isValid = false;
     }
+    //proffession
+    if (!formData.profession.am.trim()) {
+      newErrors.profession.am = "እባክዎ የሙያዎን ስም በአማርኛ ያስገቡ";
+      isValid = false;
+    }
+    if (!formData.profession.en.trim()) {
+      newErrors.profession.en = "Please enter the profession in English";
+      isValid = false;
+    }
     // Office
     if (!formData.office.am.trim()) {
       newErrors.office.am = "እባክዎ ቢሮ ስም በአማርኛ ያስገቡ";
@@ -93,12 +118,12 @@ export default function EditInfo({ prevView, setActiveView }: propsType) {
     }
 
     // Phone
-    const phoneTrimmed = formData.phone.trim();
+    const phoneTrimmed = formData.phone_number.trim();
     if (!phoneTrimmed) {
-      newErrors.phone = text.phoneError;
+      newErrors.phone_number = text.phoneError;
       isValid = false;
     } else if (!/^\d{10}$/.test(phoneTrimmed)) {
-      newErrors.phone = text.invalidPhone;
+      newErrors.phone_number = text.invalidPhone;
       isValid = false;
     }
 
@@ -106,15 +131,48 @@ export default function EditInfo({ prevView, setActiveView }: propsType) {
     return isValid;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (validate()) {
+      try {
+        const data = { ...formData, id: user.id };
+        const response = await fetch(`${serverAddress}/users/`, {
+          method: "PATCH",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+        });
+        if (response.ok) {
+          const updatedUser = await response.json();
+          setUser(updatedUser);
+          setShowSuccessMessage(true);
+          setTimeout(() => {
+            setShowSuccessMessage(false);
+          }, 3000);
+        } else {
+          const data = await response.json();
+          if (data.field === "phone_number") {
+            setPhoneExists(true);
+          }
+          setShowFailMessage(true);
+          setTimeout(() => {
+            setPhoneExists(false);
+            setShowFailMessage(false);
+          }, 3000);
+        }
+      } catch (error) {
+        console.error("error :", error);
+        setShowFailMessage(true);
+        setTimeout(() => {
+          setShowFailMessage(false);
+        }, 3000);
+      }
       setShowSuccessMessage(true);
       setTimeout(() => {
         setShowSuccessMessage(false);
       }, 2000);
     }
-  };
+  }
 
   return (
     <div className={styles.container}>
@@ -154,7 +212,37 @@ export default function EditInfo({ prevView, setActiveView }: propsType) {
             </div>
           </div>
         </div>
-        {/* Office */}
+        {/* profession */}
+        <div className={styles.fieldGroup}>
+          <label className={styles.label}>{text.profession}</label>
+          <div className={styles.inputs}>
+            <div>
+              <label className={styles.subLabel}>በአማርኛ</label>
+              <input
+                value={formData.profession.am}
+                onChange={(e) => handleChange("profession.am", e.target.value)}
+                className={styles.input}
+                type="text"
+              />
+              {formErrors.profession.am && (
+                <div className={styles.error}>{formErrors.profession.am}</div>
+              )}
+            </div>
+            <div>
+              <label className={styles.subLabel}>In English</label>
+              <input
+                value={formData.profession.en}
+                onChange={(e) => handleChange("profession.en", e.target.value)}
+                className={styles.input}
+                type="text"
+              />
+              {formErrors.profession.en && (
+                <div className={styles.error}>{formErrors.profession.en}</div>
+              )}
+            </div>
+          </div>
+        </div>
+        {/* office */}
         <div className={styles.fieldGroup}>
           <label className={styles.label}>{text.office}</label>
           <div className={styles.inputs}>
@@ -184,18 +272,17 @@ export default function EditInfo({ prevView, setActiveView }: propsType) {
             </div>
           </div>
         </div>
-
         {/* Phone */}
         <div className={styles.fieldGroup}>
           <label className={styles.label}>{text.phoneNo}</label>
           <input
-            value={formData.phone}
-            onChange={(e) => handleChange("phone", e.target.value)}
+            value={formData.phone_number}
+            onChange={(e) => handleChange("phone_number", e.target.value)}
             className={`${styles.input} ${styles.phoneNo}`}
             type="text"
           />
-          {formErrors.phone && (
-            <div className={styles.error}>{formErrors.phone}</div>
+          {formErrors.phone_number && (
+            <div className={styles.error}>{formErrors.phone_number}</div>
           )}
         </div>
 
@@ -219,6 +306,19 @@ export default function EditInfo({ prevView, setActiveView }: propsType) {
           </div>
           <div className="overlay" style={{ zIndex: "1001" }}></div>
         </>
+      )}
+      {showFailMessage && (
+        <div className="failMessageWrapper">
+          <div className="failMessage">
+            {phoneExists
+              ? lang === "en"
+                ? "User with this phone number already exists.Please change the Phone number"
+                : "በዚህ ስልክ ቁጥር የተከፈተ አካውንት አለ።እባክዎ ስልኩን ይቀይሩ።"
+              : lang === "en"
+              ? "Request failed.Please try again later."
+              : "ጥያቄዎን ማስተናገድ አልተቻለም። እባክዎን እንደገና ይሞክሩ።"}
+          </div>
+        </div>
       )}
     </div>
   );

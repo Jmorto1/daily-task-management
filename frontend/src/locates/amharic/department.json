@@ -34,5 +34,6 @@
   "editMessage":"በተሳካ ሁኔታ ተስተካክሏል",
   "deleteMessage":"በተሳካ ሁኔታ ጠፍቷል",
   "transferMessage":"በተሳካ ሁኔታ ተዘዋውሯል",
-  "preventDelete":"ሰራተኛ ያለበትን ፅ/ቤት ማጥፋት አይቻልም"
+  "preventDelete":"ሰራተኛ ያለበትን ፅ/ቤት ማጥፋት አይቻልም",
+  "oneDeptLeft":"ቢያንስ 1 ፅ/ቤት መኖር አለበት"
 }

@@ -3,8 +3,10 @@ import enAbout from "../locates/english/about.json";
 import { useLang } from "../hooks/useLang";
 import { FaUser, FaBriefcase, FaPhone, FaBuilding } from "react-icons/fa";
 import styles from "../styles/about.module.css";
-export default function About({ preview }: { preview: string | null }) {
-  const { lang, setLang } = useLang();
+import { useAppData } from "../hooks/useAppData";
+export default function About() {
+  const { user, profileImage } = useAppData();
+  const { lang } = useLang();
   const translate = {
     am: amAbout,
     en: enAbout,
@@ -13,25 +15,29 @@ export default function About({ preview }: { preview: string | null }) {
   return (
     <div className={styles.card}>
       <div className={styles.profileHeader}>
-        {preview ? (
+        {profileImage ? (
           <div
             className={styles.profileImage}
-            style={{ backgroundImage: preview ? `url(${preview})` : undefined }}
+            style={{
+              backgroundImage: profileImage
+                ? `url(${profileImage})`
+                : undefined,
+            }}
           ></div>
         ) : (
           <FaUser className={styles.icon} />
         )}
 
-        <h2 className={styles.fullName}>Yealem Birhanu</h2>
+        <h2 className={styles.fullName}>{user.name[lang]}</h2>
       </div>
 
       <div className={styles.infoGrid}>
         <div className={styles.infoBox}>
           <div className={styles.infoHeader}>
             <FaBriefcase className={styles.infoIcon} />
-            <h4 className={styles.label}>{text.role}</h4>
+            <h4 className={styles.label}>{text.profession}</h4>
           </div>
-          <p className={styles.value}>Admin</p>
+          <p className={styles.value}>{user.profession[lang]}</p>
         </div>
 
         <div className={styles.infoBox}>
@@ -39,7 +45,7 @@ export default function About({ preview }: { preview: string | null }) {
             <FaPhone className={styles.infoIcon} />
             <h4 className={styles.label}>{text.phoneNo}</h4>
           </div>
-          <p className={styles.value}>0912345678</p>
+          <p className={styles.value}>{user.phone_number}</p>
         </div>
 
         <div className={styles.infoBox}>
@@ -47,7 +53,7 @@ export default function About({ preview }: { preview: string | null }) {
             <FaBuilding className={styles.infoIcon} />
             <h4 className={styles.label}>{text.office}</h4>
           </div>
-          <p className={styles.value}>Innovation And Technology</p>
+          <p className={styles.value}>{user.office[lang]}</p>
         </div>
       </div>
     </div>

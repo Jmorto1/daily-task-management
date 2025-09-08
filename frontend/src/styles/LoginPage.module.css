@@ -151,7 +151,7 @@
 }
 
 .loginButton:disabled {
-    background-color: #bee3f8;
+    background-color: #52a7d8;
     cursor: not-allowed;
 }
 

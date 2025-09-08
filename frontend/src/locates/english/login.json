@@ -6,8 +6,9 @@
     "forgot":"Forgot password?",
     "login":"Log In",
     "logging":"Logging In...",
-    "signup":"Sing Up",
-    "noAccount":"Don't have an account?",
-    "error":"Invalid phone number or password"
-
+    "signup":"Sign Up",
+    "noAccount":"You don't have an account?",
+    "error":"Invalid phone number or password",
+    "pendingError":"Your account is pending department admin approval.",
+    "randomError":"Request failed.Please try again later."
 }
