@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link, replace, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { FaPhoneAlt, FaLock, FaEye, FaEyeSlash } from "react-icons/fa";
 import styles from "../styles/LoginPage.module.css";
 import Language from "../components/subComponent/languages";
@@ -133,7 +133,7 @@ export default function LoginPage() {
           </div>
 
           <div className={styles.options}>
-            <Link to="/login" className={styles.forgotPassword}>
+            <Link to="/forgot-password" className={styles.forgotPassword}>
               {text.forgot}
             </Link>
           </div>

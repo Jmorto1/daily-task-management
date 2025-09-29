@@ -5,6 +5,7 @@ import styles from "../../styles/PasswordAuth.module.css";
 import { useLang } from "../../hooks/useLang";
 import passwordAuthAm from "../../locates/amharic/passwordAuth.json";
 import passwordAuthEn from "../../locates/english/passwordAuth.json";
+import { useAppData } from "../../hooks/useAppData";
 
 interface PasswordAuthProps {
   handleAuthResult: (success: boolean) => void;
@@ -15,7 +16,8 @@ export default function PasswordAuth({
   handleAuthResult,
   setPasswordAuth,
 }: PasswordAuthProps) {
-  const { lang, setLang } = useLang();
+  const { serverAddress } = useAppData();
+  const { lang } = useLang();
   const translate = {
     am: passwordAuthAm,
     en: passwordAuthEn,
@@ -25,7 +27,7 @@ export default function PasswordAuth({
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (!password) {
       setError(text.pswdError);
@@ -33,18 +35,29 @@ export default function PasswordAuth({
     }
     setError("");
     setIsSubmitting(true);
-    setTimeout(() => {
-      if (password === "password") {
+    try {
+      const res = await fetch(`${serverAddress}/users/check-password/`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password }),
+        credentials: "include",
+      });
+      if (res.status === 200) {
         handleAuthResult(true);
         setTimeout(() => {
           setPasswordAuth(false);
         }, 500);
       } else {
-        handleAuthResult(false);
         setError(text.wrongPswd);
+        handleAuthResult(false);
       }
+    } catch (err) {
+      setError(
+        lang === "en" ? "Error checking password" : "የይለፍ ቃሉን ማረጋገጥ አልተቻለም"
+      );
+    } finally {
       setIsSubmitting(false);
-    }, 1000);
+    }
   };
 
   return (

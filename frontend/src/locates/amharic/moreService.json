@@ -7,6 +7,7 @@
     "date": "ቀን",
     "cancel": "ይቅር",
     "save": "መዝግብ",
+    "saving": "በመዝግብ ላይ...",
     "nameAmError":"የአገልግሎት ስም ያስፈልጋል",
     "nameEnError":"Service name is required.",
     "freqError": "መጠን ቢያንስ 1 መሆን አለበት",

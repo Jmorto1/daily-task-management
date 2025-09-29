@@ -5,12 +5,16 @@
     "startingTime":"የተጀመረበት ሰዓት",
     "endingTime":"የተጠናቀበት ሰዓት",
     "hour":"የወሰደው ጊዜ",
+    "quality":"ጥራት",
     "date": "ቀን",
     "cancel": "ይቅር",
     "submit": "አስገባ",
+    "submiting":"በማስገባት ላይ...",
     "freqError": "መጠን ቢያንስ 1 መሆን አለበት",
     "startingTimeError":"የተጀመረበት ሰዓት ያስፈልጋል",
     "endingTimeError":"የተጠናቀበት ሰዓት ያስፈልጋል",
+    "qualityError":"ጥራት ያስፈልጋል",
+    "invalidQualityError":"እባክዎ ቁጥርን ከ % ጋር ያስገቡ",
     "dateError": "ቀን ያስፈልጋል",
     "message":"ተገባር ሪፖርት በተሳካ ሁኔታ ገብቱታል"
 }

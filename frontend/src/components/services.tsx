@@ -13,117 +13,7 @@ import { useAppData } from "../hooks/useAppData";
 import { useLang } from "../hooks/useLang";
 import styles from "../styles/services.module.css";
 
-export interface Activity {
-  id: string;
-  name: {
-    am: string;
-    en: string;
-  };
-  frequency?: string;
-  time?: string;
-  quality?: string;
-}
-
-export interface SubService {
-  id: string;
-  name: {
-    en: string;
-    am: string;
-  };
-  activities: Activity[];
-}
-
-export interface MainService {
-  id: string;
-  name: {
-    en: string;
-    am: string;
-  };
-  subServices: SubService[];
-}
-
-const services: MainService[] = [
-  {
-    id: "1",
-    name: {
-      en: "Service A",
-      am: "አገልግሎት A",
-    },
-    subServices: [
-      {
-        id: "101",
-        name: {
-          en: "Sub Service A1",
-          am: "ንዑስ አገልግሎት A1",
-        },
-        activities: [
-          {
-            id: "1001",
-            name: {
-              en: "Activity A1Activity A1Activity A1Activity A1Activity A1Activity A1",
-              am: "እንቅስቃሴ A1",
-            },
-          },
-          {
-            id: "1002",
-            name: {
-              en: "Activity A1-2",
-              am: "እንቅስቃሴ A1-2",
-            },
-            frequency: "2",
-            time: "10:00",
-            quality: "100%",
-          },
-        ],
-      },
-      {
-        id: "102",
-        name: {
-          en: "Sub Service A2",
-          am: "ንዑስ አገልግሎት A2",
-        },
-        activities: [
-          {
-            id: "1003",
-            name: {
-              en: "Activity A2-1",
-              am: "እንቅስቃሴ A2-1",
-            },
-          },
-        ],
-      },
-    ],
-  },
-  {
-    id: "2",
-    name: {
-      en: "Service B",
-      am: "አገልግሎት B",
-    },
-    subServices: [
-      {
-        id: "201",
-        name: {
-          en: "Sub Service B1",
-          am: "ንዑስ አገልግሎት B1",
-        },
-        activities: [
-          {
-            id: "2001",
-            name: {
-              en: "Activity B1-1",
-              am: "እንቅስቃሴ B1-1",
-            },
-            frequency: " 2",
-            time: "8:00",
-            quality: "100%",
-          },
-        ],
-      },
-    ],
-  },
-];
-
+import type { Activity, Service } from "../context/appDataContext";
 const ArrowIcon = ({ open }: { open: boolean }) => (
   <div className={open ? styles.circleOpen : styles.circleClosed}>
     <svg
@@ -149,47 +39,72 @@ export default function Services() {
     en: enService,
   };
   const text = translate[lang];
-
+  const { services } = useAppData();
   const { user } = useAppData();
   const [searchQuery, setSearchQuery] = useState("");
-  const [openMain, setOpenMain] = useState<string | null>(null);
-  const [openSub, setOpenSub] = useState<string | null>(null);
+  const [openMain, setOpenMain] = useState<number | null>(null);
+  const [openSub, setOpenSub] = useState<number | null>(null);
   const [boxWidth, setBoxWidth] = useState(0);
   const boxRef = useRef<HTMLDivElement | null>(null);
 
   const [selected, setSelected] = useState<
-    | { type: "main"; mainId: string }
-    | { type: "sub"; mainId: string; subId: string }
-    | { type: "activity"; mainId: string; subId: string; actId: string }
+    | { type: "service"; service_id: number }
+    | { type: "subService"; service_id: number; subService_id: number }
+    | {
+        type: "activity";
+        service_id: number;
+        subService_id: number;
+        activity_id: number;
+      }
     | null
   >(null);
   const [submitReport, setSubmitReport] = useState<boolean>(false);
   let [activityProp, setActivityProp] = useState<Activity | null>(null);
+  let [serviceIdProp, setServiceIdProp] = useState<number | null>(null);
   const [more, setMore] = useState<boolean>(false);
   const [addNew, setAddNew] = useState<boolean>(false);
 
-  const toggleMain = (id: string) => {
+  const toggleMain = (id: number) => {
     setOpenMain(openMain === id ? null : id);
     setOpenSub(null);
   };
 
-  const toggleSub = (mainId: string, subId: string) => {
-    setOpenSub(openSub === subId ? null : subId);
+  const toggleSub = (subService_id: number) => {
+    setOpenSub(openSub === subService_id ? null : subService_id);
   };
 
-  const selectActivity = (mainId: string, subId: string, actId: string) => {
+  const selectActivity = (
+    service_id: number,
+    subService_id: number,
+    activity_id: number
+  ) => {
     setSelected({
       type: "activity",
-      mainId,
-      subId,
-      actId,
+      service_id,
+      subService_id,
+      activity_id,
     });
   };
-  const [mode, setMode] = useState("notUser");
+  const [mode, setMode] = useState<"user" | "notUser">("notUser");
   const isAdminClickable = user.role === "admin" && mode === "notUser";
-  const filteredServices = services.filter((service) =>
-    service.name[lang].toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const [filteredServices, setFilteredServices] = useState<Service[]>([]);
+  useEffect(() => {
+    if (mode === "user") {
+      setFilteredServices(
+        services.filter(
+          (service) =>
+            service.user_ids.includes(user.id) &&
+            service.name[lang].toLowerCase().includes(searchQuery.toLowerCase())
+        )
+      );
+    } else {
+      setFilteredServices(
+        services.filter((service) =>
+          service.name[lang].toLowerCase().includes(searchQuery.toLowerCase())
+        )
+      );
+    }
+  }, [mode, searchQuery, services]);
   useEffect(() => {
     const resizeObserver = new ResizeObserver(([entry]) => {
       setBoxWidth(entry.contentRect.width);
@@ -264,19 +179,21 @@ export default function Services() {
             <div className={styles.serviceHeader} ref={boxRef}>
               {text.title}
             </div>
-            {filteredServices.map((main) => {
+            {filteredServices.map((service) => {
               const handleSelectService = () =>
-                setSelected({ type: "main", mainId: main.id });
+                setSelected({ type: "service", service_id: service.id });
               return (
-                <div key={main.id} className={styles.mainService}>
+                <div key={service.id} className={styles.mainService}>
                   <button
-                    onClick={() => toggleMain(main.id)}
+                    onClick={() => toggleMain(service.id)}
                     className={styles.mainButton}
-                    aria-expanded={openMain === main.id}
-                    aria-controls={`main-${main.id}`}
+                    aria-expanded={openMain === service.id}
+                    aria-controls={`service-${service.id}`}
                   >
-                    <ArrowIcon open={openMain === main.id} />
-                    <span className={styles.mainText}>{main.name[lang]}</span>
+                    <ArrowIcon open={openMain === service.id} />
+                    <span className={styles.mainText}>
+                      {service.name[lang]}
+                    </span>
                     {isAdminClickable && (
                       <span
                         className={styles.actionContainer}
@@ -289,32 +206,35 @@ export default function Services() {
                       </span>
                     )}
                   </button>
-                  {openMain === main.id && (
+                  {openMain === service.id && (
                     <div
-                      id={`main-${main.id}`}
+                      id={`service-${service.id}`}
                       className={styles.subServicesContainer}
                     >
                       <div className={styles.subServiceTitle}>
                         {text.subservice}
                       </div>
-                      {main.subServices.map((sub) => {
+                      {service.subServices.map((subService) => {
                         const handleSelectSubService = () =>
                           setSelected({
-                            type: "sub",
-                            mainId: main.id,
-                            subId: sub.id,
+                            type: "subService",
+                            service_id: service.id,
+                            subService_id: subService.id,
                           });
                         return (
-                          <div key={sub.id} className={styles.subService}>
+                          <div
+                            key={subService.id}
+                            className={styles.subService}
+                          >
                             <button
-                              onClick={() => toggleSub(main.id, sub.id)}
+                              onClick={() => toggleSub(subService.id)}
                               className={styles.subButton}
-                              aria-expanded={openSub === sub.id}
-                              aria-controls={`sub-${sub.id}`}
+                              aria-expanded={openSub === subService.id}
+                              aria-controls={`subService-${subService.id}`}
                             >
-                              <ArrowIcon open={openSub === sub.id} />
+                              <ArrowIcon open={openSub === subService.id} />
                               <span className={styles.subText}>
-                                {sub.name[lang]}
+                                {subService.name[lang]}
                               </span>
                               {isAdminClickable && (
                                 <span
@@ -329,7 +249,7 @@ export default function Services() {
                               )}
                             </button>
 
-                            {openSub === sub.id && (
+                            {openSub === subService.id && (
                               <>
                                 {boxWidth > 580 && (
                                   <div className={styles.activityHeader}>
@@ -352,13 +272,17 @@ export default function Services() {
                                   </div>
                                 )}
                                 <ul
-                                  id={`sub-${sub.id}`}
+                                  id={`subService-${subService.id}`}
                                   className={styles.activitiesList}
                                 >
-                                  {sub.activities.map(
+                                  {subService.activities.map(
                                     (act: Activity, index: number) => {
                                       const handleSelectActivity = () => {
-                                        selectActivity(main.id, sub.id, act.id);
+                                        selectActivity(
+                                          service.id,
+                                          subService.id,
+                                          act.id
+                                        );
                                       };
                                       return (
                                         <li
@@ -411,6 +335,9 @@ export default function Services() {
                                                       }
                                                       onClick={() => {
                                                         setActivityProp(act);
+                                                        setServiceIdProp(
+                                                          service.id
+                                                        );
                                                         setSubmitReport(true);
                                                       }}
                                                     >
@@ -481,6 +408,9 @@ export default function Services() {
                                                       }
                                                       onClick={() => {
                                                         setActivityProp(act);
+                                                        setServiceIdProp(
+                                                          service.id
+                                                        );
                                                         setSubmitReport(true);
                                                       }}
                                                     >
@@ -509,11 +439,7 @@ export default function Services() {
               );
             })}
             {selected && (
-              <ChangeService
-                selected={selected}
-                setSelected={setSelected}
-                services={services}
-              />
+              <ChangeService selected={selected} setSelected={setSelected} />
             )}
           </>
         )}
@@ -524,6 +450,7 @@ export default function Services() {
         <SubmitReport
           setSubmitReport={setSubmitReport}
           activity={activityProp}
+          service_id={serviceIdProp}
         />
       )}
     </div>

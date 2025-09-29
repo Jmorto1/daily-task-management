@@ -8,11 +8,12 @@
     "timeError":"ጊዜ ያስፈልጋል",
     "invalidTimeError":"እባክዎ ሰዓትን በ H:MM ቅርጽ ያስገቡ",
     "quality":"ጥራት",
-    "qualityEror":"ጥራት ያስፈልጋል",
+    "qualityError":"ጥራት ያስፈልጋል",
     "addActivity": "+ ተግባር አክል",
     "invalidQualityError":"እባክዎ ቁጥርን ከ % ጋር ያስገቡ",
     "addSubService": "+ ንዑስ አገልግሎት አክል",
     "cancel": "ይቅር",
     "save": "መዝግብ",
+    "saving":"በመዝግብ ላይ...",
     "message":"አዲስ አገልግሎት በተሳካ ሁኔታ ተጨምሩአል"
 }

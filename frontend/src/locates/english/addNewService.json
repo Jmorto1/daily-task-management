@@ -8,11 +8,12 @@
     "timeError":"Time is required",
     "invalidTimeError":"Please enter the time in H:MM format .",
     "quality":"Quality",
-    "qualityEror":"Quality is required",
+    "qualityError":"Quality is required",
     "invalidQualityError":"Please enter a number followed % .",
     "addActivity":"+ Add Activity",
     "addSubService":"+ Add Subservice",
     "cancel":"Cancel",
     "save":"Save",
+    "saving":"Saving...",
     "message":"New Service Added successfully."
 }

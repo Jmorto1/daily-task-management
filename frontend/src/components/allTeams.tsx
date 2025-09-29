@@ -14,17 +14,7 @@ import {
 } from "react-icons/fi";
 import { MdChangeCircle } from "react-icons/md";
 import { useAppData } from "../hooks/useAppData";
-import type { Team, User } from "../context/appDataContext";
-
-type Service = {
-  id: number;
-  name: {
-    am: string;
-    en: string;
-  };
-  teamIDs?: number[];
-  adminID?: number;
-};
+import type { Service, Team, User } from "../context/appDataContext";
 type OptionLeader = {
   value: User;
   label: string;
@@ -46,9 +36,16 @@ export default function AllTeams() {
     en: allTeamsEn,
   };
   const text = translate[lang];
-  const { teams, setTeams, employees, setEmployees, user, serverAddress } =
-    useAppData();
-  const services: Service[] = [];
+  const {
+    teams,
+    setTeams,
+    employees,
+    setEmployees,
+    user,
+    services,
+    setServices,
+    serverAddress,
+  } = useAppData();
   const [createTeam, setCreateTeam] = useState(false);
   const [editTeam, setEditTeam] = useState(false);
   const [submitType, setSubmitType] = useState("");
@@ -146,20 +143,20 @@ export default function AllTeams() {
   const filteredServices = (): Service[] => {
     if (assignService) {
       if (assignService.type === "admin") {
-        return services.filter((service) => service.adminID !== user.id);
+        return services.filter(
+          (service) => !service.user_ids.includes(user.id)
+        );
       } else {
         return services.filter(
-          (service) => !service.teamIDs?.includes(assignService.value.id)
+          (service) => !service.team_ids.includes(assignService.value.id)
         );
       }
     } else if (seeService) {
       if (seeService.type === "admin") {
-        return services.filter((service) => service.adminID === user.id);
+        return services.filter((service) => service.user_ids.includes(user.id));
       } else {
-        return services.filter(
-          (service) =>
-            service.teamIDs !== undefined &&
-            service.teamIDs.includes(seeService.value.id)
+        return services.filter((service) =>
+          service.team_ids.includes(seeService.value.id)
         );
       }
     }
@@ -207,6 +204,10 @@ export default function AllTeams() {
     setSelectedLeader(null);
     setChangeLeaderError("");
     setChangeLeader(null);
+  };
+  const closeAssignServicePanel = () => {
+    setSelectedServices([]);
+    setAssignService(null);
   };
   const handleCreateSubmit = (e: FormEvent) => {
     e.preventDefault();
@@ -344,12 +345,150 @@ export default function AllTeams() {
   };
   const handleAssignSubmit = (e: FormEvent) => {
     e.preventDefault();
+    setSubmitType("assignService");
     setPasswordAuth(true);
   };
+  async function handleAssignServiceApi() {
+    if (assignService) {
+      try {
+        const putData =
+          assignService.type === "admin"
+            ? {
+                user_id: assignService.value.id,
+                service_ids: selectedServices,
+              }
+            : {
+                team_id: assignService.value.id,
+                service_ids: selectedServices,
+              };
+        const response = await fetch(`${serverAddress}/assignServices/`, {
+          method: "PUT",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(putData),
+        });
+
+        if (response.ok) {
+          if (assignService.type === "admin") {
+            setServices((prev) =>
+              prev.map((service) => {
+                if (selectedServices.includes(service.id)) {
+                  return {
+                    ...service,
+                    user_ids: [...service.user_ids, assignService.value.id],
+                  };
+                }
+                return service;
+              })
+            );
+          } else {
+            setServices((prev) =>
+              prev.map((service) => {
+                if (selectedServices.includes(service.id)) {
+                  return {
+                    ...service,
+                    team_ids: [...service.team_ids, assignService.value.id],
+                  };
+                }
+                return service;
+              })
+            );
+          }
+
+          setShowSuccessMessage(true);
+          setTimeout(() => {
+            closeAssignServicePanel();
+            setShowSuccessMessage(false);
+          }, 3000);
+        } else {
+          setShowFailMessage(true);
+          setTimeout(() => {
+            setShowFailMessage(false);
+          }, 3000);
+        }
+      } catch (error) {
+        console.error("error:", error);
+        setShowFailMessage(true);
+        setTimeout(() => {
+          setShowFailMessage(false);
+        }, 3000);
+      }
+    }
+  }
   const handleDeleteServiceSubmit = (e: FormEvent) => {
     e.preventDefault();
+    setSubmitType("deleteService");
     setPasswordAuth(true);
   };
+  async function handleDeleteServiceApi() {
+    if (deleteService) {
+      try {
+        const putData =
+          deleteService.type === "admin"
+            ? {
+                user_id: deleteService.adminTeam.id,
+                service_ids: [deleteService.service.id],
+              }
+            : {
+                team_id: deleteService.adminTeam.id,
+                service_ids: [deleteService.service.id],
+              };
+
+        const response = await fetch(`${serverAddress}/removeServices/`, {
+          method: "PUT",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(putData),
+        });
+
+        if (response.ok) {
+          if (deleteService.type === "admin") {
+            setServices((prev) =>
+              prev.map((service) => {
+                if (deleteService.service.id === service.id) {
+                  return {
+                    ...service,
+                    user_ids: service.user_ids.filter(
+                      (id) => id !== deleteService.adminTeam.id
+                    ),
+                  };
+                }
+                return service;
+              })
+            );
+          } else {
+            setServices((prev) =>
+              prev.map((service) => {
+                if (deleteService.service.id === service.id) {
+                  return {
+                    ...service,
+                    team_ids: service.team_ids.filter(
+                      (id) => id !== deleteService.adminTeam.id
+                    ),
+                  };
+                }
+                return service;
+              })
+            );
+          }
+
+          setShowSuccessMessage(true);
+          setTimeout(() => {
+            setDeleteService(null);
+            setShowSuccessMessage(false);
+          }, 3000);
+        } else {
+          setShowFailMessage(true);
+          setTimeout(() => setShowFailMessage(false), 3000);
+        }
+      } catch (error) {
+        console.error("error:", error);
+        setShowFailMessage(true);
+        setTimeout(() => setShowFailMessage(false), 3000);
+      }
+    }
+  }
+
   const handleDeleteTeamSubmit = (e: FormEvent) => {
     e.preventDefault();
     setSubmitType("deleteTeam");
@@ -514,6 +653,10 @@ export default function AllTeams() {
         handleDeleteTeamApi();
       } else if (submitType === "changeLeader") {
         handleChangeLeaderApi();
+      } else if (submitType === "assignService") {
+        handleAssignServiceApi();
+      } else if (submitType === "deleteService") {
+        handleDeleteServiceApi();
       }
     }
     setSubmitType("");
@@ -794,10 +937,7 @@ export default function AllTeams() {
             <button
               className={styles.closeIconButton}
               aria-label="Close panel"
-              onClick={() => {
-                setSelectedServices([]);
-                setAssignService(null);
-              }}
+              onClick={closeAssignServicePanel}
             >
               <svg
                 width="20"
@@ -862,10 +1002,7 @@ export default function AllTeams() {
                   <button
                     type="button"
                     className={styles.cancelBtn}
-                    onClick={() => {
-                      setSelectedServices([]);
-                      setAssignService(null);
-                    }}
+                    onClick={closeAssignServicePanel}
                   >
                     {text.cancel}
                   </button>
@@ -886,6 +1023,15 @@ export default function AllTeams() {
                 </div>
                 <div className="overlay" style={{ zIndex: "1001" }}></div>
               </>
+            )}
+            {showFailMessage && (
+              <div className="failMessageWrapper">
+                <div className="failMessage">
+                  {lang === "en"
+                    ? "Request failed.Please try again later."
+                    : "ጥያቄዎን ማስተናገድ አልተቻለም። እባክዎን እንደገና ይሞክሩ።"}
+                </div>
+              </div>
             )}
           </div>
         </div>
@@ -1021,6 +1167,15 @@ export default function AllTeams() {
                             style={{ zIndex: "1001" }}
                           ></div>
                         </>
+                      )}
+                      {showFailMessage && (
+                        <div className="failMessageWrapper">
+                          <div className="failMessage">
+                            {lang === "en"
+                              ? "Request failed.Please try again later."
+                              : "ጥያቄዎን ማስተናገድ አልተቻለም። እባክዎን እንደገና ይሞክሩ።"}
+                          </div>
+                        </div>
                       )}
                     </div>
                   </div>

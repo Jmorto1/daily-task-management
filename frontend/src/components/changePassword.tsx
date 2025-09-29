@@ -4,13 +4,16 @@ import { FaEye, FaEyeSlash } from "react-icons/fa";
 import amChangePassword from "../locates/amharic/changePassword.json";
 import enChangePassword from "../locates/english/changePassword.json";
 import { useLang } from "../hooks/useLang";
+import { useAppData } from "../hooks/useAppData";
 interface ChangePasswordProps {
   onClose: () => void;
 }
 export default function ChangePassword({ onClose }: ChangePasswordProps) {
+  const { serverAddress } = useAppData();
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [inAPIRequest, setInAPIRequest] = useState(false);
   const emptyErrors = {
     current: "",
     new: "",
@@ -28,8 +31,9 @@ export default function ChangePassword({ onClose }: ChangePasswordProps) {
   const [showCurrent, setShowCurrent] = useState(false);
   const [showNew, setShowNew] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
-  const { lang, setLang } = useLang();
+  const { lang } = useLang();
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const [showFailMessage, setShowFailMessage] = useState<boolean>(false);
   const translate = {
     en: enChangePassword,
     am: amChangePassword,
@@ -39,11 +43,11 @@ export default function ChangePassword({ onClose }: ChangePasswordProps) {
     let isValid = true;
     const newErrors = emptyErrors;
     if (!currentPassword.trim()) {
-      newErrors.current = text.newError;
+      newErrors.current = text.curError;
       isValid = false;
     }
     if (!newPassword.trim()) {
-      newErrors.new = text.curError;
+      newErrors.new = text.newError;
       isValid = false;
     }
     if (!confirmPassword.trim()) {
@@ -61,23 +65,53 @@ export default function ChangePassword({ onClose }: ChangePasswordProps) {
       } else if (newPassword.trim().length < 6) {
         newErrors.noSixChar = text.noSixCharError;
         isValid = false;
-      } else if (currentPassword.trim() !== "password") {
-        newErrors.current = text.wrongPswd;
-        isValid = false;
       }
     }
     setErrors(newErrors);
     return isValid;
   };
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate()) {
       return;
     }
-    setShowSuccessMessage(true);
-    setTimeout(() => {
-      setShowSuccessMessage(false);
-    }, 3000);
+    setInAPIRequest(true);
+    try {
+      const res = await fetch(`${serverAddress}/users/change-password/`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          current_password: currentPassword,
+          new_password: newPassword,
+        }),
+      });
+
+      if (res.ok) {
+        setShowSuccessMessage(true);
+        setTimeout(() => {
+          setShowSuccessMessage(false);
+          text.wrongPswd;
+        }, 3000);
+      } else {
+        const data = await res.json();
+        if (data.detail === "wrongPassword") {
+          setErrors((prev) => ({ ...prev, current: text.wrongPswd }));
+        } else {
+          setShowFailMessage(true);
+          setTimeout(() => {
+            setShowFailMessage(false);
+          }, 3000);
+        }
+      }
+    } catch (error) {
+      setShowFailMessage(true);
+      setTimeout(() => {
+        setShowFailMessage(false);
+      }, 3000);
+    } finally {
+      setInAPIRequest(false);
+    }
   };
 
   return (
@@ -176,11 +210,20 @@ export default function ChangePassword({ onClose }: ChangePasswordProps) {
           <div className={styles.error}>{errors.noSixChar}</div>
         )}
         <div className={styles.buttonGroup}>
-          <button type="button" onClick={onClose} className={styles.cancelBtn}>
+          <button
+            type="button"
+            onClick={onClose}
+            className={styles.cancelBtn}
+            disabled={inAPIRequest}
+          >
             {text.cancel}
           </button>
-          <button type="submit" className={styles.saveBtn}>
-            {text.save}
+          <button
+            type="submit"
+            className={styles.saveBtn}
+            disabled={inAPIRequest}
+          >
+            {inAPIRequest ? text.saving : text.save}
           </button>
         </div>
       </form>
@@ -191,6 +234,15 @@ export default function ChangePassword({ onClose }: ChangePasswordProps) {
           </div>
           <div className="overlay" style={{ zIndex: "1001" }}></div>
         </>
+      )}
+      {showFailMessage && (
+        <div className="failMessageWrapper">
+          <div className="failMessage">
+            {lang === "en"
+              ? "Request failed.Please try again later."
+              : "ጥያቄዎን ማስተናገድ አልተቻለም። እባክዎን እንደገና ይሞክሩ።"}
+          </div>
+        </div>
       )}
     </div>
   );

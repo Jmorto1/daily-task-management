@@ -5,13 +5,17 @@
     "startingTime":"Starting Time",
     "endingTime":"Ending Time",
     "hour":"Total Hour",
+    "quality":"Quality",
     "date":"Date",
     "cancel":"Cancel",
     "submit":"Submit",
+    "submiting":"Submitting...",
     "freqError":"Frequency must be at least 1.",
     "startingTimeError":"Starting time is required.",
     "endingTimeError":"Ending time is required.",
     "invalidHourError":"Please enter the time in H:MM format .",
+    "qualityError":"Quality is required",
+    "invalidQualityError":"Please enter a number followed % .",
     "dateError":"Date is required.",
     "message":"Activity Report submitted successfully."
     

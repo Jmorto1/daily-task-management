@@ -35,10 +35,68 @@ export type User = {
     en: string;
   };
   phone_number: string;
+  email: string;
   department: Department | null;
   team: Team | null;
   profile: File | null;
   status?: "user" | "pending";
+};
+export type Activity = {
+  id: number;
+  name: {
+    am: string;
+    en: string;
+  };
+  frequency: string;
+  time: string;
+  quality: string;
+  subService_id: number;
+};
+export type SubService = {
+  id: number;
+  name: {
+    am: string;
+    en: string;
+  };
+  service_id: number;
+  activities: Activity[];
+};
+export type Service = {
+  id: number;
+  name: {
+    am: string;
+    en: string;
+  };
+  subServices: SubService[];
+  department_id: number;
+  team_ids: number[];
+  user_ids: number[];
+};
+export type ReportActivity = {
+  id: number;
+  name: { en: string; am: string };
+  user_id: number;
+  activity_id: number;
+  quality: string | null;
+  frequency: string;
+  startingTime: string;
+  endingTime: string;
+  totalHour: string;
+  date: string;
+};
+export type StanderdSubService = {
+  id: number;
+  name: { en: string; am: string };
+  activities: ReportActivity[];
+};
+export type StandardReport = {
+  id: number;
+  name: { en: string; am: string };
+  type: "standard";
+  subServices: StanderdSubService[];
+};
+export type AdditionalReport = ReportActivity & {
+  type: "additional";
 };
 
 type AppDataContextType = {
@@ -56,6 +114,15 @@ type AppDataContextType = {
   setDepartments: React.Dispatch<React.SetStateAction<Department[]>>;
   teams: Team[];
   setTeams: React.Dispatch<React.SetStateAction<Team[]>>;
+  services: Service[];
+  setServices: React.Dispatch<React.SetStateAction<Service[]>>;
+  standardReports: StandardReport[];
+  setStandardReports: React.Dispatch<React.SetStateAction<StandardReport[]>>;
+  additionalReports: AdditionalReport[];
+  setAdditionalReports: React.Dispatch<
+    React.SetStateAction<AdditionalReport[]>
+  >;
+
   serverAddress: string;
   profileImage: string;
 };
@@ -83,6 +150,7 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
       en: "",
     },
     phone_number: "",
+    email: "",
     department: null,
     team: null,
     profile: null,
@@ -94,9 +162,13 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
   const [teams, setTeams] = useState<Team[]>([]);
   const [employees, setEmployees] = useState<User[]>([]);
   const [pendingEmployees, setPendingEmployees] = useState<User[]>([]);
+  const [services, setServices] = useState<Service[]>([]);
+  const [standardReports, setStandardReports] = useState<StandardReport[]>([]);
+  const [additionalReports, setAdditionalReports] = useState<
+    AdditionalReport[]
+  >([]);
   const [loading, setLoading] = useState(true);
-  const serverAddress = "http://10.243.121.154:8000";
-
+  const serverAddress = "http://localhost:8000";
   // fetch loggedin user and departments
   useEffect(() => {
     async function fetchCurrentUser() {
@@ -166,15 +238,52 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
             if (response.ok) {
               const data = await response.json();
               setTeams(data);
-              console.log(data);
             }
           } catch (error) {
             console.error("error:", error);
           }
         }
       }
+      async function fetchServices() {
+        try {
+          const response = await fetch(`${serverAddress}/services/`, {
+            method: "GET",
+            credentials: "include",
+          });
+          if (response.ok) {
+            const data = await response.json();
+            setServices(data);
+          }
+        } catch (error) {
+          console.error("error:", error);
+        }
+      }
+      async function fetchReports() {
+        try {
+          const response = await fetch(`${serverAddress}/reports/`, {
+            method: "GET",
+            credentials: "include",
+          });
+          if (response.ok) {
+            const data = await response.json();
+            const standardReportsData = data.filter(
+              (r: any) => r.type === "standard"
+            );
+            const additionalReportsData = data.filter(
+              (r: any) => r.type === "additional"
+            );
+            setStandardReports(standardReportsData);
+            setAdditionalReports(additionalReportsData);
+          }
+        } catch (error) {
+          console.error("error:", error);
+        }
+      }
+
+      fetchServices();
       fetchEmployees();
       fetchTeams();
+      fetchReports();
     }
   }, [isLoggedIn]);
   //profile image
@@ -215,6 +324,12 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
         setDepartments,
         teams,
         setTeams,
+        services,
+        setServices,
+        standardReports,
+        setStandardReports,
+        additionalReports,
+        setAdditionalReports,
         serverAddress,
         profileImage,
       }}
@@ -223,3 +338,23 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
     </AppDataContext.Provider>
   );
 }
+export const deleteUserServicesReports = async (
+  serverAddress: string,
+  userId: number
+) => {
+  try {
+    const res = await fetch(
+      `${serverAddress}delete-services-reports/${userId}/`,
+      {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+      }
+    );
+
+    const data = await res.json();
+    return { status: res.status, message: data.detail || "" };
+  } catch (error) {
+    return { status: 500, message: "Something went wrong." };
+  }
+};

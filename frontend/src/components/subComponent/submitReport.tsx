@@ -3,16 +3,19 @@ import React, { useState, useEffect, useRef } from "react";
 import submitReportAm from "../../locates/amharic/submitReport.json";
 import submitReportEn from "../../locates/english/submitReport.json";
 import { useLang } from "../../hooks/useLang";
-import type { Activity } from "../services";
-import PasswordAuth from "./passwordAuth";
+import type { Activity } from "../../context/appDataContext";
+import { useAppData } from "../../hooks/useAppData";
+import EthiopianCalendar from "./ethioCalander";
 interface submitReportProps {
   setSubmitReport: (value: boolean) => void;
   activity: Activity | null;
+  service_id: number | null;
 }
 interface formErrors {
   frequency?: string;
   startingTime?: string;
   endingTime?: string;
+  quality?: string;
   date?: string;
 }
 interface form {
@@ -20,39 +23,52 @@ interface form {
   startingTime: string;
   endingTime: string;
   TotalHour: string;
+  quality: string;
   date: string;
 }
 export default function SubmitReport({
   setSubmitReport,
   activity,
+  service_id,
 }: submitReportProps) {
-  const { lang, setLang } = useLang();
+  const { lang } = useLang();
   const translate = {
     en: submitReportEn,
     am: submitReportAm,
   };
   const text = translate[lang];
-  const [passwordAuth, setPasswordAuth] = useState<boolean>(false);
+  const { user, serverAddress, standardReports, setStandardReports } =
+    useAppData();
+  const [showFailMessage, setShowFailMessage] = useState<boolean>(false);
   const [showSuccessMessage, setShowSuccessMessage] = useState<boolean>(false);
+  const [inAPIRequest, setInAPIRequest] = useState<boolean>(false);
   const [form, setForm] = useState<form>({
     frequency: "",
     startingTime: "",
     endingTime: "",
     TotalHour: "",
+    quality: "",
     date: "",
   });
   const [errors, setErrors] = useState<formErrors>({
     frequency: "",
     startingTime: "",
     endingTime: "",
+    quality: "",
     date: "",
   });
   const validate = () => {
+    const percentPattern = /^(\d+)(\.\d+)?%$/;
     const newErrors: formErrors = {};
     if (!form.frequency.trim()) newErrors.frequency = text.freqError;
     if (!form.startingTime.trim())
       newErrors.startingTime = text.startingTimeError;
     if (!form.endingTime.trim()) newErrors.endingTime = text.endingTimeError;
+    if (!form.quality.trim()) {
+      newErrors.quality = text.qualityError;
+    } else if (!percentPattern.test(form.quality.trim())) {
+      newErrors.quality = text.invalidQualityError;
+    }
     if (!form.date.trim()) newErrors.date = text.dateError;
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -79,23 +95,81 @@ export default function SubmitReport({
 
     setErrors((prev) => ({ ...prev, [name]: undefined }));
   };
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate()) {
       return;
     }
-    setPasswordAuth(true);
-  };
-  const handleAuthResult = (success: boolean) => {
-    if (success) {
-      setPasswordAuth(false);
-      setShowSuccessMessage(true);
-      setTimeout(() => {
-        setShowSuccessMessage(false);
-      }, 3000);
-    } else {
-      return;
+    setInAPIRequest(true);
+    if (activity && service_id) {
+      const postData = {
+        type: "standard",
+        service_id: service_id,
+        subService_id: activity.subService_id,
+        user_id: user.id,
+        name: activity.name,
+        quality: form.quality,
+        activity_id: activity.id,
+        frequency: form.frequency,
+        startingTime: form.startingTime,
+        endingTime: form.endingTime,
+        totalHour: form.TotalHour,
+        date: form.date,
+      };
+      try {
+        const response = await fetch(`${serverAddress}/reports/`, {
+          method: "POST",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(postData),
+        });
+
+        if (!response.ok) {
+          const error = await response.json();
+          console.log("error:", error);
+          setShowFailMessage(true);
+          setTimeout(() => setShowFailMessage(false), 3000);
+        } else {
+          const data = await response.json();
+          const newEntry = data[0];
+          let reportCopy = [...standardReports];
+
+          const { id: serviceId, subServices } = newEntry;
+          const newSubService = subServices[0];
+          const newActivity = newSubService.activities[0];
+          let service = reportCopy.find((s) => s.id === serviceId);
+
+          if (!service) {
+            reportCopy.push(newEntry);
+          } else {
+            let subService = service.subServices.find(
+              (ss) => ss.id === newSubService.id
+            );
+
+            if (!subService) {
+              service.subServices.push(newSubService);
+            } else {
+              subService.activities.push(newActivity);
+            }
+          }
+
+          setStandardReports(reportCopy);
+
+          setShowSuccessMessage(true);
+          setTimeout(() => {
+            setShowSuccessMessage(false);
+            setSubmitReport(false);
+          }, 3000);
+        }
+      } catch (error) {
+        console.error("Error creating report:", error);
+        setShowFailMessage(true);
+        setTimeout(() => setShowFailMessage(false), 3000);
+      }
     }
+    setInAPIRequest(false);
   };
   const refTextInput = useRef<HTMLInputElement>(null);
   const [width, setWidth] = useState<number>(0);
@@ -209,18 +283,49 @@ export default function SubmitReport({
             />
           </div>
           <div className={styles.formGroup}>
+            <label htmlFor="Quality" className={styles.label}>
+              {text.quality}
+            </label>
+            <input
+              type="text"
+              id="quality"
+              name="quality"
+              min="1"
+              placeholder="e.g.100%"
+              value={form.quality}
+              onChange={handleChange}
+              className={styles.input}
+              ref={refTextInput}
+            />
+          </div>
+          {errors.quality && (
+            <div className={styles.error}>{errors.quality}</div>
+          )}
+          <div className={styles.formGroup}>
             <label htmlFor="date" className={styles.label}>
               {text.date}
             </label>
-            <input
-              type="date"
-              id="date"
-              name="date"
-              value={form.date}
-              onChange={handleChange}
-              className={styles.input}
-              style={{ width: `${width}px` }}
-            />
+
+            {lang === "am" ? (
+              <EthiopianCalendar
+                value={(form.date && new Date(form.date)) || new Date()}
+                onChange={(selectedDate: string) => {
+                  setForm((prev) => ({ ...prev, date: selectedDate }));
+                  setErrors((prev) => ({ ...prev, date: "" }));
+                }}
+                className={styles.input}
+              />
+            ) : (
+              <input
+                type="date"
+                id="date"
+                name="date"
+                value={form.date}
+                onChange={handleChange}
+                className={styles.input}
+                style={{ width: `${width}px` }}
+              />
+            )}
           </div>
           {errors.date && <div className={styles.error}>{errors.date}</div>}
           <div className={styles.formActions}>
@@ -228,11 +333,16 @@ export default function SubmitReport({
               type="button"
               className={styles.cancelButton}
               onClick={() => setSubmitReport(false)}
+              disabled={inAPIRequest}
             >
               {text.cancel}
             </button>
-            <button type="submit" className={styles.saveButton}>
-              {text.submit}
+            <button
+              type="submit"
+              className={styles.saveButton}
+              disabled={inAPIRequest}
+            >
+              {inAPIRequest ? text.submiting : text.submit}
             </button>
           </div>
         </form>
@@ -244,13 +354,16 @@ export default function SubmitReport({
             <div className={styles.overlay} style={{ zIndex: "1001" }}></div>
           </>
         )}
+        {showFailMessage && (
+          <div className="failMessageWrapper">
+            <div className="failMessage">
+              {lang === "en"
+                ? "Request failed.Please try again later."
+                : "ጥያቄዎን ማስተናገድ አልተቻለም። እባክዎን እንደገና ይሞክሩ።"}
+            </div>
+          </div>
+        )}
       </div>
-      {passwordAuth && (
-        <PasswordAuth
-          handleAuthResult={handleAuthResult}
-          setPasswordAuth={setPasswordAuth}
-        />
-      )}
     </div>
   );
 }

@@ -22,8 +22,10 @@
     "action":"Actions",
     "edit":"Edit",
     "delete":"Delete",
+    "deleting":"Deleting...",
     "cancel":"Cancel",
     "save":"Save",
+    "saving":"Saving...",
     "no":"No",
     "yes":"Yes",
     "dateError":"Date is Required",
@@ -34,21 +36,15 @@
     "endingTimeError":"Ending Time is Required",
     "editMessage":"Edited Successfully",
     "deleteMessage":"Deleted Successfully",
-
-
-
-
-
-
     "fileService": "Services",
-  "fileSubService": "Sub Services",
-  "fileActivity": "Main Activities of Sub Service ",
-  "fileDate":"Date",
-  "fileActivityPlan": "Activity Plan (BPR)",
-  "fileActivityperformance": "Activities Quantity, Time, and Quality Performance",
-  "fileActivityAverage": "Activities Average Performance Template",
-  "fileSubServicePerformance": "Sub Services' plan Average  Performance  (Standard Sub Service Average Performance)",
-  "employeeName": "Employee Name",
-  "signature": "Signature",
-  "adminName": "Supervisor Name"
+    "fileSubService": "Sub Services",
+    "fileActivity": "Main Activities of Sub Service ",
+    "fileDate":"Date",
+    "fileActivityPlan": "Activity's Quantity, Time, and Quality Plan (BPR)",
+    "fileActivityperformance": "Activities Quantity, Time, and Quality Performance",
+    "fileActivityAverage": "Activities Average Performance Template",
+    "fileSubServicePerformance": "Sub Services' plan Average  Performance  (Standard Sub Service Average Performance)",
+    "employeeName": "Employee Name",
+    "signature": "Signature",
+    "adminName": "Supervisor Name"
 }

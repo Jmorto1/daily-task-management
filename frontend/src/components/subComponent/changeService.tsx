@@ -1,37 +1,50 @@
 import type { Dispatch, SetStateAction, FormEvent } from "react";
-import { useState, useEffect, useRef } from "react";
-import type { Activity, SubService } from "../services";
+import { useState, useRef } from "react";
+import type { Activity, SubService } from "../../context/appDataContext";
 import changeServiceAm from "../../locates/amharic/changeService.json";
 import changeServiceEn from "../../locates/english/changeService.json";
 import { useLang } from "../../hooks/useLang";
 import PasswordAuth from "./passwordAuth";
 import styles from "../../styles/services.module.css";
+import { useAppData } from "../../hooks/useAppData";
 type ChangeServiceProps = {
   selected:
-    | { type: "main"; mainId: string }
-    | { type: "sub"; mainId: string; subId: string }
-    | { type: "activity"; mainId: string; subId: string; actId: string };
+    | { type: "service"; service_id: number }
+    | { type: "subService"; service_id: number; subService_id: number }
+    | {
+        type: "activity";
+        service_id: number;
+        subService_id: number;
+        activity_id: number;
+      };
   setSelected: Dispatch<
     SetStateAction<
-      | { type: "main"; mainId: string }
-      | { type: "sub"; mainId: string; subId: string }
-      | { type: "activity"; mainId: string; subId: string; actId: string }
+      | { type: "service"; service_id: number }
+      | { type: "subService"; service_id: number; subService_id: number }
+      | {
+          type: "activity";
+          service_id: number;
+          subService_id: number;
+          activity_id: number;
+        }
       | null
     >
   >;
-  services: Array<any>;
 };
 export default function ChangeService({
   selected,
   setSelected,
-  services,
 }: ChangeServiceProps) {
+  const { serverAddress, services, setServices } = useAppData();
   const [editMode, setEditMode] = useState(false);
   const [deleteMode, setDeleteMode] = useState(false);
   const [editForm, setEditForm] = useState<any>({});
   const [editError, setEditError] = useState<any>({});
   const [passwordAuth, setPasswordAuth] = useState<boolean>(false);
   const [showSuccessMessage, setShowSuccessMessage] = useState<boolean>(false);
+  const [showFailMessage, setShowFailMessage] = useState<boolean>(false);
+  const [inAPIRequest, setInAPIRequest] = useState<boolean>(false);
+  const [submitType, setSubmitType] = useState("");
   const { lang } = useLang();
   const translate = {
     am: changeServiceAm,
@@ -40,29 +53,33 @@ export default function ChangeService({
   const text = translate[lang];
   const handleEdit = () => {
     if (!selected) return;
-    if (selected.type === "main") {
+    if (selected.type === "service") {
       setEditForm({
         nameAm:
-          services.find((s) => s.id === selected.mainId)?.name["am"] || "",
+          services.find((s) => s.id === selected.service_id)?.name["am"] || "",
         nameEn:
-          services.find((s) => s.id === selected.mainId)?.name["en"] || "",
+          services.find((s) => s.id === selected.service_id)?.name["en"] || "",
       });
       setEditError({
         nameAm: "",
         nameEn: "",
       });
-    } else if (selected.type === "sub") {
+    } else if (selected.type === "subService") {
       setEditForm({
         nameAm:
           services
-            .find((s) => s.id === selected.mainId)
-            ?.subServices.find((sub: SubService) => sub.id === selected.subId)
-            ?.name["am"] || "",
+            .find((s) => s.id === selected.service_id)
+            ?.subServices.find(
+              (subService: SubService) =>
+                subService.id === selected.subService_id
+            )?.name["am"] || "",
         nameEn:
           services
-            .find((s) => s.id === selected.mainId)
-            ?.subServices.find((sub: SubService) => sub.id === selected.subId)
-            ?.name["en"] || "",
+            .find((s) => s.id === selected.service_id)
+            ?.subServices.find(
+              (subService: SubService) =>
+                subService.id === selected.subService_id
+            )?.name["en"] || "",
       });
       setEditError({
         nameAm: "",
@@ -70,9 +87,11 @@ export default function ChangeService({
       });
     } else if (selected.type === "activity") {
       const act = services
-        .find((s) => s.id === selected.mainId)
-        ?.subServices.find((sub: SubService) => sub.id === selected.subId)
-        ?.activities.find((act: Activity) => act.id === selected.actId);
+        .find((s) => s.id === selected.service_id)
+        ?.subServices.find(
+          (subService: SubService) => subService.id === selected.subService_id
+        )
+        ?.activities.find((act: Activity) => act.id === selected.activity_id);
       setEditForm({
         nameAm: act?.name["am"] || "",
         nameEn: act?.name["en"] || "",
@@ -98,9 +117,11 @@ export default function ChangeService({
   };
   const validate = () => {
     let isValid = true;
+    const timePattern = /^\d+:[0-5]\d$/;
     const percentPattern = /^(\d+)(\.\d+)?%$/;
+
     const newError: any = {};
-    if (selected.type === "main" || selected.type === "sub") {
+    if (selected.type === "service" || selected.type === "subService") {
       setEditError({
         nameAm: "",
         nameEn: "",
@@ -129,6 +150,9 @@ export default function ChangeService({
       if (!editForm.time.trim()) {
         newError.time = text.timeError;
         isValid = false;
+      } else if (!timePattern.test(editForm.time.trim())) {
+        newError.time = text.invalidTimeError;
+        isValid = false;
       }
       if (!editForm.quality.trim()) {
         newError.quality = text.qualityError;
@@ -141,50 +165,320 @@ export default function ChangeService({
     setEditError(newError);
     return isValid;
   };
-  const handleEditSubmit = (e: FormEvent) => {
-    e.preventDefault();
-    if (!validate()) {
-      return;
-    } else {
-      setPasswordAuth(true);
-    }
-  };
-  const handleAuthResult = (success: boolean) => {
-    if (success) {
-      setPasswordAuth(false);
-      setShowSuccessMessage(true);
-      setTimeout(() => {
-        setShowSuccessMessage(false);
-      }, 3000);
-    } else {
-      return;
-    }
-  };
-  const handleDeleteSubmit = (e: FormEvent) => {
-    e.preventDefault();
-    setPasswordAuth(true);
-  };
   const closePanel = () => {
     setSelected(null);
     setEditMode(false);
     setDeleteMode(false);
     setEditForm(null);
+    setEditError({});
+  };
+  const handleEditSubmit = (e: FormEvent) => {
+    e.preventDefault();
+    if (!validate()) {
+      return;
+    }
+    if (selected.type === "service") {
+      handleEditServiceApi();
+    } else if (selected.type === "subService") {
+      handleEditSubServiceApi();
+    } else if (selected.type === "activity") {
+      handleEditActivityApi();
+    }
+  };
+  async function handleEditServiceApi() {
+    setInAPIRequest(true);
+    try {
+      const patchData = {
+        name: {
+          am: editForm.nameAm,
+          en: editForm.nameEn,
+        },
+      };
+      const response = await fetch(
+        `${serverAddress}/services/${selected.service_id}/`,
+        {
+          method: "PATCH",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(patchData),
+        }
+      );
+      if (response.ok) {
+        const data = await response.json();
+        const index = services.findIndex((service) => service.id === data.id);
+        if (index !== -1) {
+          setServices((prev) => [
+            ...prev.slice(0, index),
+            data,
+            ...prev.slice(index + 1),
+          ]);
+        } else {
+          setServices((prev) => [...prev, data]);
+        }
+        setShowSuccessMessage(true);
+        setTimeout(() => {
+          closePanel();
+          setShowSuccessMessage(false);
+        }, 3000);
+      } else {
+        setShowFailMessage(true);
+        setTimeout(() => {
+          setShowFailMessage(false);
+        }, 3000);
+      }
+    } catch (error) {
+      setShowFailMessage(true);
+      setTimeout(() => {
+        setShowFailMessage(false);
+      }, 3000);
+    }
+    setInAPIRequest(false);
+  }
+  async function handleEditSubServiceApi() {
+    if (selected.type !== "subService") return;
+    setInAPIRequest(true);
+    try {
+      const patchData = {
+        name: {
+          am: editForm.nameAm,
+          en: editForm.nameEn,
+        },
+      };
+      const response = await fetch(
+        `${serverAddress}/subServices/${selected.subService_id}/`,
+        {
+          method: "PATCH",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(patchData),
+        }
+      );
+      if (response.ok) {
+        const data = await response.json();
+        setServices((prev) => {
+          return prev.map((service) => {
+            const subServicesCopy: SubService[] = service.subServices.map(
+              (subService) => (subService.id === data.id ? data : subService)
+            );
+            return { ...service, subServices: subServicesCopy };
+          });
+        });
+        setShowSuccessMessage(true);
+        setTimeout(() => {
+          closePanel();
+          setShowSuccessMessage(false);
+        }, 3000);
+      } else {
+        setShowFailMessage(true);
+        setTimeout(() => {
+          setShowFailMessage(false);
+        }, 3000);
+      }
+    } catch (error) {
+      setShowFailMessage(true);
+      setTimeout(() => {
+        setShowFailMessage(false);
+      }, 3000);
+    }
+    setInAPIRequest(false);
+  }
+  async function handleEditActivityApi() {
+    if (selected.type !== "activity") return;
+    setInAPIRequest(true);
+    try {
+      const patchData = {
+        name: {
+          am: editForm.nameAm,
+          en: editForm.nameEn,
+        },
+        frequency: editForm.frequency,
+        time: editForm.time,
+        quality: editForm.quality,
+      };
+      const response = await fetch(
+        `${serverAddress}/activities/${selected.activity_id}/`,
+        {
+          method: "PATCH",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(patchData),
+        }
+      );
+      if (response.ok) {
+        const data = await response.json();
+        setServices((prev) => {
+          return prev.map((service) => {
+            const subServicesCopy: SubService[] = service.subServices.map(
+              (subService) => {
+                const activitiesCopy: Activity[] = subService.activities.map(
+                  (activity) => (activity.id === data.id ? data : activity)
+                );
+                return { ...subService, activities: activitiesCopy };
+              }
+            );
+            return { ...service, subServices: subServicesCopy };
+          });
+        });
+        setShowSuccessMessage(true);
+        setTimeout(() => {
+          closePanel();
+          setShowSuccessMessage(false);
+        }, 3000);
+      } else {
+        setShowFailMessage(true);
+        setTimeout(() => {
+          setShowFailMessage(false);
+        }, 3000);
+      }
+    } catch (error) {
+      setShowFailMessage(true);
+      setTimeout(() => {
+        setShowFailMessage(false);
+      }, 3000);
+    }
+    setInAPIRequest(false);
+  }
+  const handleDeleteSubmit = (e: FormEvent) => {
+    e.preventDefault();
+    if (selected.type === "service") {
+      setSubmitType("service");
+    } else if (selected.type === "subService") {
+      setSubmitType("subService");
+    } else if (selected.type === "activity") {
+      setSubmitType("activity");
+    }
+    setPasswordAuth(true);
+  };
+  async function handleDeleteServiceApi() {
+    setInAPIRequest(true);
+    try {
+      const response = await fetch(
+        `${serverAddress}/services/${selected.service_id}/`,
+        {
+          method: "DELETE",
+          credentials: "include",
+        }
+      );
+      if (response.ok) {
+        setServices((prev) =>
+          prev.filter((service) => service.id !== selected.service_id)
+        );
+        setShowSuccessMessage(true);
+        setTimeout(() => {
+          closePanel();
+          setShowSuccessMessage(false);
+        }, 3000);
+      } else {
+        setShowFailMessage(true);
+        setTimeout(() => {
+          setShowFailMessage(false);
+        }, 3000);
+      }
+    } catch (error) {
+      setShowFailMessage(true);
+      setTimeout(() => {
+        setShowFailMessage(false);
+      }, 3000);
+    }
+    setInAPIRequest(false);
+  }
+  async function handleDeleteSubServiceApi() {
+    if (selected.type !== "subService") return;
+    setInAPIRequest(true);
+    try {
+      const response = await fetch(
+        `${serverAddress}/subServices/${selected.subService_id}/`,
+        {
+          method: "DELETE",
+          credentials: "include",
+        }
+      );
+      if (response.ok) {
+        setServices((prev) => {
+          return prev.map((service) => {
+            const subServicesCopy: SubService[] = service.subServices.filter(
+              (subService) => subService.id !== selected.subService_id
+            );
+            return { ...service, subServices: subServicesCopy };
+          });
+        });
+        setShowSuccessMessage(true);
+        setTimeout(() => {
+          closePanel();
+          setShowSuccessMessage(false);
+        }, 3000);
+      } else {
+        setShowFailMessage(true);
+        setTimeout(() => {
+          setShowFailMessage(false);
+        }, 3000);
+      }
+    } catch (error) {
+      setShowFailMessage(true);
+      setTimeout(() => {
+        setShowFailMessage(false);
+      }, 3000);
+    }
+    setInAPIRequest(false);
+  }
+  async function handleDeleteActivityApi() {
+    if (selected.type !== "activity") return;
+    setInAPIRequest(true);
+    try {
+      const response = await fetch(
+        `${serverAddress}/activities/${selected.activity_id}/`,
+        {
+          method: "DELETE",
+          credentials: "include",
+        }
+      );
+      if (response.ok) {
+        setServices((prev) => {
+          return prev.map((service) => {
+            const subServicesCopy: SubService[] = service.subServices.map(
+              (subService) => {
+                const activitiesCopy: Activity[] = subService.activities.filter(
+                  (activity) => activity.id !== selected.activity_id
+                );
+                return { ...subService, activities: activitiesCopy };
+              }
+            );
+            return { ...service, subServices: subServicesCopy };
+          });
+        });
+        setShowSuccessMessage(true);
+        setTimeout(() => {
+          closePanel();
+          setShowSuccessMessage(false);
+        }, 3000);
+      } else {
+        setShowFailMessage(true);
+        setTimeout(() => {
+          setShowFailMessage(false);
+        }, 3000);
+      }
+    } catch (error) {
+      setShowFailMessage(true);
+      setTimeout(() => {
+        setShowFailMessage(false);
+      }, 3000);
+    }
+    setInAPIRequest(false);
+  }
+  const handleAuthResult = (success: boolean) => {
+    if (success) {
+      setPasswordAuth(false);
+      if (submitType === "service") {
+        handleDeleteServiceApi();
+      } else if (submitType === "subService") {
+        handleDeleteSubServiceApi();
+      } else if (submitType === "activity") {
+        handleDeleteActivityApi();
+      }
+      setSubmitType("");
+    }
   };
   const refTextInput = useRef<HTMLInputElement>(null);
-  const [width, setWidth] = useState<number>(0);
-  useEffect(() => {
-    const handleResize = () => {
-      if (refTextInput.current) {
-        setWidth(refTextInput.current.getBoundingClientRect().width);
-      }
-    };
-    handleResize();
-    window.addEventListener("resize", handleResize);
-
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
-  }, [editMode]);
   return (
     <div className={styles.overlay}>
       <div
@@ -197,27 +491,29 @@ export default function ChangeService({
         <div className={styles.panelHeader}>
           {editMode && (
             <h3 className={styles.headerTitile}>
-              {selected.type === "main" &&
+              {selected.type === "service" &&
                 `${text.service}: ${
-                  services.find((s) => s.id === selected.mainId)?.name[lang]
+                  services.find((s) => s.id === selected.service_id)?.name[lang]
                 }`}
-              {selected.type === "sub" &&
+              {selected.type === "subService" &&
                 `${text.subService}: ${
                   services
-                    .find((s) => s.id === selected.mainId)
+                    .find((s) => s.id === selected.service_id)
                     ?.subServices.find(
-                      (sub: SubService) => sub.id === selected.subId
+                      (subService: SubService) =>
+                        subService.id === selected.subService_id
                     )?.name[lang]
                 }`}
               {selected.type === "activity" &&
                 `${text.activity}: ${
                   services
-                    .find((s) => s.id === selected.mainId)
+                    .find((s) => s.id === selected.service_id)
                     ?.subServices.find(
-                      (sub: SubService) => sub.id === selected.subId
+                      (subService: SubService) =>
+                        subService.id === selected.subService_id
                     )
                     ?.activities.find(
-                      (act: Activity) => act.id === selected.actId
+                      (act: Activity) => act.id === selected.activity_id
                     )?.name[lang]
                 }`}
             </h3>
@@ -248,7 +544,8 @@ export default function ChangeService({
           editMode ? (
             <>
               <form className={styles.form} onSubmit={handleEditSubmit}>
-                {(selected.type === "main" || selected.type === "sub") && (
+                {(selected.type === "service" ||
+                  selected.type === "subService") && (
                   <>
                     <div className={styles.formGroup}>
                       <label className={styles.label}>Name</label>
@@ -336,9 +633,7 @@ export default function ChangeService({
                         onChange={(e) =>
                           handleEditFieldChange("time", e.target.value)
                         }
-                        type="time"
-                        placeholder="HH:MM"
-                        style={{ width: `${width}px` }}
+                        placeholder="e.g. 2:00"
                       />
                     </div>
                     {editError.time && (
@@ -366,11 +661,16 @@ export default function ChangeService({
                     type="button"
                     className={styles.cancelButton}
                     onClick={() => setEditMode(false)}
+                    disabled={inAPIRequest}
                   >
                     {text.cancel}
                   </button>
-                  <button type="submit" className={styles.saveButton}>
-                    {text.save}
+                  <button
+                    type="submit"
+                    className={styles.saveButton}
+                    disabled={inAPIRequest}
+                  >
+                    {inAPIRequest ? text.saving : text.save}
                   </button>
                 </div>
               </form>
@@ -385,63 +685,74 @@ export default function ChangeService({
                   </div>
                 </>
               )}
+              {showFailMessage && (
+                <div className="failMessageWrapper">
+                  <div className="failMessage">
+                    {lang === "en"
+                      ? "Request failed.Please try again later."
+                      : "ጥያቄዎን ማስተናገድ አልተቻለም። እባክዎን እንደገና ይሞክሩ።"}
+                  </div>
+                </div>
+              )}
             </>
           ) : (
             <>
               <form className={styles.form} onSubmit={handleDeleteSubmit}>
                 {lang === "en" ? (
                   <div>
-                    {selected.type === "main" &&
+                    {selected.type === "service" &&
                       `${text.deleteDeptWarning} ${
-                        services.find((s) => s.id === selected.mainId)?.name[
-                          lang
-                        ]
+                        services.find((s) => s.id === selected.service_id)
+                          ?.name[lang]
                       }?`}
-                    {selected.type === "sub" &&
+                    {selected.type === "subService" &&
                       `${text.deleteDeptWarning} ${
                         services
-                          .find((s) => s.id === selected.mainId)
+                          .find((s) => s.id === selected.service_id)
                           ?.subServices.find(
-                            (sub: SubService) => sub.id === selected.subId
+                            (subService: SubService) =>
+                              subService.id === selected.subService_id
                           )?.name[lang]
                       }?`}
                     {selected.type === "activity" &&
                       `${text.deleteDeptWarning} ${
                         services
-                          .find((s) => s.id === selected.mainId)
+                          .find((s) => s.id === selected.service_id)
                           ?.subServices.find(
-                            (sub: SubService) => sub.id === selected.subId
+                            (subService: SubService) =>
+                              subService.id === selected.subService_id
                           )
                           ?.activities.find(
-                            (act: Activity) => act.id === selected.actId
+                            (act: Activity) => act.id === selected.activity_id
                           )?.name[lang]
                       }?`}
                   </div>
                 ) : (
                   <div>
-                    {selected.type === "main" &&
+                    {selected.type === "service" &&
                       `${
-                        services.find((s) => s.id === selected.mainId)?.name[
-                          lang
-                        ]
+                        services.find((s) => s.id === selected.service_id)
+                          ?.name[lang]
                       }${text.deleteDeptWarning}`}
-                    {selected.type === "sub" &&
+                    {selected.type === "subService" &&
                       `${
                         services
-                          .find((s) => s.id === selected.mainId)
+                          .find((s) => s.id === selected.service_id)
                           ?.subServices.find(
-                            (sub: SubService) => sub.id === selected.subId
+                            (subService: SubService) =>
+                              subService.id === selected.subService_id
                           )?.name[lang]
                       }${text.deleteDeptWarning}`}
                     {selected.type === "activity" &&
                       `${
                         services
-                          .find((s) => s.id === selected.mainId)
+                          .find((s) => s.id === selected.service_id)
                           ?.subServices.find(
-                            (sub: SubService) => sub.id === selected.subId
+                            (subService: SubService) =>
+                              subService.id === selected.subService_id
                           )
                           ?.activities.find(
-                            (act: Activity) => act.id === selected.actId
+                            (act: Activity) => act.id === selected.activity_id
                           )?.name[lang]
                       }${text.deleteDeptWarning}`}
                   </div>
@@ -453,11 +764,16 @@ export default function ChangeService({
                     onClick={() => {
                       setDeleteMode(false);
                     }}
+                    disabled={inAPIRequest}
                   >
                     {text.no}
                   </button>
-                  <button type="submit" className={styles.saveButton}>
-                    {text.yes}
+                  <button
+                    type="submit"
+                    className={styles.saveButton}
+                    disabled={inAPIRequest}
+                  >
+                    {inAPIRequest ? text.deleting : text.yes}
                   </button>
                 </div>
               </form>
@@ -471,6 +787,15 @@ export default function ChangeService({
                     style={{ zIndex: "1001" }}
                   ></div>
                 </>
+              )}
+              {showFailMessage && (
+                <div className="failMessageWrapper">
+                  <div className="failMessage">
+                    {lang === "en"
+                      ? "Request failed.Please try again later."
+                      : "ጥያቄዎን ማስተናገድ አልተቻለም። እባክዎን እንደገና ይሞክሩ።"}
+                  </div>
+                </div>
               )}
             </>
           )

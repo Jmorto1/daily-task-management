@@ -11,6 +11,8 @@ import LoginPage from "./pages/Login";
 import Dashboard from "./pages/dashboard";
 import LoadingPage from "./pages/loading";
 import { useAppData } from "./hooks/useAppData";
+import ForgotPasswordForm from "./pages/forgetPassword";
+import ResetPasswordForm from "./pages/resetPassword";
 function AppRoutes() {
   const { isLoggedIn, setIsLoggedIn, loading, serverAddress } = useAppData();
   useEffect(() => {
@@ -62,6 +64,14 @@ function AppRoutes() {
     {
       path: "/login",
       element: isLoggedIn ? <Navigate to="/dashboard" /> : <LoginPage />,
+    },
+    {
+      path: "/forgot-password",
+      element: <ForgotPasswordForm />,
+    },
+    {
+      path: "/reset-password/:uid/:token",
+      element: <ResetPasswordForm />,
     },
     {
       path: "/",

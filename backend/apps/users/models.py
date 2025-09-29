@@ -1,4 +1,4 @@
-import uuid
+
 import os
 from django.db import models
 from django.contrib.auth.models import AbstractUser, BaseUserManager
@@ -48,7 +48,7 @@ class User(AbstractUser):
     username = models.CharField(max_length=150, unique=False, blank=True, null=True)
     
     # Make email optional since we're using phone number as primary identifier
-    email = models.EmailField(blank=True, null=True)
+    email = models.EmailField(unique=True,blank=True, null=True)
     
     # Custom fields
     name_am = models.TextField()

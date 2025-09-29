@@ -13,8 +13,8 @@ import styles from "../styles/SignupPage.module.css";
 import { useLang } from "../hooks/useLang";
 import Select from "react-select";
 import type { SingleValue } from "react-select";
-import singupAm from "../locates/amharic/singup.json";
-import singupEn from "../locates/english/singup.json";
+import singupAm from "../locates/amharic/signup.json";
+import singupEn from "../locates/english/signup.json";
 import { useAppData } from "../hooks/useAppData";
 import type { Department } from "../context/appDataContext";
 type DeptOption = {
@@ -25,6 +25,7 @@ type DeptOption = {
 export default function SignupPage() {
   const { departments, serverAddress } = useAppData();
   const { lang } = useLang();
+  const [inAPIRequest, setInAPIRequest] = useState(false);
   const translate = {
     am: singupAm,
     en: singupEn,
@@ -40,6 +41,7 @@ export default function SignupPage() {
     name: { am: "", en: "" },
     department: null as Department | null,
     phoneNumber: "",
+    email: "",
     password: "",
     confirmPassword: "",
   };
@@ -52,12 +54,14 @@ export default function SignupPage() {
     nameEn: "",
     department: "",
     phoneNumber: "",
+    email: "",
     password: "",
     confirmPassword: "",
   });
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [showFailMessage, setShowFailMessage] = useState<boolean>(false);
   const [phoneExists, setPhoneExists] = useState(false);
+  const [emailExists, setEmailExists] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
@@ -95,6 +99,14 @@ export default function SignupPage() {
       valid = false;
     } else if (!/^\d{10}$/.test(formData.phoneNumber)) {
       errors.phoneNumber = text.invalidPhone;
+      valid = false;
+    }
+    if (!formData.email.trim()) {
+      (errors.email = text.emailError), (valid = false);
+    } else if (
+      !/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(formData.email)
+    ) {
+      errors.email = text.invalidEmail;
       valid = false;
     }
     if (!formData.password.trim()) {
@@ -138,10 +150,12 @@ export default function SignupPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (validate()) {
+      setInAPIRequest(true);
       try {
         const user = {
           name: formData.name,
           phone_number: formData.phoneNumber.trim(),
+          email: formData.email,
           department_id: formData.department?.id,
           password: formData.password.trim(),
           status: "pending",
@@ -163,11 +177,14 @@ export default function SignupPage() {
           console.error(data.errors);
           if (data.field === "phone_number") {
             setPhoneExists(true);
+          } else if (data.field === "email") {
+            setEmailExists(true);
           }
           setShowFailMessage(true);
           setTimeout(() => {
             setShowFailMessage(false);
             setPhoneExists(false);
+            setEmailExists(false);
           }, 3000);
         }
       } catch (error) {
@@ -176,6 +193,8 @@ export default function SignupPage() {
         setTimeout(() => {
           setShowFailMessage(false);
         }, 3000);
+      } finally {
+        setInAPIRequest(false);
       }
     }
   }
@@ -250,7 +269,22 @@ export default function SignupPage() {
           {formErrors.phoneNumber && (
             <span className={styles.error}>{formErrors.phoneNumber}</span>
           )}
-
+          {/* email */}
+          <div className={styles.inputGroup}>
+            <span className={styles.inputIcon}>
+              <FaPhone />
+            </span>
+            <input
+              type="email"
+              name="email"
+              placeholder={text.email}
+              value={formData.email}
+              onChange={handleChange}
+            />
+          </div>
+          {formErrors.email && (
+            <span className={styles.error}>{formErrors.email}</span>
+          )}
           {/* Department */}
           <div className={styles.inputGroup}>
             <span className={styles.selectIcon}>
@@ -348,7 +382,7 @@ export default function SignupPage() {
           )}
 
           <button type="submit" className={styles.signupButton}>
-            {text.signup}
+            {!inAPIRequest ? text.signup : text.signingup}
           </button>
           {showSuccessMessage && (
             <>
@@ -361,10 +395,14 @@ export default function SignupPage() {
           {showFailMessage && (
             <div className="failMessageWrapper">
               <div className="failMessage">
-                {phoneExists
-                  ? lang === "en"
-                    ? "User with this phone number already exists.Please change the Phone number"
-                    : "በዚህ ስልክ ቁጥር የተከፈተ አካውንት አለ።እባክዎ ስልኩን ይቀይሩ።"
+                {phoneExists || emailExists
+                  ? phoneExists
+                    ? lang === "en"
+                      ? "User with this phone number already exists.Please change the Phone number"
+                      : "በዚህ ስልክ ቁጥር የተከፈተ አካውንት አለ።እባክዎ ስልኩን ይቀይሩ።"
+                    : lang === "en"
+                    ? "User with this Email already exists.Please change the Email"
+                    : "በዚህ ኢሜል የተከፈተ አካውንት አለ።እባክዎ ኢሜሉን ይቀይሩ።"
                   : lang === "en"
                   ? "Request failed.Please try again later."
                   : "ጥያቄዎን ማስተናገድ አልተቻለም። እባክዎን እንደገና ይሞክሩ።"}

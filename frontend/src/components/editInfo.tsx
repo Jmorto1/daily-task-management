@@ -23,6 +23,7 @@ type FormData = {
     am: string;
     en: string;
   };
+  email: string;
   phone_number: string;
 };
 type FormError = FormData;
@@ -39,6 +40,7 @@ const emptyError: FormError = {
     am: "",
     en: "",
   },
+  email: "",
   phone_number: "",
 };
 export default function EditInfo({ prevView, setActiveView }: propsType) {
@@ -47,6 +49,8 @@ export default function EditInfo({ prevView, setActiveView }: propsType) {
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [showFailMessage, setShowFailMessage] = useState<boolean>(false);
   const [phoneExists, setPhoneExists] = useState(false);
+  const [emailExists, setEmailExists] = useState(false);
+  const [inAPIRequest, setInAPIRequest] = useState(false);
   const translate = { am: amEditInfo, en: enEditInfo };
   const text = translate[lang];
 
@@ -57,6 +61,7 @@ export default function EditInfo({ prevView, setActiveView }: propsType) {
       en: user.profession.en,
     },
     office: { am: user.office.am, en: user.office.en },
+    email: user.email,
     phone_number: user.phone_number,
   });
 
@@ -134,6 +139,7 @@ export default function EditInfo({ prevView, setActiveView }: propsType) {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (validate()) {
+      setInAPIRequest(true);
       try {
         const data = { ...formData, id: user.id };
         const response = await fetch(`${serverAddress}/users/`, {
@@ -153,10 +159,13 @@ export default function EditInfo({ prevView, setActiveView }: propsType) {
           const data = await response.json();
           if (data.field === "phone_number") {
             setPhoneExists(true);
+          } else if (data.field === "email") {
+            setEmailExists(true);
           }
           setShowFailMessage(true);
           setTimeout(() => {
             setPhoneExists(false);
+            setEmailExists(false);
             setShowFailMessage(false);
           }, 3000);
         }
@@ -166,6 +175,8 @@ export default function EditInfo({ prevView, setActiveView }: propsType) {
         setTimeout(() => {
           setShowFailMessage(false);
         }, 3000);
+      } finally {
+        setInAPIRequest(false);
       }
       setShowSuccessMessage(true);
       setTimeout(() => {
@@ -272,6 +283,19 @@ export default function EditInfo({ prevView, setActiveView }: propsType) {
             </div>
           </div>
         </div>
+        {/* email */}
+        <div className={styles.fieldGroup}>
+          <label className={styles.label}>{text.email}</label>
+          <input
+            value={formData.email}
+            onChange={(e) => handleChange("email", e.target.value)}
+            className={`${styles.input} ${styles.phoneNo}`}
+            type="email"
+          />
+          {formErrors.email && (
+            <div className={styles.error}>{formErrors.email}</div>
+          )}
+        </div>
         {/* Phone */}
         <div className={styles.fieldGroup}>
           <label className={styles.label}>{text.phoneNo}</label>
@@ -285,17 +309,21 @@ export default function EditInfo({ prevView, setActiveView }: propsType) {
             <div className={styles.error}>{formErrors.phone_number}</div>
           )}
         </div>
-
         <div className={styles.actions}>
           <button
             type="button"
             className={styles.cancelbtn}
             onClick={() => setActiveView(prevView)}
+            disabled={inAPIRequest}
           >
             {text.cancel}
           </button>
-          <button type="submit" className={styles.savebtn}>
-            {text.save}
+          <button
+            type="submit"
+            className={styles.savebtn}
+            disabled={inAPIRequest}
+          >
+            {!inAPIRequest ? text.save : text.saving}
           </button>
         </div>
       </form>
@@ -310,10 +338,14 @@ export default function EditInfo({ prevView, setActiveView }: propsType) {
       {showFailMessage && (
         <div className="failMessageWrapper">
           <div className="failMessage">
-            {phoneExists
-              ? lang === "en"
-                ? "User with this phone number already exists.Please change the Phone number"
-                : "በዚህ ስልክ ቁጥር የተከፈተ አካውንት አለ።እባክዎ ስልኩን ይቀይሩ።"
+            {phoneExists || emailExists
+              ? phoneExists
+                ? lang === "en"
+                  ? "User with this phone number already exists.Please change the Phone number"
+                  : "በዚህ ስልክ ቁጥር የተከፈተ አካውንት አለ።እባክዎ ስልኩን ይቀይሩ።"
+                : lang === "en"
+                ? "User with this Email already exists.Please change the Email"
+                : "በዚህ ኢሜል የተከፈተ አካውንት አለ።እባክዎ ኢሜሉን ይቀይሩ።"
               : lang === "en"
               ? "Request failed.Please try again later."
               : "ጥያቄዎን ማስተናገድ አልተቻለም። እባክዎን እንደገና ይሞክሩ።"}

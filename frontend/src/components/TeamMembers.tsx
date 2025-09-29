@@ -6,146 +6,11 @@ import teammemberEn from "../locates/english/teamMember.json";
 import { FiMoreVertical, FiEye, FiPlus } from "react-icons/fi";
 import { useIsMoblie } from "../hooks/useIsMobile";
 import PasswordAuth from "./subComponent/passwordAuth";
-
-type Male = {
-  am: string;
-  en: string;
-};
-
-type Female = {
-  am: string;
-  en: string;
-};
-type Employee = {
-  id: string;
-  name: {
-    en: string;
-    am: string;
-  };
-  phone: string;
-  gender: Male | Female;
-  profession: {
-    am: string;
-    en: string;
-  };
-};
-
-type Service = {
-  id: string;
-  name: {
-    am: string;
-    en: string;
-  };
-  employeeIDs: string[];
-};
-
-const employees: Employee[] = [
-  {
-    id: "e1",
-    name: { en: "John Smith", am: "ጆን ስሚዝ" },
-    phone: "0911000001",
-    gender: { en: "Male", am: "ወንድ" },
-    profession: { en: "Team Leader", am: "ቡድን አለቃ" },
-  },
-  {
-    id: "e2",
-    name: { en: "Sara Tesfaye", am: "ሳራ ተስፋዬ" },
-    phone: "0911000002",
-    gender: { en: "Female", am: "ሴት" },
-    profession: { en: "Cleaner", am: "አጽዳቂ" },
-  },
-  {
-    id: "e3",
-    name: { en: "Michael Alemu", am: "ሚካኤል አለሙ" },
-    phone: "0911000003",
-    gender: { en: "Male", am: "ወንድ" },
-    profession: { en: "Gardener", am: "አትክልተኛ" },
-  },
-  {
-    id: "e4",
-    name: { en: "Hana Bekele", am: "ሀና በቀለ" },
-    phone: "0911000004",
-    gender: { en: "Female", am: "ሴት" },
-    profession: { en: "Electrician", am: "ኤሌክትሪክ ባለሙያ" },
-  },
-  {
-    id: "e5",
-    name: { en: "Daniel Fikru", am: "ዳንኤል ፍቅሩ" },
-    phone: "0911000005",
-    gender: { en: "Male", am: "ወንድ" },
-    profession: { en: "Plumber", am: "የቧንቧ ሰሪ" },
-  },
-  {
-    id: "e6",
-    name: { en: "Marta Gebre", am: "ማርታ ገብረ" },
-    phone: "0911000006",
-    gender: { en: "Female", am: "ሴት" },
-    profession: { en: "Security Guard", am: "የደህንነት ጠባቂ" },
-  },
-  {
-    id: "e7",
-    name: { en: "Kebede Mekonnen", am: "ከበደ መኮንን" },
-    phone: "0911000007",
-    gender: { en: "Male", am: "ወንድ" },
-    profession: { en: "Driver", am: "አሽከርካሪ" },
-  },
-  {
-    id: "e8",
-    name: { en: "Selamawit Girma", am: "ሰላማዊት ግርማ" },
-    phone: "0911000008",
-    gender: { en: "Female", am: "ሴት" },
-    profession: { en: "Cook", am: "በጋራ" },
-  },
-  {
-    id: "e9",
-    name: { en: "Abel Yohannes", am: "አቤል ዮሐንስ" },
-    phone: "0911000009",
-    gender: { en: "Male", am: "ወንድ" },
-    profession: { en: "Technician", am: "ቴክኒሻን" },
-  },
-  {
-    id: "e10",
-    name: { en: "Lily Worku", am: "ሊሊ ወርቁ" },
-    phone: "0911000010",
-    gender: { en: "Female", am: "ሴት" },
-    profession: { en: "Janitor", am: "ቤት አጽዳቂ" },
-  },
-];
-const services: Service[] = [
-  {
-    id: "s1",
-    name: { en: "Cleaning", am: "ንጽህና" },
-    employeeIDs: ["e1", "e2", "e10"],
-  },
-  {
-    id: "s2",
-    name: { en: "Gardening", am: "አትክልት" },
-    employeeIDs: ["e1", "e3"],
-  },
-  {
-    id: "s3",
-    name: { en: "Electrical Maintenance", am: "ኤሌክትሪክ ጥገና" },
-    employeeIDs: ["e4", "e9"],
-  },
-  {
-    id: "s4",
-    name: { en: "Plumbing", am: "የቧንቧ" },
-    employeeIDs: ["e5"],
-  },
-  {
-    id: "s5",
-    name: { en: "Security", am: "ደህንነት" },
-    employeeIDs: ["e6", "e7"],
-  },
-  {
-    id: "s6",
-    name: { en: "Cooking & Food Service", am: "ምግብ አሰራር" },
-    employeeIDs: ["e8"],
-  },
-];
-
+import type { Service, User } from "../context/appDataContext";
+import { useAppData } from "../hooks/useAppData";
 export default function TeamMembers() {
-  const { lang, setLang } = useLang();
+  const { employees, services, setServices, serverAddress } = useAppData();
+  const { lang } = useLang();
   const translate = {
     am: teamMemberAm,
     en: teammemberEn,
@@ -154,49 +19,150 @@ export default function TeamMembers() {
   const isMobile = useIsMoblie(960);
   const [passwordAuth, setPasswordAuth] = useState<boolean>(false);
   const [showSuccessMessage, setShowSuccessMessage] = useState<boolean>(false);
+  const [showFailMessage, setShowFailMessage] = useState<boolean>(false);
+  const [submitType, setSubmitType] = useState("");
   const [actionDropdown, setActionDropdown] = useState<string | null>(null);
-  const [assignService, setAssignService] = useState<Employee | null>(null);
-  const [selectedServices, setSelectedServices] = useState<string[]>([]);
-  const [seeService, SetSeeService] = useState<Employee | null>(null);
+  const [assignService, setAssignService] = useState<User | null>(null);
+  const [selectedServices, setSelectedServices] = useState<number[]>([]);
+  const [seeService, SetSeeService] = useState<User | null>(null);
   const [deleteService, setDeleteService] = useState<{
     service: Service;
-    employee: Employee;
+    employee: User;
   } | null>(null);
   const filteredServices = (): Service[] => {
     if (assignService) {
       return services.filter(
-        (service) => !service.employeeIDs.includes(assignService.id)
+        (service) => !service.user_ids.includes(assignService.id)
       );
     } else if (seeService) {
       return services.filter((service) =>
-        service.employeeIDs.includes(seeService.id)
+        service.user_ids.includes(seeService.id)
       );
     }
     return [];
   };
-  const handleCheckboxChange = (serviceId: string) => {
+  const handleCheckboxChange = (serviceId: number) => {
     setSelectedServices((prev) =>
       prev.includes(serviceId)
         ? prev.filter((id) => id !== serviceId)
         : [...prev, serviceId]
     );
   };
+
+  //close panels
+  const closeAssignServicePanel = () => {
+    setSelectedServices([]);
+    setAssignService(null);
+  };
   const handleAssignSubmit = (e: FormEvent) => {
     e.preventDefault();
+    setSubmitType("assignService");
     setPasswordAuth(true);
   };
+  async function handleAssignServiceApi() {
+    if (assignService) {
+      try {
+        const putData = {
+          user_id: assignService.id,
+          service_ids: selectedServices,
+        };
+        const response = await fetch(`${serverAddress}/assignServices/`, {
+          method: "PUT",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(putData),
+        });
+
+        if (response.ok) {
+          setServices((prev) =>
+            prev.map((service) => {
+              if (selectedServices.includes(service.id)) {
+                return {
+                  ...service,
+                  user_ids: [...service.user_ids, assignService.id],
+                };
+              }
+              return service;
+            })
+          );
+          setShowSuccessMessage(true);
+          setTimeout(() => {
+            closeAssignServicePanel();
+            setShowSuccessMessage(false);
+          }, 3000);
+        } else {
+          setShowFailMessage(true);
+          setTimeout(() => {
+            setShowFailMessage(false);
+          }, 3000);
+        }
+      } catch (error) {
+        console.error("error:", error);
+        setShowFailMessage(true);
+        setTimeout(() => {
+          setShowFailMessage(false);
+        }, 3000);
+      }
+    }
+  }
   const handleDeleteServiceSubmit = (e: FormEvent) => {
     e.preventDefault();
+    setSubmitType("deleteService");
     setPasswordAuth(true);
   };
+  async function handleDeleteServiceApi() {
+    if (deleteService) {
+      try {
+        const putData = {
+          user_id: deleteService.employee.id,
+          service_ids: [deleteService.service.id],
+        };
+
+        const response = await fetch(`${serverAddress}/removeServices/`, {
+          method: "PUT",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(putData),
+        });
+
+        if (response.ok) {
+          setServices((prev) =>
+            prev.map((service) => {
+              if (deleteService.service.id === service.id) {
+                return {
+                  ...service,
+                  user_ids: service.user_ids.filter(
+                    (id) => id !== deleteService.employee.id
+                  ),
+                };
+              }
+              return service;
+            })
+          );
+          setShowSuccessMessage(true);
+          setTimeout(() => {
+            setDeleteService(null);
+            setShowSuccessMessage(false);
+          }, 3000);
+        } else {
+          setShowFailMessage(true);
+          setTimeout(() => setShowFailMessage(false), 3000);
+        }
+      } catch (error) {
+        console.error("error:", error);
+        setShowFailMessage(true);
+        setTimeout(() => setShowFailMessage(false), 3000);
+      }
+    }
+  }
   const handleAuthResult = (success: boolean) => {
     if (success) {
-      setPasswordAuth(false);
-      setShowSuccessMessage(true);
-      setTimeout(() => {
-        setShowSuccessMessage(false);
-        setDeleteService(null);
-      }, 3000);
+      if (submitType === "assignService") {
+        handleAssignServiceApi();
+      } else if (submitType === "deleteService") {
+        handleDeleteServiceApi();
+      }
+      setSubmitType("");
     } else {
       return;
     }
@@ -233,7 +199,7 @@ export default function TeamMembers() {
             </div>
             <div>
               <div>{text.phoneNo}</div>
-              <div>{emp.phone}</div>
+              <div>{emp.phone_number}</div>
             </div>
             <div>
               <div>{text.gender}</div>
@@ -300,7 +266,7 @@ export default function TeamMembers() {
               <tr key={emp.id}>
                 <td>{idx + 1}</td>
                 <td>{emp.name[lang]}</td>
-                <td>{emp.phone}</td>
+                <td>{emp.phone_number}</td>
                 <td>{emp.gender[lang]}</td>
                 <td>{emp.profession[lang]}</td>
                 <td
@@ -443,6 +409,15 @@ export default function TeamMembers() {
                 <div className="overlay" style={{ zIndex: "1001" }}></div>
               </>
             )}
+            {showFailMessage && (
+              <div className="failMessageWrapper">
+                <div className="failMessage">
+                  {lang === "en"
+                    ? "Request failed.Please try again later."
+                    : "ጥያቄዎን ማስተናገድ አልተቻለም። እባክዎን እንደገና ይሞክሩ።"}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -574,6 +549,15 @@ export default function TeamMembers() {
                             style={{ zIndex: "1001" }}
                           ></div>
                         </>
+                      )}
+                      {showFailMessage && (
+                        <div className="failMessageWrapper">
+                          <div className="failMessage">
+                            {lang === "en"
+                              ? "Request failed.Please try again later."
+                              : "ጥያቄዎን ማስተናገድ አልተቻለም። እባክዎን እንደገና ይሞክሩ።"}
+                          </div>
+                        </div>
                       )}
                     </div>
                   </div>

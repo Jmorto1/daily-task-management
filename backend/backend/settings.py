@@ -42,6 +42,10 @@ INSTALLED_APPS = [
     "apps.users",
     "apps.departments",
     "apps.teams",
+    "apps.services",
+    "apps.subServices",
+    "apps.activities",
+    "apps.reports",
     "rest_framework",
     "corsheaders",
     "rest_framework_simplejwt",
@@ -152,7 +156,7 @@ AUTHENTICATION_BACKENDS = [
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
-    "http://10.243.121.154:5173"
+    "http://192.168.1.131:5173"
 ]
 
 CORS_ALLOW_CREDENTIALS = True
@@ -182,3 +186,12 @@ SIMPLE_JWT = {
 }
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+# EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"      (for production)
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = "yealembirhanu33@gmail.com"   # Your email
+EMAIL_HOST_PASSWORD = "hbsp hqfe lfsi akml" # Generated App Password if 2FA is on
+DEFAULT_FROM_EMAIL = "usersupport <yealembirhanu33@gmail.com>"
+

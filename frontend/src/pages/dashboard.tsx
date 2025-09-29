@@ -255,20 +255,17 @@ export default function Dashboard() {
                     {text.teamMember}
                   </li>
                 )}
-                {user.role === "admin" ||
-                  (user.role === "teamLeader" && (
-                    <li
-                      onClick={() => {
-                        setActiveView("report");
-                      }}
-                      className={
-                        activeView === "report" ? styles.activebtn : ""
-                      }
-                    >
-                      <FaFileAlt className={styles.icons} />
-                      {text.reports}
-                    </li>
-                  ))}
+                {(user.role === "admin" || user.role === "teamLeader") && (
+                  <li
+                    onClick={() => {
+                      setActiveView("report");
+                    }}
+                    className={activeView === "report" ? styles.activebtn : ""}
+                  >
+                    <FaFileAlt className={styles.icons} />
+                    {text.reports}
+                  </li>
+                )}
                 {user.role === "admin" && (
                   <li
                     onClick={() => {

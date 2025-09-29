@@ -7,6 +7,7 @@
     "date":"Date",
     "cancel":"Cancel",
     "save":"Save",
+    "saving":"Saving...",
     "nameAmError":"የአገልግሎት ስም ያስፈልጋል::",
     "nameEnError":"Service name is required.",
     "freqError":"Frequency must be at least 1.",

@@ -12,33 +12,21 @@ import tasksReportAm from "../../locates/amharic/tasksReport.json";
 import tasksReportEn from "../../locates/english/tasksReport.json";
 import type { TeamUserOption } from "../report";
 import { useAppData } from "../../hooks/useAppData";
+import type {
+  AdditionalReport,
+  ReportActivity,
+  StandardReport,
+} from "../../context/appDataContext";
+import EthiopianCalendar from "./ethioCalander";
+import {
+  gregorianToEthiopian,
+  ETHIOPIAN_MONTHS,
+  formatEthDate,
+} from "../../actions/dataConverter";
 interface tasksReportProps {
   parent: "report" | "myTask";
   selectedTeamUser?: TeamUserOption | null;
 }
-type Activity = {
-  id: string;
-  name: { en: string; am: string };
-  quality?: string;
-  frequency: string;
-  startingTime: string;
-  endingTime: string;
-  totalHour: string;
-  date: string;
-};
-type SubService = {
-  id: string;
-  name: { en: string; am: string };
-  quality: string;
-  activities: Activity[];
-};
-
-type StandardService = {
-  id: string;
-  name: { en: string; am: string };
-  quality: string;
-  subServices: SubService[];
-};
 type pdfDataFormat = {
   serviceName: string;
   subServiceName: string;
@@ -54,387 +42,23 @@ type pdfDataFormat = {
   avgActQlt: string;
   avgsubServiceQlt: string;
 };
-const standardServices: StandardService[] | null = [
-  {
-    id: "s1",
-    name: { en: "Cleaning Service", am: "ንጹህ አገልግሎት" },
-    quality: "90%",
-    subServices: [
-      {
-        id: "ss1",
-        name: { en: "Floor Cleaning", am: "የአፈር ንጹህነት" },
-        quality: "85%",
-        activities: [
-          {
-            id: "a1",
-            name: { en: "Sweeping", am: "ማስወገጃ" },
-            quality: "85%",
-            frequency: "3",
-            startingTime: "08:00",
-            endingTime: "09:00",
-            totalHour: "1",
-            date: "2025-08-01",
-          },
-          {
-            id: "a2",
-            name: { en: "Mopping", am: "መጠጥ ማድረግ" },
-            quality: "90%",
-            frequency: "3",
-            startingTime: "09:30",
-            endingTime: "10:30",
-            totalHour: "1",
-            date: "2025-08-02",
-          },
-          {
-            id: "a3",
-            name: { en: "Vacuuming", am: "መሳሪያ ማጠብ" },
-            quality: "95%",
-            frequency: "3",
-            startingTime: "11:00",
-            endingTime: "12:00",
-            totalHour: "1",
-            date: "2025-08-03",
-          },
-          {
-            id: "a4",
-            name: { en: "Dusting", am: "ንጹህ ማድረግ" },
-            quality: "88%",
-            frequency: "3",
-            startingTime: "13:00",
-            endingTime: "14:00",
-            totalHour: "1",
-            date: "2025-08-04",
-          },
-          {
-            id: "a5",
-            name: { en: "Sanitizing", am: "መጠጥ ማድረግ" },
-            quality: "92%",
-            frequency: "3",
-            startingTime: "14:30",
-            endingTime: "15:30",
-            totalHour: "1",
-            date: "2025-08-05",
-          },
-        ],
-      },
-      {
-        id: "ss2",
-        name: { en: "Window Cleaning", am: "መስኮት ንጹህነት" },
-        quality: "88%",
-        activities: [
-          {
-            id: "a6",
-            name: { en: "Interior Windows", am: "የውስጥ መስኮቶች" },
-            quality: "90%",
-            frequency: "2",
-            startingTime: "08:00",
-            endingTime: "09:00",
-            totalHour: "1",
-            date: "2025-08-01",
-          },
-          {
-            id: "a7",
-            name: { en: "Exterior Windows", am: "የውጭ መስኮቶች" },
-            quality: "85%",
-            frequency: "2",
-            startingTime: "09:30",
-            endingTime: "10:30",
-            totalHour: "1",
-            date: "2025-08-02",
-          },
-          {
-            id: "a8",
-            name: { en: "Glass Polishing", am: "የብረት ማቀነባበር" },
-            quality: "92%",
-            frequency: "2",
-            startingTime: "11:00",
-            endingTime: "12:00",
-            totalHour: "1",
-            date: "2025-08-03",
-          },
-          {
-            id: "a9",
-            name: { en: "Frame Cleaning", am: "የመስኮት መስመር" },
-            quality: "87%",
-            frequency: "2",
-            startingTime: "13:00",
-            endingTime: "14:00",
-            totalHour: "1",
-            date: "2025-08-04",
-          },
-          {
-            id: "a10",
-            name: { en: "Screen Cleaning", am: "የማስከፊያ ንጹህነት" },
-            quality: "89%",
-            frequency: "2",
-            startingTime: "14:30",
-            endingTime: "15:30",
-            totalHour: "1",
-            date: "2025-08-05",
-          },
-        ],
-      },
-      {
-        id: "ss3",
-        name: { en: "Office Cleaning", am: "የጽ/ቤት ንጹህነት" },
-        quality: "91%",
-        activities: [
-          {
-            id: "a11",
-            name: { en: "Desk Cleaning", am: "የጽ/ቤት ዴስክ ንጹህነት" },
-            quality: "93%",
-            frequency: "3",
-            startingTime: "08:00",
-            endingTime: "09:00",
-            totalHour: "01:00",
-            date: "2025-08-01",
-          },
-          {
-            id: "a12",
-            name: { en: "Trash Removal", am: "ትራሽ ማስወገጃ" },
-            quality: "90%",
-            frequency: "3",
-            startingTime: "09:30",
-            endingTime: "10:30",
-            totalHour: "1",
-            date: "2025-08-02",
-          },
-          {
-            id: "a13",
-            name: { en: "Chair Cleaning", am: "የወንበር ንጹህነት" },
-            quality: "88%",
-            frequency: "3",
-            startingTime: "11:00",
-            endingTime: "12:00",
-            totalHour: "1",
-            date: "2025-08-03",
-          },
-          {
-            id: "a14",
-            name: { en: "Floor Polishing", am: "የአፈር ማቀነባበር" },
-            quality: "92%",
-            frequency: "3",
-            startingTime: "13:00",
-            endingTime: "14:00",
-            totalHour: "1",
-            date: "2025-08-04",
-          },
-          {
-            id: "a15",
-            name: { en: "Sanitizer Refill", am: "የመጠጥ መሙላት" },
-            quality: "95%",
-            frequency: "3",
-            startingTime: "14:30",
-            endingTime: "15:30",
-            totalHour: "1",
-            date: "2025-08-05",
-          },
-        ],
-      },
-      {
-        id: "ss4",
-        name: { en: "Restroom Cleaning", am: "የምታገስባት ቤት ንጹህነት" },
-        quality: "87%",
-        activities: [
-          {
-            id: "a16",
-            name: { en: "Toilet Cleaning", am: "ሽንት ቤት ንጹህነት" },
-            quality: "88%",
-            frequency: "3",
-            startingTime: "08:00",
-            endingTime: "09:00",
-            totalHour: "1",
-            date: "2025-08-01",
-          },
-          {
-            id: "a17",
-            name: { en: "Urinal Cleaning", am: "የሁሉም ሽንት ቤት" },
-            quality: "85%",
-            frequency: "3",
-            startingTime: "09:30",
-            endingTime: "10:30",
-            totalHour: "1",
-            date: "2025-08-02",
-          },
-          {
-            id: "a18",
-            name: { en: "Sink Cleaning", am: "የምስኪን ንጹህነት" },
-            quality: "90%",
-            frequency: "3",
-            startingTime: "11:00",
-            endingTime: "12:00",
-            totalHour: "1",
-            date: "2025-08-03",
-          },
-          {
-            id: "a19",
-            name: { en: "Mirror Cleaning", am: "መስኮት ንጹህነት" },
-            quality: "92%",
-            frequency: "3",
-            startingTime: "13:00",
-            endingTime: "14:00",
-            totalHour: "1",
-            date: "2025-08-04",
-          },
-          {
-            id: "a20",
-            name: { en: "Hand Dryer Cleaning", am: "የእጅ ማጠቢያ ንጹህነት" },
-            quality: "89%",
-            frequency: "3",
-            startingTime: "14:30",
-            endingTime: "15:30",
-            totalHour: "1",
-            date: "2025-08-05",
-          },
-        ],
-      },
-    ],
-  },
-];
-
-const additionalActivities: Activity[] | null = [
-  {
-    id: "aa1",
-    name: { en: "Pest Control", am: "የእንስሳት መቆጣጠሪያ" },
-    frequency: "1",
-    startingTime: "09:00",
-    endingTime: "11:00",
-    totalHour: "2",
-    date: "2025-08-01",
-  },
-  {
-    id: "aa2",
-    name: { en: "Garden Maintenance", am: "የአትክልት አንድ አገልግሎት" },
-    frequency: "2",
-    startingTime: "07:00",
-    endingTime: "09:00",
-    totalHour: "2",
-    date: "2025-08-02",
-  },
-  {
-    id: "aa3",
-    name: { en: "IT Equipment Check", am: "የአይቲ መሳሪያ ምርመራ" },
-    frequency: "2",
-    startingTime: "10:00",
-    endingTime: "12:00",
-    totalHour: "2",
-    date: "2025-08-03",
-  },
-  {
-    id: "aa4",
-    name: { en: "Electricity Check", am: "የኤሌክትሪክ ምርመራ" },
-    frequency: "1",
-    startingTime: "08:00",
-    endingTime: "10:00",
-    totalHour: "2",
-    date: "2025-08-04",
-  },
-  {
-    id: "aa5",
-    name: { en: "Water System Check", am: "የውሃ ስርዓት ምርመራ" },
-    frequency: "1",
-    startingTime: "11:00",
-    endingTime: "13:00",
-    totalHour: "2",
-    date: "2025-08-05",
-  },
-  {
-    id: "aa6",
-    name: { en: "Air Conditioning Maintenance", am: "የኤር ኮንዲሽነር አገልግሎት" },
-    frequency: "1",
-    startingTime: "14:00",
-    endingTime: "16:00",
-    totalHour: "2",
-    date: "2025-08-06",
-  },
-  {
-    id: "aa7",
-    name: { en: "Fire Safety Check", am: "የእሳት ደህንነት ምርመራ" },
-    frequency: "1",
-    startingTime: "09:00",
-    endingTime: "11:00",
-    totalHour: "2",
-    date: "2025-08-07",
-  },
-  {
-    id: "aa8",
-    name: { en: "Parking Lot Cleaning", am: "የመኪና ቦታ ንጹህነት" },
-    frequency: "2",
-    startingTime: "07:00",
-    endingTime: "09:00",
-    totalHour: "2",
-    date: "2025-08-08",
-  },
-  {
-    id: "aa9",
-    name: { en: "Document Filing", am: "የሰነድ ማደራጃ" },
-    frequency: "3",
-    startingTime: "08:00",
-    endingTime: "10:00",
-    totalHour: "2",
-    date: "2025-08-09",
-  },
-  {
-    id: "aa10",
-    name: { en: "Inventory Check", am: "የእቃ ምርመራ" },
-    frequency: "2",
-    startingTime: "10:00",
-    endingTime: "12:00",
-    totalHour: "2",
-    date: "2025-08-10",
-  },
-  {
-    id: "aa11",
-    name: { en: "CCTV Monitoring", am: "የስልክ ካሜራ እና ተመልከት" },
-    frequency: "3",
-    startingTime: "09:00",
-    endingTime: "11:00",
-    totalHour: "2",
-    date: "2025-08-01",
-  },
-  {
-    id: "aa12",
-    name: { en: "Signage Maintenance", am: "የምልክት እና መግለጫ አገልግሎት" },
-    frequency: "1",
-    startingTime: "14:00",
-    endingTime: "16:00",
-    totalHour: "2",
-    date: "2025-08-02",
-  },
-  {
-    id: "aa13",
-    name: { en: "Printer Maintenance", am: "የቅርጸ-ተነባባ መተንበያ አገልግሎት" },
-    frequency: "2",
-    startingTime: "11:00",
-    endingTime: "13:00",
-    totalHour: "2",
-    date: "2025-08-03",
-  },
-  {
-    id: "aa14",
-    name: { en: "Conference Room Setup", am: "የኮንፈረንስ ክፍል አሰራር" },
-    frequency: "3",
-    startingTime: "08:00",
-    endingTime: "10:00",
-    totalHour: "2",
-    date: "2025-08-04",
-  },
-  {
-    id: "aa15",
-    name: { en: "Mail Distribution", am: "የፖስታ መደርሰያ" },
-    frequency: "3",
-    startingTime: "09:00",
-    endingTime: "10:00",
-    totalHour: "1",
-    date: "2025-08-05",
-  },
-];
 
 export default function TaskReport({
   parent,
   selectedTeamUser,
 }: tasksReportProps) {
-  const { profileImage } = useAppData();
+  const {
+    standardReports,
+    setStandardReports,
+    additionalReports,
+    setAdditionalReports,
+    profileImage,
+    employees,
+    user,
+    serverAddress,
+    services,
+  } = useAppData();
+
   const today = new Date();
   const { lang } = useLang();
   const translate = {
@@ -443,6 +67,8 @@ export default function TaskReport({
   };
   const text = translate[lang];
   const [actionDropdown, setActionDropdown] = useState<string | null>(null);
+  const [showFailMessage, setShowFailMessage] = useState<boolean>(false);
+  const [inAPIRequest, setInAPIRequest] = useState<boolean>(false);
   const [initialDate, setInitialDate] = useState(() => {
     const d = new Date(today);
     d.setDate(d.getDate());
@@ -452,16 +78,16 @@ export default function TaskReport({
     () => today.toISOString().split("T")[0]
   );
   const [filteredStandardServices, setFilteredStandardServices] = useState<
-    StandardService[] | null
-  >(standardServices);
+    StandardReport[] | null
+  >(standardReports);
   const [filteredAdditionalServices, setFilteredAdditionalServices] = useState<
-    Activity[] | null
-  >(additionalActivities);
+    AdditionalReport[] | null
+  >(additionalReports);
   const [editMode, setEditMode] = useState(false);
   const [deleteMode, setDeleteMode] = useState(false);
   const [selected, setSelected] = useState<{
     type: "ad" | "st";
-    act: Activity;
+    act: ReportActivity | AdditionalReport;
   } | null>(null);
   const [showSuccessMessage, setShowSuccessMessage] = useState<boolean>(false);
   const [formData, setFormData] = useState({
@@ -544,22 +170,184 @@ export default function TaskReport({
     setErrors(newError);
     return isValid;
   };
-  const handleEditSubmit = (e: FormEvent) => {
-    e.preventDefault();
-    if (!validate()) {
-      return;
-    }
-    setShowSuccessMessage(true);
-    setTimeout(() => {
-      setShowSuccessMessage(false);
-    }, 3000);
+  //close panels
+  const closeEditPanel = () => {
+    setEditMode(false);
+    setSelected(null);
+    setErrors({
+      nameEn: "",
+      nameAm: "",
+      date: "",
+      quality: "",
+      frequency: "",
+      startingTime: "",
+      endingTime: "",
+    });
+    setFormData({
+      nameEn: "",
+      nameAm: "",
+      date: "",
+      quality: "",
+      frequency: "",
+      startingTime: "",
+      endingTime: "",
+      totalHour: "",
+    });
   };
-  const handleDeleteSubmit = (e: FormEvent) => {
+  const closeDeletePanel = () => {
+    setDeleteMode(false);
+    setSelected(null);
+  };
+  const handleEditSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    setShowSuccessMessage(true);
-    setTimeout(() => {
-      setShowSuccessMessage(false);
-    }, 3000);
+    if (!validate()) return;
+
+    setInAPIRequest(true);
+
+    if (!selected) return;
+
+    // Prepare postData
+    const postData =
+      selected.type === "st"
+        ? {
+            frequency: formData.frequency,
+            quality: formData.quality,
+            startingTime: formData.startingTime,
+            endingTime: formData.endingTime,
+            totalHour: formData.totalHour,
+            date: formData.date,
+          }
+        : {
+            name: { am: formData.nameAm, en: formData.nameEn },
+            frequency: formData.frequency,
+            startingTime: formData.startingTime,
+            endingTime: formData.endingTime,
+            totalHour: formData.totalHour,
+            date: formData.date,
+          };
+
+    try {
+      const response = await fetch(
+        `${serverAddress}/reports/${selected.act.id}/`,
+        {
+          method: "PATCH",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(postData),
+        }
+      );
+
+      if (!response.ok) {
+        const error = await response.json();
+        console.error("Update failed:", error);
+        setShowFailMessage(true);
+        setTimeout(() => setShowFailMessage(false), 3000);
+        return;
+      }
+
+      const data = await response.json();
+      if (selected.type === "st") {
+        const updatedActivity = data[0]?.subServices?.[0]?.activities?.[0];
+        if (!updatedActivity)
+          throw new Error("Invalid update response for standard activity");
+
+        setStandardReports((prev) =>
+          prev.map((service) => ({
+            ...service,
+            subServices: service.subServices.map((sub) => ({
+              ...sub,
+              activities: sub.activities.map((act) =>
+                act.id === updatedActivity.id ? updatedActivity : act
+              ),
+            })),
+          }))
+        );
+      } else {
+        const updatedActivity = data[0];
+        if (!updatedActivity)
+          throw new Error("Invalid update response for additional activity");
+
+        setAdditionalReports((prev) =>
+          prev.map((act) =>
+            act.id === updatedActivity.id ? updatedActivity : act
+          )
+        );
+      }
+
+      setShowSuccessMessage(true);
+      setTimeout(() => {
+        setShowSuccessMessage(false);
+        closeEditPanel();
+      }, 3000);
+    } catch (error) {
+      console.error("Error updating report:", error);
+      setShowFailMessage(true);
+      setTimeout(() => setShowFailMessage(false), 3000);
+    } finally {
+      setInAPIRequest(false);
+    }
+  };
+
+  const handleDeleteSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    setInAPIRequest(true);
+    if (!selected) return;
+    try {
+      const response = await fetch(
+        `${serverAddress}/reports/${selected.act.id}/`,
+        {
+          method: "DELETE",
+          credentials: "include",
+        }
+      );
+
+      if (!response.ok) {
+        const error = await response.json();
+        console.error("Update failed:", error);
+        setShowFailMessage(true);
+        setTimeout(() => setShowFailMessage(false), 3000);
+        return;
+      }
+      if (selected.type === "st") {
+        setStandardReports((prev) =>
+          prev
+            .map((service) => {
+              const subCopy = service.subServices
+                .map((sub) => {
+                  const actCopy = sub.activities.filter(
+                    (act) => act.id !== selected.act.id
+                  );
+                  if (actCopy.length > 0) {
+                    return { ...sub, activities: actCopy };
+                  }
+                  return null;
+                })
+                .filter((sub) => sub !== null);
+              if (subCopy.length > 0) {
+                return { ...service, subServices: subCopy };
+              }
+              return null;
+            })
+            .filter((s) => s !== null)
+        );
+      } else {
+        setAdditionalReports((prev) =>
+          prev.filter((act) => act.id !== selected.act.id)
+        );
+      }
+
+      setShowSuccessMessage(true);
+      setTimeout(() => {
+        setShowSuccessMessage(false);
+        closeDeletePanel();
+      }, 3000);
+    } catch (error) {
+      console.error("Error updating report:", error);
+      setShowFailMessage(true);
+      setTimeout(() => setShowFailMessage(false), 3000);
+    } finally {
+      setInAPIRequest(false);
+    }
   };
   const handleInitialDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInitialDate(e.target.value);
@@ -570,8 +358,7 @@ export default function TaskReport({
     if (e.target.value < initialDate) setInitialDate(e.target.value);
   };
   const formatToHumanDate = (date: string): string => {
-    const locates = lang === "am" ? "am-ET" : "en-US";
-    return new Date(date).toLocaleDateString(locates, {
+    return new Date(date).toLocaleDateString("en-US", {
       year: "numeric",
       month: "short",
       day: "numeric",
@@ -585,6 +372,11 @@ export default function TaskReport({
     const year = date.getFullYear();
 
     return `${day}/${month}/${year}`;
+  };
+  const formatEthiopianDateToHumanDate = (dateString: string) => {
+    const date = new Date(dateString);
+    const { day, month, year } = gregorianToEthiopian(date);
+    return ETHIOPIAN_MONTHS[month - 1] + " " + day + " " + year;
   };
   const handleDownloadTotalServicesPDF = () => {
     const margin = 15;
@@ -675,7 +467,11 @@ export default function TaskReport({
         service.serviceName,
         service.subServiceName,
         service.activityName,
-        formatToDDMMYYYY(service.date),
+        lang === "am"
+          ? formatToDDMMYYYY(
+              formatEthDate(gregorianToEthiopian(new Date(service.date)))
+            )
+          : formatToDDMMYYYY(service.date),
         service.frequency,
         service.quality,
         service.startingTime,
@@ -731,7 +527,7 @@ export default function TaskReport({
         }
       },
       tableWidth: pageWidth - 2 * margin,
-      didDrawPage: (data) => {
+      didDrawPage: () => {
         doc.setFont("NotoSansEthiopic", "normal"); // ensure Amharic font
 
         // -------- SIGNATURE ROW (every page) --------
@@ -741,7 +537,7 @@ export default function TaskReport({
         const blockHeight = 20;
         const labels = [
           text.employeeName,
-          "Yealem Birhanu",
+          user.name[lang],
           text.signature,
           "",
           text.adminName,
@@ -923,7 +719,11 @@ export default function TaskReport({
         service.serviceName,
         service.subServiceName,
         service.activityName,
-        formatToDDMMYYYY(service.date),
+        lang === "am"
+          ? formatToDDMMYYYY(
+              formatEthDate(gregorianToEthiopian(new Date(service.date)))
+            )
+          : formatToDDMMYYYY(service.date),
         service.frequency,
         service.quality,
         service.startingTime,
@@ -976,12 +776,95 @@ export default function TaskReport({
 
   const getTotalServices = () => {
     const totalServices: pdfDataFormat[] = [];
+
+    if (!filteredStandardServices && !filteredAdditionalServices)
+      return totalServices;
+
+    const parseTimeToMinutes = (time?: string | null) => {
+      if (!time) return 0;
+      const parts = time.split(":").map((p) => p.trim());
+      const hh = parts[0] ? parseInt(parts[0], 10) : 0;
+      const mm = parts[1] ? parseInt(parts[1], 10) : 0;
+      if (Number.isNaN(hh) || Number.isNaN(mm)) return 0;
+      return hh * 60 + mm;
+    };
+
+    const parseQuality = (q?: string | number | null) => {
+      if (q == null) return 0;
+      if (typeof q === "number") return q;
+      const asNum = parseFloat(String(q).replace("%", "").trim());
+      return Number.isNaN(asNum) ? 0 : asNum;
+    };
+
+    // --- Standard services ---
     if (filteredStandardServices) {
-      for (const service of filteredStandardServices) {
-        for (const sub of service.subServices) {
+      for (const s of filteredStandardServices) {
+        for (const sub of s.subServices) {
+          const activityPerformances: number[] = [];
+
           for (const act of sub.activities) {
+            const originalActivity = services
+              .find((service) => service.id === s.id)
+              ?.subServices.find((ss) => ss.id === sub.id)
+              ?.activities.find((a) => a.id === act.activity_id);
+            let actQTQ = "";
+            let avgActQlt = "";
+            let avgsubServiceQlt = "";
+
+            if (originalActivity) {
+              const plannedFreq = parseInt(
+                originalActivity.frequency || "0",
+                10
+              );
+              const plannedTimeMinutes = parseTimeToMinutes(
+                originalActivity.time
+              );
+              const actualFreq = act.frequency
+                ? parseInt(act.frequency, 10)
+                : 0;
+              const actualTimeMinutes = parseTimeToMinutes(act.totalHour);
+
+              const plannedQuality = parseQuality(originalActivity.quality);
+              const actualQuality = parseQuality(act.quality);
+
+              let timeScore = 0;
+              if (plannedTimeMinutes > 0 && actualTimeMinutes > 0) {
+                timeScore =
+                  ((plannedTimeMinutes * actualFreq) /
+                    (actualTimeMinutes * plannedFreq)) *
+                  100;
+              }
+
+              let freqScore = 0;
+              if (plannedFreq > 0 && actualTimeMinutes > 0) {
+                freqScore =
+                  ((actualFreq * plannedTimeMinutes) /
+                    (actualTimeMinutes * plannedFreq)) *
+                  100;
+              }
+
+              let qualityScore = 0;
+              if (plannedQuality > 0) {
+                qualityScore = (actualQuality / plannedQuality) * 100;
+              } else {
+                qualityScore = actualQuality;
+              }
+
+              const activityPerf = (timeScore + freqScore + qualityScore) / 3;
+              activityPerformances.push(activityPerf);
+
+              const fmt = (v: number) => Number(v.toFixed(2));
+
+              actQTQ = `${fmt(freqScore)}%, ${fmt(timeScore)}%, ${fmt(
+                qualityScore
+              )}%`;
+              avgActQlt = `${timeScore}% + ${freqScore}% + ${qualityScore}% =${fmt(
+                activityPerf
+              )}%`;
+            }
+
             const activity: pdfDataFormat = {
-              serviceName: service.name[lang],
+              serviceName: s.name[lang],
               subServiceName: sub.name[lang],
               activityName: act.name[lang],
               date: act.date,
@@ -990,16 +873,65 @@ export default function TaskReport({
               startingTime: act.startingTime,
               endingTime: act.endingTime,
               totalHour: act.totalHour,
-              activityBPR: "",
-              actQTQ: "",
-              avgActQlt: "",
-              avgsubServiceQlt: "",
+              activityBPR: originalActivity
+                ? `${originalActivity.frequency}, ${originalActivity.time}, ${originalActivity.quality}`
+                : "",
+              actQTQ,
+              avgActQlt,
+              avgsubServiceQlt, // will update below
             };
             totalServices.push(activity);
+          }
+
+          // --- compute subservice average ---
+          if (activityPerformances.length > 0) {
+            const subAvg =
+              activityPerformances.reduce((a, b) => a + b, 0) /
+              activityPerformances.length;
+
+            // update activities of this subservice with avgsubServiceQlt
+            totalServices.forEach((a) => {
+              if (
+                a.subServiceName === sub.name[lang] &&
+                a.serviceName === s.name[lang]
+              ) {
+                if (subAvg) {
+                  if (subAvg < 100)
+                    a.avgsubServiceQlt =
+                      lang === "am"
+                        ? `በሰሌቱ መሰረት የንኡስ አገልግሎት አፈፃፀም ${subAvg.toFixed(
+                            2
+                          )}% ሲሆን ክንውኑም ከሰታንዳርድ በታች ነዉ።`
+                        : `Based on the calculation sub service's performance is ${subAvg.toFixed(
+                            2
+                          )}% and it is below the standard`;
+                  else if (subAvg === 100) {
+                    a.avgsubServiceQlt =
+                      lang === "am"
+                        ? "በሰሌቱ መሰረት የንኡስ አገልግሎት አፈፃፀም 100% ሲሆን ክንውኑም በሰታንዳርድ መሰረት ነዉ።"
+                        : "Based on the calculation sub service's performance is 100% and it is based on the standard.";
+                  } else {
+                    a.avgsubServiceQlt =
+                      lang === "am"
+                        ? `በሰሌቱ መሰረት የንኡስ አገልግሎት አፈፃፀም ${subAvg.toFixed(
+                            2
+                          )}% ሲሆን ክንውኑም ከሰታንዳርድ በላይ ነዉ።`
+                        : `Based on the calculation sub service's performance is ${subAvg.toFixed(
+                            2
+                          )}% and it is above the standard`;
+                  }
+                } else {
+                  a.avgsubServiceQlt =
+                    lang === "am" ? "በስታንዳርድ የተሰራ" : "Done based on standard.";
+                }
+              }
+            });
           }
         }
       }
     }
+
+    // --- Additional services ---
     if (filteredAdditionalServices) {
       for (const act of filteredAdditionalServices) {
         const activity: pdfDataFormat = {
@@ -1015,22 +947,29 @@ export default function TaskReport({
           activityBPR: "",
           actQTQ: "",
           avgActQlt: "",
-          avgsubServiceQlt: "",
+          avgsubServiceQlt:
+            lang === "am"
+              ? "ከቢፒአር ዕቅድ ውጭ የተሰራ"
+              : "It has been done without BPR plan.",
         };
         totalServices.push(activity);
       }
     }
-    totalServices.sort((a, b) => {
-      return new Date(b.date).getTime() - new Date(a.date).getTime();
-    });
+
+    // --- sort by date desc ---
+    totalServices.sort(
+      (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+    );
+
     return totalServices;
   };
+
   useEffect(() => {
-    const filterStandardServicesByDate = (
-      services: StandardService[] | null,
+    const filterStandardServices = (
+      services: StandardReport[] | null,
       startDate: string,
       endDate: string
-    ): StandardService[] | null => {
+    ): StandardReport[] | null => {
       if (services === null) return null;
       const start = new Date(startDate);
       const end = new Date(endDate);
@@ -1041,7 +980,26 @@ export default function TaskReport({
             .map((sub) => {
               const filteredActivities = sub.activities.filter((act) => {
                 const actDate = new Date(act.date);
-                return actDate >= start && actDate <= end;
+                if (actDate >= start && actDate <= end) {
+                  if (parent === "myTask") {
+                    return act.user_id === user.id;
+                  } else if (parent === "report" && selectedTeamUser) {
+                    if (selectedTeamUser.value.type === "all") {
+                      return true;
+                    } else if (selectedTeamUser.value.type === "team") {
+                      const emp = employees.find(
+                        (emp) => emp.id === act.user_id
+                      );
+                      return emp?.team?.id === selectedTeamUser.value.id;
+                    } else if (selectedTeamUser.value.type === "user") {
+                      return act.user_id === selectedTeamUser.value.id;
+                    }
+                  } else {
+                    return true;
+                  }
+                } else {
+                  return false;
+                }
               });
               return { ...sub, activities: filteredActivities };
             })
@@ -1051,33 +1009,53 @@ export default function TaskReport({
         })
         .filter((service) => service.subServices.length > 0);
     };
-    const filterAdditionalActivitiesByDate = (
-      activities: Activity[] | null,
+    const filterAdditionalActivities = (
+      activities: AdditionalReport[] | null,
       initialDate: string,
       finalDate: string
-    ): Activity[] | null => {
+    ): AdditionalReport[] | null => {
       if (activities === null) return null;
       const start = new Date(initialDate);
       const end = new Date(finalDate);
 
       return activities.filter((act) => {
         const actDate = new Date(act.date);
-        return actDate >= start && actDate <= end;
+        if (actDate >= start && actDate <= end) {
+          if (parent === "myTask") {
+            return act.user_id === user.id;
+          } else if (parent === "report" && selectedTeamUser) {
+            if (selectedTeamUser.value.type === "all") {
+              return true;
+            } else if (selectedTeamUser.value.type === "team") {
+              const emp = employees.find((emp) => emp.id === act.user_id);
+              return emp?.team?.id === selectedTeamUser.value.id;
+            } else if (selectedTeamUser.value.type === "user") {
+              return act.user_id === selectedTeamUser.value.id;
+            }
+          } else {
+            return true;
+          }
+        } else {
+          return false;
+        }
       });
     };
     if (initialDate && finalDate) {
       setFilteredStandardServices(
-        filterStandardServicesByDate(standardServices, initialDate, finalDate)
+        filterStandardServices(standardReports, initialDate, finalDate)
       );
       setFilteredAdditionalServices(
-        filterAdditionalActivitiesByDate(
-          additionalActivities,
-          initialDate,
-          finalDate
-        )
+        filterAdditionalActivities(additionalReports, initialDate, finalDate)
       );
     }
-  }, [initialDate, finalDate]);
+  }, [
+    initialDate,
+    finalDate,
+    parent,
+    selectedTeamUser,
+    standardReports,
+    additionalReports,
+  ]);
   const noStandardService =
     !filteredStandardServices || filteredStandardServices.length === 0;
   const noAdditionalService =
@@ -1121,31 +1099,57 @@ export default function TaskReport({
           <div className={styles.datePickerWrapper}>
             <div>
               <label className={styles.label}>{text.initialDate}</label>
-              <input
-                type="date"
-                className={styles.datePicker}
-                value={initialDate}
-                onChange={handleInitialDateChange}
-                max={finalDate}
-              />
+              {lang === "am" ? (
+                <EthiopianCalendar
+                  value={new Date(initialDate) || new Date()}
+                  onChange={(selectedDate: string) => {
+                    setInitialDate(selectedDate);
+                  }}
+                  className={styles.datePicker}
+                />
+              ) : (
+                <input
+                  type="date"
+                  className={styles.datePicker}
+                  value={initialDate}
+                  onChange={handleInitialDateChange}
+                  max={finalDate}
+                />
+              )}
             </div>
             <div>
               <label className={styles.label}>{text.finalDate}</label>
-              <input
-                type="date"
-                className={styles.datePicker}
-                value={finalDate}
-                onChange={handleFinalDateChange}
-                min={initialDate}
-              />
+              {lang === "am" ? (
+                <EthiopianCalendar
+                  value={new Date(finalDate) || new Date()}
+                  onChange={(selectedDate: string) => {
+                    setFinalDate(selectedDate);
+                  }}
+                  className={styles.datePicker}
+                />
+              ) : (
+                <input
+                  type="date"
+                  className={styles.datePicker}
+                  value={finalDate}
+                  onChange={handleFinalDateChange}
+                  min={initialDate}
+                />
+              )}
             </div>
           </div>
           <div className={styles.dateRange}>
             <div>
-              {text.from} {formatToHumanDate(initialDate)}{" "}
+              {text.from}{" "}
+              {lang === "am"
+                ? formatEthiopianDateToHumanDate(initialDate)
+                : formatToHumanDate(initialDate)}{" "}
             </div>
             <div>
-              {text.to} {formatToHumanDate(finalDate)}
+              {text.to}{" "}
+              {lang === "am"
+                ? formatEthiopianDateToHumanDate(finalDate)
+                : formatToHumanDate(finalDate)}{" "}
             </div>
           </div>
           {!(noStandardService && noAdditionalService) &&
@@ -1173,9 +1177,6 @@ export default function TaskReport({
                     <summary className={styles.serviceTitle}>
                       <div className={styles.serviceTitleContent}>
                         <span>{service.name[lang]} </span>
-                        <span>
-                          {text.quality}: {service.quality}
-                        </span>
                       </div>
                     </summary>
                     <div>
@@ -1186,9 +1187,9 @@ export default function TaskReport({
                         <div key={sub.id} className={styles.subServiceBlock}>
                           <h4 className={styles.subServiceTitle}>
                             <span>{sub.name[lang]}</span>{" "}
-                            <span>
+                            {/* <span>
                               {text.quality}: {sub.quality}
-                            </span>
+                            </span> */}
                           </h4>
                           {/* Table for desktop */}
                           <table className={styles.table}>
@@ -1211,13 +1212,31 @@ export default function TaskReport({
                                 <tr key={act.id}>
                                   <td>{idx + 1}</td>
                                   <td>{act.name[lang]}</td>
-                                  <td>{formatToDDMMYYYY(act.date)}</td>
+                                  <td>
+                                    {lang === "am"
+                                      ? formatToDDMMYYYY(
+                                          formatEthDate(
+                                            gregorianToEthiopian(
+                                              new Date(act.date)
+                                            )
+                                          )
+                                        )
+                                      : formatToDDMMYYYY(act.date)}
+                                  </td>
                                   <td>{act.frequency}</td>
                                   <td>{act.quality}</td>
                                   <td>{act.startingTime}</td>
                                   <td>{act.endingTime}</td>
                                   <td>{act.totalHour}</td>
-                                  {parent === "report" && <td>empty</td>}
+                                  {parent === "report" && (
+                                    <td>
+                                      {
+                                        [...employees, user].find(
+                                          (emp) => emp.id === act.user_id
+                                        )?.name[lang]
+                                      }
+                                    </td>
+                                  )}
                                   {parent === "myTask" && (
                                     <td
                                       ref={(el) => {
@@ -1305,7 +1324,15 @@ export default function TaskReport({
                                     {text.date}
                                   </span>
                                   <span className={styles.activityCardValue}>
-                                    {formatToDDMMYYYY(act.date)}
+                                    {lang === "am"
+                                      ? formatToDDMMYYYY(
+                                          formatEthDate(
+                                            gregorianToEthiopian(
+                                              new Date(act.date)
+                                            )
+                                          )
+                                        )
+                                      : formatToDDMMYYYY(act.date)}
                                   </span>
                                 </div>
                                 <div className={styles.activityCardRow}>
@@ -1354,7 +1381,11 @@ export default function TaskReport({
                                       {text.doneBy}{" "}
                                     </span>
                                     <span className={styles.activityCardValue}>
-                                      empty
+                                      {
+                                        [...employees, user].find(
+                                          (emp) => emp.id === act.user_id
+                                        )?.name[lang]
+                                      }
                                     </span>
                                   </div>
                                 )}
@@ -1462,12 +1493,28 @@ export default function TaskReport({
                     <tr key={act.id}>
                       <td>{idx + 1}</td>
                       <td>{act.name[lang]}</td>
-                      <td>{formatToDDMMYYYY(act.date)}</td>
+                      <td>
+                        {lang === "am"
+                          ? formatToDDMMYYYY(
+                              formatEthDate(
+                                gregorianToEthiopian(new Date(act.date))
+                              )
+                            )
+                          : formatToDDMMYYYY(act.date)}
+                      </td>
                       <td>{act.frequency}</td>
                       <td>{act.startingTime}</td>
                       <td>{act.endingTime}</td>
                       <td>{act.totalHour}</td>
-                      {parent === "report" && <td>empty</td>}
+                      {parent === "report" && (
+                        <td>
+                          {
+                            [...employees, user].find(
+                              (emp) => emp.id === act.user_id
+                            )?.name[lang]
+                          }
+                        </td>
+                      )}
                       {parent === "myTask" && (
                         <td
                           ref={(el) => {
@@ -1552,7 +1599,13 @@ export default function TaskReport({
                         {text.date}
                       </span>
                       <span className={styles.activityCardValue}>
-                        {formatToDDMMYYYY(act.date)}
+                        {lang === "am"
+                          ? formatToDDMMYYYY(
+                              formatEthDate(
+                                gregorianToEthiopian(new Date(act.date))
+                              )
+                            )
+                          : formatToDDMMYYYY(act.date)}
                       </span>
                     </div>
                     <div className={styles.activityCardRow}>
@@ -1592,7 +1645,13 @@ export default function TaskReport({
                         <span className={styles.activityCardLabel}>
                           {text.doneBy}
                         </span>
-                        <span className={styles.activityCardValue}>empty</span>
+                        <span className={styles.activityCardValue}>
+                          {
+                            [...employees, user].find(
+                              (emp) => emp.id === act.user_id
+                            )?.name[lang]
+                          }
+                        </span>
                       </div>
                     )}
                     {parent === "myTask" && (
@@ -1662,7 +1721,7 @@ export default function TaskReport({
             </>
           )}
         </div>
-        {/* eidt or delete */}
+        {/* edit or delete */}
       </div>
       {(editMode || deleteMode) && (
         <div className="overlay">
@@ -1849,34 +1908,17 @@ export default function TaskReport({
                     <button
                       type="button"
                       className={styles.cancelButton}
-                      onClick={() => {
-                        setEditMode(false);
-                        setSelected(null);
-                        setErrors({
-                          nameEn: "",
-                          nameAm: "",
-                          date: "",
-                          quality: "",
-                          frequency: "",
-                          startingTime: "",
-                          endingTime: "",
-                        });
-                        setFormData({
-                          nameEn: "",
-                          nameAm: "",
-                          date: "",
-                          quality: "",
-                          frequency: "",
-                          startingTime: "",
-                          endingTime: "",
-                          totalHour: "",
-                        });
-                      }}
+                      onClick={closeEditPanel}
+                      disabled={inAPIRequest}
                     >
                       {text.cancel}
                     </button>
-                    <button type="submit" className={styles.saveButton}>
-                      {text.save}
+                    <button
+                      type="submit"
+                      className={styles.saveButton}
+                      disabled={inAPIRequest}
+                    >
+                      {inAPIRequest ? text.saving : text.save}
                     </button>
                   </div>
                 </form>
@@ -1887,6 +1929,15 @@ export default function TaskReport({
                       <div className="overlay" style={{ zIndex: "1001" }}></div>
                     </div>
                   </>
+                )}
+                {showFailMessage && (
+                  <div className="failMessageWrapper">
+                    <div className="failMessage">
+                      {lang === "en"
+                        ? "Request failed.Please try again later."
+                        : "ጥያቄዎን ማስተናገድ አልተቻለም። እባክዎን እንደገና ይሞክሩ።"}
+                    </div>
+                  </div>
                 )}
               </>
             )}
@@ -1907,15 +1958,17 @@ export default function TaskReport({
                     <button
                       type="button"
                       className={styles.cancelButton}
-                      onClick={() => {
-                        setDeleteMode(false);
-                        setSelected(null);
-                      }}
+                      onClick={closeDeletePanel}
+                      disabled={inAPIRequest}
                     >
                       {text.no}
                     </button>
-                    <button type="submit" className={styles.saveButton}>
-                      {text.yes}
+                    <button
+                      type="submit"
+                      className={styles.saveButton}
+                      disabled={inAPIRequest}
+                    >
+                      {inAPIRequest ? text.deleting : text.yes}
                     </button>
                   </div>
                 </form>
@@ -1926,6 +1979,15 @@ export default function TaskReport({
                     </div>
                     <div className="overlay" style={{ zIndex: "1001" }}></div>
                   </>
+                )}
+                {showFailMessage && (
+                  <div className="failMessageWrapper">
+                    <div className="failMessage">
+                      {lang === "en"
+                        ? "Request failed.Please try again later."
+                        : "ጥያቄዎን ማስተናገድ አልተቻለም። እባክዎን እንደገና ይሞክሩ።"}
+                    </div>
+                  </div>
                 )}
               </>
             )}

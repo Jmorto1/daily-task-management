@@ -7,7 +7,8 @@ import { useState } from "react";
 import { useAppData } from "../hooks/useAppData";
 
 type teamUser = {
-  id: string;
+  type: "user" | "team" | "all";
+  id: number;
   name: {
     en: string;
     am: string;
@@ -18,49 +19,28 @@ export type TeamUserOption = {
   label: string;
 };
 const parent = "report";
-const teams: teamUser[] = [
-  {
-    id: "1",
-    name: { en: "Software Development Team", am: "የሶፍትዌር ልማት ቡድን" },
-  },
-  {
-    id: "2",
-    name: { en: "Database Management Team", am: "የዳታቤዝ አስተዳደር ቡድን" },
-  },
-  {
-    id: "3",
-    name: { en: "Network Installation Team", am: "የኔትዎርክ መግጠሚያ ቡድን" },
-  },
-  {
-    id: "4",
-    name: {
-      en: "System Maintenance and Repair Team",
-      am: "የስርዓት ጥገና እና እድሳት ቡድን",
-    },
-  },
-  {
-    id: "5",
-    name: {
-      en: "Cybersecurity and IT Support Team",
-      am: "የሳይበር ደህንነት እና አይቲ ድጋፍ ቡድን",
-    },
-  },
-];
 
 export default function Report() {
+  const { employees, teams, user } = useAppData();
   const { lang } = useLang();
 
-  const optionTeam: TeamUserOption[] = teams.map((team) => ({
-    value: team,
-    label: team.name[lang],
-  }));
+  const optionTeam: TeamUserOption[] =
+    user.role === "admin"
+      ? teams.map((team) => ({
+          value: { type: "team", id: team.id, name: team.name },
+          label: team.name[lang],
+        }))
+      : employees.map((emp) => ({
+          value: { type: "user", id: emp.id, name: emp.name },
+          label: emp.name[lang],
+        }));
+
   optionTeam.unshift({
-    value: { id: "all", name: { en: "All", am: "ሁሉም" } },
+    value: { type: "all", id: 0, name: { en: "All", am: "ሁሉም" } },
     label: lang === "en" ? "All" : "ሁሉም",
   });
   const [selectedTeamUser, setSelectedTeamUser] =
     useState<TeamUserOption | null>(optionTeam[0]);
-  const { user } = useAppData();
   const teamTitle = lang === "en" ? "Teams Report" : "የቡድን ሪፖርት";
   const memberTitle = lang === "en" ? "Team Members Report" : "የቡድን አባላት ሪፖርት";
   const TeamSelectLabel = lang === "en" ? "Select Team:" : "ቡድን ምረጥ:";

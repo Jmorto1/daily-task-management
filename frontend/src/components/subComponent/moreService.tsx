@@ -1,10 +1,10 @@
-import { useState, type FormEvent, useRef, useEffect } from "react";
-import PasswordAuth from "./passwordAuth";
+import { useState, useRef, useEffect } from "react";
 import moreServiceAm from "../../locates/amharic/moreService.json";
 import moreServiceEn from "../../locates/english/moreService.json";
 import { useLang } from "../../hooks/useLang";
 import styles from "../../styles/services.module.css";
-
+import { useAppData } from "../../hooks/useAppData";
+import EthiopianCalendar from "./ethioCalander";
 interface moreServiceProps {
   setMore: (value: boolean) => void;
 }
@@ -19,6 +19,7 @@ interface FormErrors {
 }
 
 export default function MoreService({ setMore }: moreServiceProps) {
+  const { user, setAdditionalReports, serverAddress } = useAppData();
   const [form, setForm] = useState({
     serviceNameAm: "",
     serviceNameEn: "",
@@ -29,9 +30,10 @@ export default function MoreService({ setMore }: moreServiceProps) {
     date: "",
   });
   const [errors, setErrors] = useState<FormErrors>({});
-  const [passwordAuth, setPasswordAuth] = useState<boolean>(false);
+  const [showFailMessage, setShowFailMessage] = useState<boolean>(false);
+  const [inAPIRequest, setInAPIRequest] = useState<boolean>(false);
   const [showSuccessMessage, setShowSuccessMessage] = useState<boolean>(false);
-  const { lang, setLang } = useLang();
+  const { lang } = useLang();
   const translate = {
     en: moreServiceEn,
     am: moreServiceAm,
@@ -73,23 +75,53 @@ export default function MoreService({ setMore }: moreServiceProps) {
     setErrors((prev) => ({ ...prev, [name]: undefined }));
   };
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate()) {
       return;
     }
-    setPasswordAuth(true);
-  };
-  const handleAuthResult = (success: boolean) => {
-    if (success) {
-      setPasswordAuth(false);
-      setShowSuccessMessage(true);
-      setTimeout(() => {
-        setShowSuccessMessage(false);
-      }, 3000);
-    } else {
-      return;
+    setInAPIRequest(true);
+    const postData = {
+      type: "additional",
+      user_id: user.id,
+      name: { am: form.serviceNameAm, en: form.serviceNameEn },
+      frequency: form.frequency,
+      startingTime: form.startingTime,
+      endingTime: form.endingTime,
+      totalHour: form.TotalHour,
+      date: form.date,
+    };
+
+    try {
+      const response = await fetch(`${serverAddress}/reports/`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(postData),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        console.log("error:", error);
+        setShowFailMessage(true);
+        setTimeout(() => setShowFailMessage(false), 3000);
+      } else {
+        const data = await response.json();
+        setAdditionalReports((prev) => [...prev, data[0]]);
+        setShowSuccessMessage(true);
+        setTimeout(() => {
+          setShowSuccessMessage(false);
+          setMore(false);
+        }, 3000);
+      }
+    } catch (error) {
+      console.error("Error creating report:", error);
+      setShowFailMessage(true);
+      setTimeout(() => setShowFailMessage(false), 3000);
     }
+    setInAPIRequest(false);
   };
   const refTextInput = useRef<HTMLInputElement>(null);
   const [width, setWidth] = useState<number>(0);
@@ -233,15 +265,27 @@ export default function MoreService({ setMore }: moreServiceProps) {
             <label htmlFor="date" className={styles.label}>
               {text.date}
             </label>
-            <input
-              type="date"
-              id="date"
-              name="date"
-              value={form.date}
-              onChange={handleChange}
-              className={styles.input}
-              style={{ width: `${width}px` }}
-            />
+            {lang === "am" ? (
+              <EthiopianCalendar
+                value={(form.date && new Date(form.date)) || new Date()}
+                onChange={(selectedDate: string) => {
+                  setForm((prev) => ({ ...prev, date: selectedDate }));
+                  setErrors((prev) => ({ ...prev, date: "" }));
+                }}
+                className={styles.input}
+                inputStyle={{ width: `${width}px` }} // Pass as inputStyle prop
+              />
+            ) : (
+              <input
+                type="date"
+                id="date"
+                name="date"
+                value={form.date}
+                onChange={handleChange}
+                className={styles.input}
+                style={{ width: `${width}px` }}
+              />
+            )}
           </div>
           {errors.date && <div className={styles.error}>{errors.date}</div>}
 
@@ -250,11 +294,16 @@ export default function MoreService({ setMore }: moreServiceProps) {
               type="button"
               className={styles.cancelButton}
               onClick={() => setMore(false)}
+              disabled={inAPIRequest}
             >
               {text.cancel}
             </button>
-            <button type="submit" className={styles.saveButton}>
-              {text.save}
+            <button
+              type="submit"
+              className={styles.saveButton}
+              disabled={inAPIRequest}
+            >
+              {inAPIRequest ? text.saving : text.save}
             </button>
           </div>
         </form>
@@ -266,14 +315,16 @@ export default function MoreService({ setMore }: moreServiceProps) {
             <div className={styles.overlay} style={{ zIndex: "1001" }}></div>
           </>
         )}
+        {showFailMessage && (
+          <div className="failMessageWrapper">
+            <div className="failMessage">
+              {lang === "en"
+                ? "Request failed.Please try again later."
+                : "ጥያቄዎን ማስተናገድ አልተቻለም። እባክዎን እንደገና ይሞክሩ።"}
+            </div>
+          </div>
+        )}
       </div>
-
-      {passwordAuth && (
-        <PasswordAuth
-          handleAuthResult={handleAuthResult}
-          setPasswordAuth={setPasswordAuth}
-        />
-      )}
     </div>
   );
 }

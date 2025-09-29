@@ -1,5 +1,9 @@
 from django.contrib import admin
 from .models import User, Departments, Teams
+from apps.services.models import Services
+from apps.subServices.models import SubServices
+from apps.activities.models import Activities
+from apps.reports.models import Reports
 from django import forms
 from django.contrib import admin
 from django.contrib.auth import get_user_model
@@ -70,3 +74,7 @@ class UserAdmin(BaseUserAdmin):
 admin.site.register(User, UserAdmin)
 admin.site.register(Departments)
 admin.site.register(Teams)
+admin.site.register(Services)
+admin.site.register(SubServices)
+admin.site.register(Activities)
+admin.site.register(Reports)

@@ -3,9 +3,10 @@
 	"name":"ስም",
 	"profession":"ሙያ",
 	"office":"ቢሮ",
-
+	"email":"ኢሜል",
 	"phoneNo":"ስልክ ቁጥር",
 	"save":"መዝግብ",
+	"saving":"በመመዝገብ ላይ...",
 	"cancel":"ተው",
 	"phoneError":"እባክዎ ስልክ ቁጥር ያስገቡ",
 	"invalidPhone":"ስልክ ቁጥሩ 10 ቁጥሎች መሆን አለበት",

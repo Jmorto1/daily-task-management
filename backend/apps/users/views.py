@@ -8,7 +8,13 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenRefreshView
 from .serializers import UserDetailSerializer, UserCreateSerializer
 from .auth_backend import CookieJWTAuthentication
-
+from django.core.mail import send_mail
+from django.urls import reverse
+from .token import password_reset_token
+from .serializers import ForgotPasswordSerializer
+from .serializers import ResetPasswordSerializer
+from apps.services.models import Services
+from apps.reports.models import Reports
 User = get_user_model()
 
 class LoginView(APIView):
@@ -114,7 +120,6 @@ class UserCRUDView(APIView):
     def get(self, request):
         try:
             cur_user = request.user
-
             if cur_user.role == "sysAdmin":
                 users = User.objects.exclude(id=cur_user.id)
 
@@ -122,7 +127,7 @@ class UserCRUDView(APIView):
                 users = User.objects.filter(department=cur_user.department).exclude(id=cur_user.id)
 
             elif cur_user.role == "teamLeader":
-                users = User.objects.filter(team=cur_user.team).exclude(id=cur_user.id)
+                users = User.objects.filter(team=cur_user.team)
 
             else:
                 return Response({"detail": "Not allowed"}, status=status.HTTP_403_FORBIDDEN)
@@ -133,6 +138,7 @@ class UserCRUDView(APIView):
         except Exception as e:
             print("Error in UserCRUDView.get:", e)
             return Response({"detail": "Something went wrong"}, status=status.HTTP_400_BAD_REQUEST)
+    
     def post(self,request):
         serializer=UserCreateSerializer(data=request.data)
         if serializer.is_valid():
@@ -144,6 +150,11 @@ class UserCRUDView(APIView):
         "field": "phone_number",
         "errors": serializer.errors
     }, status=status.HTTP_400_BAD_REQUEST)
+        if "email" in errors:
+            return Response({
+        "field": "email",
+        "errors": serializer.errors
+    }, status=status.HTTP_400_BAD_REQUEST)
         return Response({
         "field": "",
         "errors": serializer.errors
@@ -153,6 +164,13 @@ class UserCRUDView(APIView):
         if not user_id:
             return Response({"datail":"user id is required"},status=status.HTTP_400_BAD_REQUEST)
         user=get_object_or_404(User,id=user_id)
+        if("department_id" in request.data or "team_id" in request.data):
+            Reports.objects.filter(user=user).delete()
+            services = Services.objects.filter(users=user)
+            for service in services:
+                service.users.remove(user)
+                if service.users.count() == 0:
+                    service.delete()
         serializer=UserDetailSerializer(user,data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -162,10 +180,17 @@ class UserCRUDView(APIView):
         user_id=request.data.get("id")
         if not user_id:
             return Response({
-        "field": "phone_number",
+        "field": "",
         "errors": serializer.errors
     },status=status.HTTP_400_BAD_REQUEST)
         user=get_object_or_404(User,id=user_id)
+        if("department_id" in request.data or "team_id" in request.data):
+            Reports.objects.filter(user=user).delete()
+            services = Services.objects.filter(users=user)
+            for service in services:
+                service.users.remove(user)
+                if service.users.count() == 0:
+                    service.delete()
         serializer=UserDetailSerializer(user,data=request.data,partial=True)
         if serializer.is_valid():
             serializer.save()
@@ -176,14 +201,108 @@ class UserCRUDView(APIView):
         "field": "phone_number",
         "errors": serializer.errors
     }, status=status.HTTP_400_BAD_REQUEST)
+        if "email" in errors:
+            return Response({
+        "field": "email",
+        "errors": serializer.errors
+    }, status=status.HTTP_400_BAD_REQUEST)
     def delete(self,request):
         user_id=request.data.get("id")
         if not user_id:
             return Response({"datail":"user id is required"},status=status.HTTP_400_BAD_REQUEST)
         user=get_object_or_404(User,id=user_id)
+        Reports.objects.filter(user=user).delete()
+        services = Services.objects.filter(users=user)
+        for service in services:
+            service.users.remove(user)
+            if service.users.count() == 0:
+                service.delete()
         user.delete()
         return Response(
             {"detail": "User deleted successfully"},
             status=status.HTTP_204_NO_CONTENT
         )
+
+class ForgotPasswordView(APIView):
+    permission_classes = [AllowAny]
+    def post(self, request):
+        serializer = ForgotPasswordSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        email = serializer.validated_data["email"]
+
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            return Response({"detail": "No user with this email."}, status=status.HTTP_400_BAD_REQUEST)
+
+        token = password_reset_token.make_token(user)
+        uid = user.pk  # You can encode it if needed
+        # Suppose your frontend runs on http://localhost:5173
+        frontend_url = f"http://localhost:5173/reset-password/{uid}/{token}/"
+
+        send_mail(
+            subject="Reset your password",
+            message=f"Click here to reset your password: {frontend_url}",
+            from_email=None,  # Uses DEFAULT_FROM_EMAIL
+            recipient_list=[email],
+        )
+
+        return Response({"detail": "Password reset link sent."}, status=status.HTTP_200_OK)
+
+class ResetPasswordView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request, uid, token):
+        serializer = ResetPasswordSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(
+                {"detail": "Invalid data", "errors": serializer.errors},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            user = User.objects.get(pk=uid)
+        except User.DoesNotExist:
+            return Response({"detail": "Invalid user."}, status=status.HTTP_400_BAD_REQUEST)
+
+        if not password_reset_token.check_token(user, token):
+            return Response({"detail": "Invalid or expired token."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        user.set_password(serializer.validated_data["password"])
+        user.save()
+    
+        return Response({"detail": "Password has been reset successfully."}, status=status.HTTP_200_OK)
+
+class CheckPasswordView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        cur_user = request.user
+        password = request.data.get("password")
+        if not password:
+            return Response({"detail": "Password is required."}, status=status.HTTP_400_BAD_REQUEST)
+
+        if not request.user.check_password(password):
+            return Response({"detail": "Password is incorrect."}, status=status.HTTP_401_UNAUTHORIZED)
+
+        return Response({"detail": "Password is correct."}, status=status.HTTP_200_OK)
+class ChangePasswordView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        current_password = request.data.get("current_password")
+        new_password = request.data.get("new_password")
+
+        if not current_password or not new_password:
+            return Response({"detail": "Both current and new password are required."}, status=status.HTTP_400_BAD_REQUEST)
+
+        user = request.user
+
+        if not user.check_password(current_password):
+            return Response({"detail": "wrongPassword"}, status=status.HTTP_400_BAD_REQUEST)
+
+        user.set_password(new_password)
+        user.save()
+
+        return Response({"detail": "Password changed successfully."}, status=status.HTTP_200_OK)
 

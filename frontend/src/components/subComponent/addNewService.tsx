@@ -1,9 +1,9 @@
 import styles from "../../styles/services.module.css";
 import addNewServiceAm from "../../locates/amharic/addNewService.json";
 import addNewServiceEn from "../../locates/english/addNewService.json";
-import PasswordAuth from "./passwordAuth";
 import { useLang } from "../../hooks/useLang";
 import { useState, useEffect, useRef, type FormEvent } from "react";
+import { useAppData } from "../../hooks/useAppData";
 interface AddNewServiceProps {
   setAddNew: (value: boolean) => void;
 }
@@ -38,13 +38,15 @@ const emptySubService = (): SubServiceType => ({
   activities: [emptyActivity()],
 });
 export default function AddNewService({ setAddNew }: AddNewServiceProps) {
+  const { user, setServices, serverAddress } = useAppData();
   const [newService, setNewService] = useState<NewServiceType>({
     nameAm: { value: "", error: "" },
     nameEn: { value: "", error: "" },
     subServices: [emptySubService()],
   });
-  const [passwordAuth, setPasswordAuth] = useState<boolean>(false);
   const [showSuccessMessage, setShowSuccessMessage] = useState<boolean>(false);
+  const [showFailMessage, setShowFailMessage] = useState<boolean>(false);
+  const [inAPIRequest, setInAPIRequest] = useState<boolean>(false);
   const { lang } = useLang();
   const translate = { am: addNewServiceAm, en: addNewServiceEn };
   const text = translate[lang];
@@ -96,7 +98,7 @@ export default function AddNewService({ setAddNew }: AddNewServiceProps) {
           valid = false;
         }
         if (!updatedAct.quality.value.trim()) {
-          updatedAct.quality.error = text.qualityEror;
+          updatedAct.quality.error = text.qualityError;
           valid = false;
         } else if (!percentPattern.test(updatedAct.quality.value.trim())) {
           updatedAct.quality.error = text.invalidQualityError;
@@ -163,30 +165,80 @@ export default function AddNewService({ setAddNew }: AddNewServiceProps) {
       return { ...prev, subServices: updated };
     });
   };
-  const handleSubmit = (e: FormEvent) => {
+  const closeAddPanel = () => {
+    setNewService({
+      nameAm: { value: "", error: "" },
+      nameEn: { value: "", error: "" },
+      subServices: [emptySubService()],
+    });
+    setAddNew(false);
+  };
+  function transformServiceForPost(
+    service: NewServiceType,
+    departmentId: number
+  ) {
+    return {
+      name: {
+        am: service.nameAm.value,
+        en: service.nameEn.value,
+      },
+      department_id: departmentId,
+      subServices: service.subServices.map((sub) => ({
+        name: {
+          am: sub.nameAm.value,
+          en: sub.nameEn.value,
+        },
+        activities: sub.activities.map((act) => ({
+          name: {
+            am: act.nameAm.value,
+            en: act.nameEn.value,
+          },
+          frequency: act.frequency.value,
+          time: act.time.value,
+          quality: act.quality.value,
+        })),
+      })),
+    };
+  }
+  async function handleSubmit(e: FormEvent) {
     e.preventDefault();
-    if (!validate()) {
-      return;
-    } else {
-      setPasswordAuth(true);
-    }
-  };
-  const handleAuthResult = (success: boolean) => {
-    if (success) {
-      setPasswordAuth(false);
-      setShowSuccessMessage(true);
-      setTimeout(() => {
-        setShowSuccessMessage(false);
-      }, 3000);
-      setNewService({
-        nameAm: { value: "", error: "" },
-        nameEn: { value: "", error: "" },
-        subServices: [emptySubService()],
+    if (!(validate() && user.department)) return;
+
+    const postData = transformServiceForPost(newService, user.department.id);
+    setInAPIRequest(true);
+    try {
+      const response = await fetch(`${serverAddress}/services/`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(postData),
       });
-    } else {
-      return;
+
+      if (!response.ok) {
+        setShowFailMessage(true);
+        setTimeout(() => {
+          setShowFailMessage(false);
+        }, 3000);
+      } else {
+        const data = await response.json();
+        setServices((prev) => [...prev, data]);
+        setShowSuccessMessage(true);
+        setTimeout(() => {
+          setShowSuccessMessage(false);
+          closeAddPanel();
+        }, 3000);
+      }
+    } catch (err) {
+      console.error("Network error:", err);
+      setShowFailMessage(true);
+      setTimeout(() => {
+        setShowFailMessage(false);
+      }, 3000);
     }
-  };
+    setInAPIRequest(false);
+  }
   const panelRef = useRef<HTMLDivElement>(null);
 
   const [successPosition, setSuccessPosition] = useState<{
@@ -205,7 +257,6 @@ export default function AddNewService({ setAddNew }: AddNewServiceProps) {
         right: window.innerWidth - rect.right + 30,
         width: rect.width - 30,
       });
-      console.log(rect.top);
     };
 
     updatePosition();
@@ -217,14 +268,7 @@ export default function AddNewService({ setAddNew }: AddNewServiceProps) {
     <div className={styles.overlay}>
       <div className={styles.addNew} ref={panelRef}>
         <button
-          onClick={() => {
-            setNewService({
-              nameAm: { value: "", error: "" },
-              nameEn: { value: "", error: "" },
-              subServices: [emptySubService()],
-            });
-            setAddNew(false);
-          }}
+          onClick={closeAddPanel}
           className={styles.closeIconButton}
           aria-label="Close panel"
         >
@@ -439,19 +483,17 @@ export default function AddNewService({ setAddNew }: AddNewServiceProps) {
             <button
               type="button"
               className={styles.cancelButton}
-              onClick={() => {
-                setNewService({
-                  nameAm: { value: "", error: "" },
-                  nameEn: { value: "", error: "" },
-                  subServices: [emptySubService()],
-                });
-                setAddNew(false);
-              }}
+              onClick={closeAddPanel}
+              disabled={inAPIRequest}
             >
               {text.cancel}
             </button>
-            <button type="submit" className={styles.saveButton}>
-              {text.save}
+            <button
+              type="submit"
+              className={styles.saveButton}
+              disabled={inAPIRequest}
+            >
+              {inAPIRequest ? text.saving : text.save}
             </button>
           </div>
         </form>
@@ -472,11 +514,22 @@ export default function AddNewService({ setAddNew }: AddNewServiceProps) {
           </div>
         </>
       )}
-      {passwordAuth && (
-        <PasswordAuth
-          handleAuthResult={handleAuthResult}
-          setPasswordAuth={setPasswordAuth}
-        />
+      {showFailMessage && (
+        <div
+          className="failMessageWrapper"
+          style={{
+            position: "fixed",
+            top: `${successPosition.top}px`,
+            right: `${successPosition.right}px`,
+            width: `${successPosition.width}px`,
+          }}
+        >
+          <div className="failMessage">
+            {lang === "en"
+              ? "Request failed.Please try again later."
+              : "ጥያቄዎን ማስተናገድ አልተቻለም። እባክዎን እንደገና ይሞክሩ።"}
+          </div>
+        </div>
       )}
     </div>
   );

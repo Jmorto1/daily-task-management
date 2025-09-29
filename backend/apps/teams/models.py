@@ -1,5 +1,4 @@
 from django.db import models
-import uuid
 from apps.departments.models import Departments
 class Teams(models.Model):
     name_am=models.TextField()

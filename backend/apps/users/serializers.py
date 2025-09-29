@@ -4,7 +4,7 @@ from apps.departments.serializers import DepartmentSerializer
 from apps.departments.models import Departments
 from apps.teams.serializers import TeamSerializer
 from apps.teams.models import Teams
-
+from rest_framework import serializers
 User = get_user_model()
 
 class UserDetailSerializer(serializers.ModelSerializer):
@@ -30,7 +30,7 @@ class UserDetailSerializer(serializers.ModelSerializer):
         model = User
         fields = [
             "id", "name", "gender", "profession", "office",
-            "phone_number", "role","status", "team", "department", "profile",
+            "phone_number","email", "role","status", "team", "department", "profile",
             "team_id", "department_id", "is_active", "date_joined"
         ]
         read_only_fields = ["id", "date_joined"]
@@ -70,6 +70,7 @@ class UserDetailSerializer(serializers.ModelSerializer):
 
         # Simple fields
         instance.phone_number = validated_data.get('phone_number', instance.phone_number)
+        instance.email=validated_data.get("email",instance.email)
         instance.role = validated_data.get('role', instance.role)
         instance.status=validated_data.get('status', instance.status)
         instance.is_active = validated_data.get('is_active', instance.is_active)
@@ -110,7 +111,7 @@ class UserCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = [
-            'name', 'gender', 'profession', 'office', 'phone_number', 'role', 'status',
+            'name', 'gender', 'profession', 'office', 'phone_number',"email", 'role', 'status',
             'team_id', 'department_id', 'profile', 'password'
         ]
 
@@ -141,3 +142,10 @@ class UserCreateSerializer(serializers.ModelSerializer):
         user.save()
 
         return user
+
+class ForgotPasswordSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+
+class ResetPasswordSerializer(serializers.Serializer):
+    password = serializers.CharField(write_only=True, min_length=6)
+
