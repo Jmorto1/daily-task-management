@@ -9,7 +9,7 @@ export default function SearchBar({
   searchQuery,
   setSearchQuery,
 }: searchBarProps) {
-  const { lang, setLang } = useLang();
+  const {lang} = useLang();
   return (
     <div className={styles.searchContainer}>
       <input
