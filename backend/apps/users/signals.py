@@ -10,6 +10,7 @@ def create_initial_data(sender, **kwargs):
         # Create default sysAdmin (superuser)
         User.objects.create_superuser(
             phone_number="0911111111",
+            email="tempSysAdmin@gmail.com",
             password="sysAdmin123",
             role="sysAdmin",
             name_am="ስይስተም አስተዳደር",
@@ -21,6 +22,7 @@ def create_initial_data(sender, **kwargs):
         # Check if admin exists for this department
         admin = User(
             phone_number="0922222222",
+            email="tempSysAdmin@gmail.com",
             role="admin",
             department=dept,
             name_am="ፅ/ቤት ሀላፊ",
