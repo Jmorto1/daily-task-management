@@ -168,7 +168,7 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
     AdditionalReport[]
   >([]);
   const [loading, setLoading] = useState(true);
-  const serverAddress = "http://localhost:8000";
+  const serverAddress = "https://daily-task-management-ri8e.onrender.com";
   // fetch loggedin user and departments
   useEffect(() => {
     async function fetchCurrentUser() {
