@@ -56,8 +56,8 @@ class LoginView(APIView):
             key="access_token",
             value=access_token,
             httponly=True,
-            secure=False,
-            samesite='Lax',
+            secure=True,
+            samesite='None',
             max_age=3600,
             path='/',
         )
@@ -65,8 +65,8 @@ class LoginView(APIView):
             key="refresh_token",
             value=str(refresh),
             httponly=True,
-            secure=False,
-            samesite='Strict',
+            secure=True,
+            samesite='None',
             max_age=7*24*3600,
             path='/',
         )
@@ -103,13 +103,14 @@ class CookieTokenRefreshView(TokenRefreshView):
                 key='access_token',
                 value=response.data['access'],
                 httponly=True,
-                secure=False,
-                samesite='Lax',
+                secure=True,
+                samesite='None',
                 max_age=3600,
                 path='/',
             )
             
         return response
+
 class UserCRUDView(APIView):
     authentication_classes = [CookieJWTAuthentication]
 
