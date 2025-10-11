@@ -26,7 +26,7 @@ def create_initial_data(sender, **kwargs):
             role="admin",
             department=dept,
             name_am="ፅ/ቤት ሀላፊ",
-            name_en="Department Adminstrator",
+            name_en="Dept Admin",
             gender_am="ወንድ",
             gender_en="Male",
             profession_am="ሀላፊ",
