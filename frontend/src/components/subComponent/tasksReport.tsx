@@ -858,9 +858,9 @@ export default function TaskReport({
               actQTQ = `${fmt(freqScore)}%, ${fmt(timeScore)}%, ${fmt(
                 qualityScore
               )}%`;
-              avgActQlt = `${timeScore}% + ${freqScore}% + ${qualityScore}% =${fmt(
-                activityPerf
-              )}%`;
+              avgActQlt = `${fmt(timeScore)}% + ${fmt(freqScore)}% + ${fmt(
+                qualityScore
+              )}% / 3 =${fmt(activityPerf)}%`;
             }
 
             const activity: pdfDataFormat = {

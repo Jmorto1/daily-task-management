@@ -15,6 +15,7 @@ const ResetPasswordForm: React.FC = () => {
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [showConfirm, setShowConfirm] = useState<boolean>(false);
   const [message, setMessage] = useState<string>("");
+  const [color, setColor] = useState<string>("");
   const [inAPIRequest, setInAPIRequest] = useState(false);
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -22,13 +23,15 @@ const ResetPasswordForm: React.FC = () => {
       setMessage(
         lang === "en" ? "Passwords do not match!" : "የይለፍቃል ቃል አይመሳሰልም!"
       );
+      setColor("red");
       return;
-    } else if (password.trim.length < 6) {
+    } else if (password.length < 6) {
       setMessage(
         lang === "en"
           ? "Password is short.it requires atlearst 6 character!"
           : "የይለፍቃሉ ትንሽ ነው።ቢያንስ 6ቁልፎችን ያስገቡ!"
       );
+      setColor("red");
       return;
     }
     setInAPIRequest(true);
@@ -49,7 +52,13 @@ const ResetPasswordForm: React.FC = () => {
             ? "Password reset successful. Try logging in."
             : "የይለፍቃል ቃል በተሳካ ሁኔታ ተቀይሯል። እባክዎን ወደ አካውንትዎ ይግቡ።")
       );
+      if (data.detail) {
+        setColor("red");
+      } else {
+        setColor("green");
+      }
     } catch (err) {
+      setColor("red");
       setMessage(
         lang === "en"
           ? "Invalid or expired link."
@@ -115,7 +124,11 @@ const ResetPasswordForm: React.FC = () => {
             : "የይለፍቃል በመቀየር ላይ..."}
         </button>
       </form>
-      {message && <p className={styles.message}>{message}</p>}
+      {message && (
+        <p className={styles.message} style={{ color: color }}>
+          {message}
+        </p>
+      )}
     </div>
   );
 };

@@ -70,7 +70,15 @@ export default function EthiopianCalendar({
       setCalendarAbove(spaceBelow < 300); // 300px = calendar height
     }
   }, [showCalendar]);
+  useEffect(() => {
+    if (value) {
+      const formattedDate = `${value.getFullYear()}-${String(
+        value.getMonth() + 1
+      ).padStart(2, "0")}-${String(value.getDate()).padStart(2, "0")}`;
 
+      onChange?.(formattedDate);
+    }
+  }, []);
   const generateCalendarDays = () => {
     const days = [];
     const gregDateOfFirst = ethiopianToGregorian(viewYear, viewMonth, 1);
@@ -175,6 +183,7 @@ export default function EthiopianCalendar({
         >
           <div className={styles.calendarHeader}>
             <button
+              type="button"
               className={styles.navButton}
               onClick={() => navigateMonth(-1)}
             >
@@ -186,6 +195,7 @@ export default function EthiopianCalendar({
             </div>
 
             <button
+              type="button"
               className={styles.navButton}
               onClick={() => navigateMonth(1)}
             >

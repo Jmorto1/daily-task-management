@@ -6,6 +6,7 @@ import Language from "../components/subComponent/languages";
 const ForgotPasswordForm: React.FC = () => {
   const [email, setEmail] = useState<string>("");
   const [message, setMessage] = useState<string>("");
+  const [color, setColor] = useState<string>("");
   const { serverAddress } = useAppData();
   const { lang } = useLang();
   const [inAPIRequest, setInAPIRequest] = useState(false);
@@ -20,14 +21,16 @@ const ForgotPasswordForm: React.FC = () => {
       });
 
       const data = await res.json();
-      if (data.detail) {
+      if (!data.detail) {
         setMessage(lang === "en" ? data.detail : "ይህ ኢይሜል ያለው ተጠቃሚ የለም።");
+        setColor("red");
       } else {
         setMessage(
           lang === "en"
             ? "A reset link has been sent."
             : "የይለፍቃል ማስተካከያ ሊንክ ተልኳል።"
         );
+        setColor("green");
       }
     } catch (err) {
       setMessage(
@@ -35,6 +38,7 @@ const ForgotPasswordForm: React.FC = () => {
           ? "Something went wrong. Try again."
           : "ጥያቄዎን ማስተናገድ አልተቻለም። እባክዎን እንደገና ይሞክሩ።"
       );
+      setColor("red");
     } finally {
       setInAPIRequest(false);
     }
@@ -67,7 +71,11 @@ const ForgotPasswordForm: React.FC = () => {
             : "የይለፍቃል ሊንክ ላክ"}
         </button>
       </form>
-      {message && <p className={styles.message}>{message}</p>}
+      {message && (
+        <p style={{ color: color }} className={styles.message}>
+          {message}
+        </p>
+      )}
     </div>
   );
 };
