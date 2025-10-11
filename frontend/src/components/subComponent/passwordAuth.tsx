@@ -1,7 +1,7 @@
 import { useState } from "react";
 import type { FormEvent } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import styles from "../../styles/PasswordAuth.module.css";
+import styles from "../../styles/passwordAuth.module.css";
 import { useLang } from "../../hooks/useLang";
 import passwordAuthAm from "../../locates/amharic/passwordAuth.json";
 import passwordAuthEn from "../../locates/english/passwordAuth.json";
