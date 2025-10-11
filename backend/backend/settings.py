@@ -148,7 +148,7 @@ AUTHENTICATION_BACKENDS = [
 # CORS settings - UPDATED
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
-    "https://your-frontend.vercel.app"
+    "https://daily-task-management-two.vercel.app",
 ]
 
 CORS_ALLOW_CREDENTIALS = True
