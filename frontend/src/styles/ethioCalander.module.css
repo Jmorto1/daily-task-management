@@ -20,7 +20,7 @@
 .ethiopianCalendar {
     position: absolute;
     top: 110%;
-    right: 0;
+    right: -50%;
     background: #fff;
     border: 1px solid #ddd;
     border-radius: 8px;
