@@ -16,7 +16,7 @@ def create_initial_data(sender, **kwargs):
             name_am="ስይስተም አስተዳደር",
             name_en="System Adminstrator",
         )    
-    if True:
+    if not Departments.objects.exists():
         dept = Departments.objects.create(name_am="የኢኖቬሽን እና ቴክኖሎጂ ክፍል",
                 name_en="Innovation And Technology Department")
         # Check if admin exists for this department
