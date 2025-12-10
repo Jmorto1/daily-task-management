@@ -25,8 +25,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get("SECRET_KEY", "fallback-secret")
 DEBUG = os.environ.get("DEBUG", "False") == "True"
 
-'''ALLOWED_HOSTS = ['localhost', '127.0.0.1']'''
-ALLOWED_HOSTS = ["*", "daily-task-management-ri8e.onrender.com", "localhost", "127.0.0.1"]
+ALLOWED_HOSTS = [
+    "daily-task-management-ri8e.onrender.com",
+    "localhost",
+    "127.0.0.1",
+]
+
 
 # Application definition
 
@@ -184,10 +188,10 @@ SIMPLE_JWT = {
     'BLACKLIST_AFTER_ROTATION': True,
     'AUTH_COOKIE': 'access_token',
     'AUTH_COOKIE_REFRESH': 'refresh_token',
-    'AUTH_COOKIE_SECURE': True,  # Set to True in production with HTTPS
+    'AUTH_COOKIE_SECURE': True,  
     'AUTH_COOKIE_HTTP_ONLY': True,
     'AUTH_COOKIE_PATH': '/',
-    'AUTH_COOKIE_SAMESITE': 'Lax',
+    'AUTH_COOKIE_SAMESITE': 'None',
 }
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
@@ -203,3 +207,7 @@ else:
     EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER")
     EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD")
     DEFAULT_FROM_EMAIL = f"User Support <{EMAIL_HOST_USER}>"
+CSRF_TRUSTED_ORIGINS = [
+    "https://daily-task-management-two.vercel.app",
+    "https://daily-task-management-ri8e.onrender.com",
+]
